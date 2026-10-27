@@ -1,0 +1,468 @@
+/* ==========================================================================
+   STYLE PETUALANGAN PINTAR 3D — ADVENTURE JOURNEY (PERJALANAN MAJU 3D)
+   Desain Mobile-First, Jelas, Terarah, Ramah Balita Usia 3-5 Tahun
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Amiri:wght@700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  background-color: #38bdf8;
+  touch-action: manipulation;
+}
+
+#game-app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Three.js Canvas Container */
+#canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#canvas-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* ================= UI OVERLAY SYSTEM ================= */
+.ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: env(safe-area-inset-top, 10px) env(safe-area-inset-right, 12px) env(safe-area-inset-bottom, 12px) env(safe-area-inset-left, 12px);
+}
+
+/* ================= TOP NAVIGATION BAR (ULTRA COMPACT & CLEAR VIEW) ================= */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  pointer-events: auto;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+.top-left, .top-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.round-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  background: #0284c7;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  transition: transform 0.1s ease;
+  pointer-events: auto;
+}
+
+.round-btn:active { transform: scale(0.92); }
+.round-btn.btn-home { background: #f59e0b; }
+.round-btn.btn-speaker { background: #10b981; font-size: 22px; }
+.round-btn.btn-parent { width: 38px; height: 38px; font-size: 16px; background: #64748b; }
+
+.btn-version-pill {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: 2px solid #ffffff;
+  border-radius: 20px;
+  color: #ffffff;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+}
+
+/* TARGET PILL RAMPING DI TOP BAR (TIDAK MENUTUPI JALAN) */
+.target-mission-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 3px solid #f59e0b;
+  border-radius: 20px;
+  padding: 3px 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  animation: pulseTarget 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulseTarget {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
+}
+
+.target-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.target-badge.arabic-badge {
+  font-family: 'Amiri', serif;
+  font-size: 26px;
+  background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.target-label-text {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+/* Progress Perjalanan Mini */
+.mini-journey-track {
+  width: 60px;
+  height: 8px;
+  background: #334155;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mini-journey-fill {
+  height: 100%;
+  width: 20%;
+  background: linear-gradient(90deg, #f59e0b, #10b981);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+/* Skor Koin Emas */
+.coin-counter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fef3c7;
+  border: 1.5px solid #f59e0b;
+  padding: 3px 8px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #b45309;
+}
+.coin-counter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #b45309;
+}
+
+/* ================= KONTROL PERJALANAN BAWAH (HP CONTROLS) ================= */
+.bottom-controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  pointer-events: auto;
+  padding: 0 8px 6px;
+  gap: 12px;
+}
+
+/* Tombol Kemudi Kiri & Kanan */
+.steer-buttons-group {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-steer {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #38bdf8, #0284c7);
+  border: 4px solid #ffffff;
+  color: #ffffff;
+  font-size: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(2, 132, 199, 0.4), inset 0 -4px 0 rgba(0,0,0,0.2);
+  transition: transform 0.08s ease;
+}
+
+.btn-steer:active {
+  transform: scale(0.9) translateY(4px);
+  background: #0369a1;
+}
+
+/* Tombol Aksi Kanan (Lompat / Gas / Klakson) */
+.action-buttons-group {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-action-primary {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 5px solid #ffffff;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(245, 158, 11, 0.45), inset 0 -5px 0 rgba(0,0,0,0.2);
+  transition: transform 0.08s ease;
+}
+
+.btn-action-primary span.icon { font-size: 34px; line-height: 1; }
+.btn-action-primary span.lbl { font-size: 11px; font-weight: 800; margin-top: 2px; }
+
+.btn-action-primary:active {
+  transform: scale(0.92) translateY(4px);
+}
+
+.btn-horn-sub {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  align-self: flex-end;
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.4);
+}
+
+.btn-horn-sub:active { transform: scale(0.9); }
+
+/* ================= 3 TOMBOL PILIHAN MATERI BERANDA ================= */
+#home-menu-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: auto;
+}
+
+.home-menu-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.big-mode-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 24px;
+  border: 4px solid #ffffff;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.3), inset 0 -4px 0 rgba(0,0,0,0.15);
+  transition: transform 0.12s ease;
+}
+
+.big-mode-card:active { transform: scale(0.96) translateY(2px); }
+
+.card-alphabet { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.card-numbers { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.card-hijaiyah { background: linear-gradient(135deg, #10b981, #059669); }
+
+.card-icon { font-size: 44px; }
+.card-info h3 { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+.card-info p { font-size: 13px; opacity: 0.95; font-weight: 600; }
+
+/* ================= MODAL PEMILIH 5 VERSI GAME ================= */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: auto;
+}
+
+.versions-modal-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 28px;
+  padding: 20px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+  border: 4px solid #38bdf8;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.modal-header h3 { font-size: 20px; color: #0f172a; }
+.close-btn {
+  background: #f1f5f9; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; cursor: pointer; color: #475569;
+}
+
+.versions-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+
+.version-option-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 20px;
+  border: 3px solid #e2e8f0;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.version-option-card:active { transform: scale(0.97); }
+.version-option-card.card-roblox { border-color: #ef4444; background: #fef2f2; }
+.version-option-card.card-tekken { border-color: #f59e0b; background: #fffbeb; }
+.version-option-card.card-babybus { border-color: #10b981; background: #f0fdf4; }
+.version-option-card.card-racing { border-color: #06b6d4; background: #ecfeff; }
+.version-option-card.card-moba { border-color: #8b5cf6; background: #faf5ff; }
+
+.ver-icon { font-size: 36px; width: 56px; height: 56px; border-radius: 16px; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+.ver-info h4 { font-size: 16px; color: #1e293b; margin-bottom: 2px; }
+.ver-info p { font-size: 12px; color: #64748b; }
+
+/* ================= SPLASH OVERLAY ================= */
+#splash-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.splash-icon { font-size: 76px; margin-bottom: 10px; animation: bounceHero 1.8s infinite ease-in-out; }
+@keyframes bounceHero { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+
+.splash-title { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.splash-sub { font-size: 16px; margin-bottom: 28px; font-weight: 600; opacity: 0.95; }
+
+.btn-play-big {
+  background: #f59e0b;
+  color: #ffffff;
+  border: 4px solid #ffffff;
+  border-radius: 36px;
+  padding: 16px 40px;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.15s ease;
+}
+.btn-play-big:active { transform: scale(0.94); }
+
+.hidden { display: none !important; }
+
+/* Responsif Mobile HP */
+@media (max-width: 480px) {
+  .btn-steer { width: 64px; height: 64px; font-size: 28px; }
+  .btn-action-primary { width: 72px; height: 72px; }
+  .btn-action-primary span.icon { font-size: 28px; }
+  .target-badge { width: 44px; height: 44px; font-size: 26px; }
+  .mission-text-box h3 { font-size: 14px; }
+  .mission-text-box p { font-size: 11px; }
+  .big-mode-card { padding: 12px 16px; }
+  .card-icon { font-size: 36px; }
+  .card-info h3 { font-size: 17px; }
+}

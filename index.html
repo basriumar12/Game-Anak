@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Petualangan Si Kecil: Dunia Alfabet & Hijaiyah</title>
+  
+  <!-- Favicon Emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎒</text></svg>">
+  
+  <!-- Google Fonts: Fredoka & Amiri (Arab Baku) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Fredoka:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       STYLE PETUALANGAN SI KECIL (MOBILE-FIRST, PORTRAIT, RAMAH BALITA 3-5 TAHUN)
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      background: #0284c7;
+      color: #1e293b;
+      touch-action: manipulation;
+    }
+
+    #app-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #38bdf8;
+    }
+
+    /* ================= 1. TOP HEADER HUD ================= */
+    .top-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 30;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: env(safe-area-inset-top, 10px) 14px 8px;
+      pointer-events: none;
+    }
+
+    .hud-left, .hud-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .btn-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 -3px 0 rgba(0,0,0,0.1);
+      transition: transform 0.1s ease;
+    }
+
+    .btn-circle:active { transform: scale(0.9); }
+    .btn-home { background: #fef08a; border-color: #f59e0b; }
+    .btn-speaker { background: #bbf7d0; border-color: #10b981; font-size: 24px; animation: pulseSpeaker 1.8s infinite alternate ease-in-out; }
+
+    @keyframes pulseSpeaker {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.08); }
+    }
+
+    /* Level & Bintang Pill */
+    .level-badge-pill {
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid #f59e0b;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #b45309;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      pointer-events: auto;
+    }
+
+    /* ================= 2. CANVAS PETUALANGAN DUNIA ================= */
+    #world-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60%;
+      z-index: 5;
+      display: block;
+    }
+
+    /* ================= 3. ZONA TANTANGAN KUIS BAWAH ================= */
+    #quiz-zone {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 44%;
+      z-index: 20;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, #f0fdf4 100%);
+      border-top: 5px solid #22c55e;
+      border-radius: 32px 32px 0 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px 16px env(safe-area-inset-bottom, 14px);
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.18);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    #quiz-zone.locked {
+      background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+      border-top-color: #94a3b8;
+    }
+
+    /* Instruksi Suara Banner */
+    .instruction-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 3px solid #38bdf8;
+      border-radius: 20px;
+      padding: 8px 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .inst-speaker-icon {
+      font-size: 26px;
+      cursor: pointer;
+    }
+
+    .inst-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0369a1;
+      text-align: center;
+    }
+
+    /* Pilihan Huruf Besar */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .choice-card-btn {
+      aspect-ratio: 1 / 1;
+      max-height: 110px;
+      background: #ffffff;
+      border: 4px solid #38bdf8;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(2, 132, 199, 0.25), inset 0 -4px 0 #bae6fd;
+      transition: transform 0.1s ease, border-color 0.15s ease;
+    }
+
+    .choice-card-btn:active {
+      transform: scale(0.92);
+    }
+
+    .choice-char {
+      font-size: 48px;
+      font-weight: 800;
+      color: #0284c7;
+      line-height: 1;
+    }
+
+    .choice-char.arabic-font {
+      font-family: 'Amiri', serif;
+      font-size: 54px;
+      color: #059669;
+    }
+
+    .choice-sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Efek Jawaban Salah Lembut & Benar */
+    .shake-soft {
+      animation: shakeAnim 0.4s ease-in-out;
+      border-color: #f59e0b !important;
+    }
+
+    @keyframes shakeAnim {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .correct-pop {
+      animation: popWin 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-color: #22c55e !important;
+      background: #dcfce7 !important;
+    }
+
+    @keyframes popWin {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    /* Status Petunjuk Gerbang Terkunci */
+    .gate-status-hint {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* ================= 4. LAYAR UTAMA (MENU MODES) ================= */
+    #main-menu-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 100;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #ffffff;
+    }
+
+    .game-logo {
+      font-size: 76px;
+      margin-bottom: 8px;
+      animation: floatLogo 2s infinite ease-in-out;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .game-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    }
+
+    .game-subtitle {
+      font-size: 15px;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 28px;
+    }
+
+    .menu-options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .btn-menu-mode {
+      border: 4px solid #ffffff;
+      border-radius: 24px;
+      padding: 14px 18px;
+      font-family: inherit;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      transition: transform 0.1s ease;
+      text-align: left;
+    }
+
+    .btn-menu-mode:active { transform: scale(0.95); }
+    .mode-alphabet { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .mode-hijaiyah { background: linear-gradient(135deg, #10b981, #059669); }
+    .mode-resume { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+    .btn-mode-icon { font-size: 38px; }
+    .btn-mode-info h4 { font-size: 17px; font-weight: 800; }
+    .btn-mode-info p { font-size: 12px; opacity: 0.9; font-weight: 600; }
+
+    /* Modal / Popups */
+    .hidden { display: none !important; }
+
+    /* Perayaan Bintang Menang Level */
+    #celebration-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 80;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      pointer-events: none;
+    }
+
+    .star-trophy {
+      font-size: 90px;
+      animation: trophyPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes trophyPop {
+      0% { transform: scale(0); }
+      80% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div id="app-container">
+    <!-- 1. Top Header HUD -->
+    <header class="top-header">
+      <div class="hud-left">
+        <button id="btn-back-menu" class="btn-circle btn-home" aria-label="Menu Utama" title="Menu Utama">🏠</button>
+        <button id="btn-sound-replay" class="btn-circle btn-speaker" aria-label="Ulangi Suara" title="Ulangi Suara">🔊</button>
+      </div>
+      <div class="hud-right">
+        <div id="level-display" class="level-badge-pill">
+          <span>🚩</span>
+          <span id="level-label">Level 1</span>
+          <span>⭐</span>
+          <span id="star-count">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. Canvas Visual Petualangan Karakter & Gerbang -->
+    <canvas id="world-canvas"></canvas>
+
+    <!-- 3. Zona Tantangan Kuis di Bagian Bawah -->
+    <div id="quiz-zone">
+      <!-- Banner Suara Pertanyaan -->
+      <div id="question-banner" class="instruction-banner">
+        <span class="inst-speaker-icon">🔊</span>
+        <span id="question-prompt" class="inst-text">Mendengarkan instruksi...</span>
+      </div>
+
+      <!-- Tombol Pilihan Jawaban Huruf Besar -->
+      <div id="choices-container" class="choices-grid">
+        <!-- Kartu Pilihan Jawaban Akan Di-Render Dinamis -->
+      </div>
+
+      <!-- Status Gerbang Rintangan -->
+      <div class="gate-status-hint">
+        <span id="gate-icon">🔒</span>
+        <span id="gate-status-text">Gerbang terkunci! Jawab pertanyaan dengan benar untuk membuka jalan.</span>
+      </div>
+    </div>
+
+    <!-- 4. Layar Pilihan Utama (Start Menu Screen) -->
+    <div id="main-menu-screen">
+      <div class="game-logo">🎒</div>
+      <h1 class="game-title">Petualangan Si Kecil</h1>
+      <p class="game-subtitle">Dunia Alfabet & Huruf Hijaiyah</p>
+
+      <div class="menu-options-container">
+        <!-- Tombol Lanjutkan Permainan (Jika Ada Progres) -->
+        <button id="btn-resume-adventure" class="btn-menu-mode mode-resume hidden">
+          <span class="btn-mode-icon">▶️</span>
+          <div class="btn-mode-info">
+            <h4>Lanjutkan Petualangan</h4>
+            <p id="resume-detail">Level 1 · Tersimpan</p>
+          </div>
+        </button>
+
+        <!-- Mode A: Petualangan Alfabet -->
+        <button id="btn-start-alphabet" class="btn-menu-mode mode-alphabet">
+          <span class="btn-mode-icon">🔤</span>
+          <div class="btn-mode-info">
+            <h4>Petualangan Alfabet</h4>
+            <p>Mengenal huruf A sampai Z</p>
+          </div>
+        </button>
+
+        <!-- Mode B: Petualangan Hijaiyah -->
+        <button id="btn-start-hijaiyah" class="btn-menu-mode mode-hijaiyah">
+          <span class="btn-mode-icon">📖</span>
+          <div class="btn-mode-info">
+            <h4>Petualangan Hijaiyah</h4>
+            <p>Mengenal huruf Alif sampai Ya</p>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 5. Overlay Perayaan Kemenangan Bintang -->
+    <div id="celebration-overlay" class="hidden">
+      <div class="star-trophy">🌟</div>
+      <h2 id="praise-heading" style="font-size: 26px; font-weight: 800; margin-top: 10px;">HEBAT SEKALI!</h2>
+      <p id="praise-sub" style="font-size: 15px; opacity: 0.95;">Gerbang terbuka! Ayo lanjut berpetualang!</p>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       LOGIKA GAME LENGKAP: VOICE-FIRST, VALIDASI JAWABAN KETAT, 10 LEVEL PETUALANGAN
+       ========================================================================== -->
+  <script>
+    (function() {
+      'use strict';
+
+      // ----------------------------------------------------------------------
+      // 1. DATA MATERI: 10 LEVEL PETUALANGAN ALFABET & HIJAIYAH
+      // ----------------------------------------------------------------------
+      const GAME_LEVELS = [
+        // LEVEL 1–5: DUNIA ALFABET
+        {
+          id: 1,
+          mode: 'alphabet',
+          title: 'Level 1 — Hutan Alfabet',
+          theme: 'forest',
+          questions: [
+            { target: 'A', options: ['A', 'B', 'C'], word: 'Apel', hint: 'A seperti Apel merah yang manis!' },
+            { target: 'B', options: ['A', 'B', 'C'], word: 'Bola', hint: 'B seperti Bola bundar yang membal!' },
+            { target: 'C', options: ['A', 'B', 'C'], word: 'Ceri', hint: 'C seperti Ceri manis berwarna merah!' }
+          ]
+        },
+        {
+          id: 2,
+          mode: 'alphabet',
+          title: 'Level 2 — Jembatan Huruf',
+          theme: 'bridge',
+          questions: [
+            { target: 'D', options: ['D', 'E', 'F'], word: 'Domba', hint: 'D seperti Domba berbulu putih!' },
+            { target: 'E', options: ['D', 'E', 'F'], word: 'Elang', hint: 'E seperti Elang yang terbang tinggi!' },
+            { target: 'F', options: ['D', 'E', 'F'], word: 'Flamingo', hint: 'F seperti Flamingo anggun!' }
+          ]
+        },
+        {
+          id: 3,
+          mode: 'alphabet',
+          title: 'Level 3 — Gua Huruf',
+          theme: 'cave',
+          questions: [
+            { target: 'G', options: ['G', 'H', 'I'], word: 'Gajah', hint: 'G seperti Gajah yang bertubuh besar!' },
+            { target: 'H', options: ['G', 'H', 'I'], word: 'Harimau', hint: 'H seperti Harimau yang gagah!' },
+            { target: 'I', options: ['G', 'H', 'I'], word: 'Ikan', hint: 'I seperti Ikan berenang di air!' }
+          ]
+        },
+        {
+          id: 4,
+          mode: 'alphabet',
+          title: 'Level 4 — Sungai Alfabet',
+          theme: 'river',
+          questions: [
+            { target: 'J', options: ['J', 'K', 'L'], word: 'Jerapah', hint: 'J seperti Jerapah berleher tinggi!' },
+            { target: 'K', options: ['J', 'K', 'L'], word: 'Kelinci', hint: 'K seperti Kelinci suka melompat!' },
+            { target: 'L', options: ['J', 'K', 'L'], word: 'Lumba-lumba', hint: 'L seperti Lumba-lumba ceria!' }
+          ]
+        },
+        {
+          id: 5,
+          mode: 'alphabet',
+          title: 'Level 5 — Istana Alfabet',
+          theme: 'castle',
+          questions: [
+            { target: 'M', options: ['M', 'N', 'O'], word: 'Monyet', hint: 'M seperti Monyet suka pisang!' },
+            { target: 'A', options: ['A', 'D', 'G'], word: 'Apel', hint: 'Ingatkah kamu huruf A untuk Apel?' },
+            { target: 'K', options: ['B', 'E', 'K'], word: 'Kelinci', hint: 'Ingatkah kamu huruf K untuk Kelinci?' }
+          ]
+        },
+
+        // LEVEL 6–10: DUNIA HIJAIYAH (28 HURUF BAKU)
+        {
+          id: 6,
+          mode: 'hijaiyah',
+          title: 'Level 6 — Taman Hijaiyah',
+          theme: 'forest',
+          questions: [
+            { target: 'alif', arabic: 'ا', name: 'Alif', options: ['alif', 'ba', 'ta'], hint: 'Ini huruf Alif. Tegak lurus seperti tongkat!' },
+            { target: 'ba', arabic: 'ب', name: 'Ba', options: ['alif', 'ba', 'ta'], hint: 'Ini huruf Ba. Ada satu titik di bawah!' },
+            { target: 'ta', arabic: 'ت', name: 'Ta', options: ['alif', 'ba', 'ta'], hint: 'Ini huruf Ta. Memiliki dua titik di atas!' }
+          ]
+        },
+        {
+          id: 7,
+          mode: 'hijaiyah',
+          title: 'Level 7 — Jembatan Hijaiyah',
+          theme: 'bridge',
+          questions: [
+            { target: 'tsa', arabic: 'ث', name: 'Tsa', options: ['tsa', 'jim', 'ha'], hint: 'Ini huruf Tsa. Memiliki tiga titik di atas!' },
+            { target: 'jim', arabic: 'ج', name: 'Jim', options: ['tsa', 'jim', 'ha'], hint: 'Ini huruf Jim. Ada titik di tengah perutnya!' },
+            { target: 'ha', arabic: 'ح', name: 'Ha', options: ['tsa', 'jim', 'ha'], hint: 'Ini huruf Ha. Bersih tanpa titik!' }
+          ]
+        },
+        {
+          id: 8,
+          mode: 'hijaiyah',
+          title: 'Level 8 — Gua Hijaiyah',
+          theme: 'cave',
+          questions: [
+            { target: 'kha', arabic: 'خ', name: 'Kha', options: ['kha', 'dal', 'dzal'], hint: 'Ini huruf Kha. Ada satu titik di atas kepalanya!' },
+            { target: 'dal', arabic: 'د', name: 'Dal', options: ['kha', 'dal', 'dzal'], hint: 'Ini huruf Dal. Melengkung ramah tanpa titik!' },
+            { target: 'dzal', arabic: 'ذ', name: 'Dzal', options: ['kha', 'dal', 'dzal'], hint: 'Ini huruf Dzal. Memiliki satu titik di atasnya!' }
+          ]
+        },
+        {
+          id: 9,
+          mode: 'hijaiyah',
+          title: 'Level 9 — Gunung Hijaiyah',
+          theme: 'mountain',
+          questions: [
+            { target: 'ra', arabic: 'ر', name: 'Ra', options: ['ra', 'zai', 'sin'], hint: 'Ini huruf Ra. Melengkung anggun ke bawah!' },
+            { target: 'zai', arabic: 'ز', name: 'Zai', options: ['ra', 'zai', 'sin'], hint: 'Ini huruf Zai. Memiliki satu titik di atasnya!' },
+            { target: 'sin', arabic: 'س', name: 'Sin', options: ['ra', 'zai', 'sin'], hint: 'Ini huruf Sin. Memiliki gigi-gigi kecil yang rapi!' }
+          ]
+        },
+        {
+          id: 10,
+          mode: 'hijaiyah',
+          title: 'Level 10 — Istana Huruf Hijaiyah',
+          theme: 'castle',
+          questions: [
+            { target: 'syin', arabic: 'ش', name: 'Syin', options: ['sin', 'syin', 'shad'], hint: 'Ini huruf Syin. Memiliki tiga titik di atas giginya!' },
+            { target: 'alif', arabic: 'ا', name: 'Alif', options: ['alif', 'jim', 'ra'], hint: 'Ayo ingat kembali huruf Alif yang tegak lurus!' },
+            { target: 'ba', arabic: 'ب', name: 'Ba', options: ['ba', 'dal', 'sin'], hint: 'Ayo ingat kembali huruf Ba dengan titik di bawah!' }
+          ]
+        }
+      ];
+
+      const HIJAIYAH_MAP = {
+        'alif': { arabic: 'ا', name: 'Alif' },
+        'ba': { arabic: 'ب', name: 'Ba' },
+        'ta': { arabic: 'ت', name: 'Ta' },
+        'tsa': { arabic: 'ث', name: 'Tsa' },
+        'jim': { arabic: 'ج', name: 'Jim' },
+        'ha': { arabic: 'ح', name: 'Ha' },
+        'kha': { arabic: 'خ', name: 'Kha' },
+        'dal': { arabic: 'د', name: 'Dal' },
+        'dzal': { arabic: 'ذ', name: 'Dzal' },
+        'ra': { arabic: 'ر', name: 'Ra' },
+        'zai': { arabic: 'ز', name: 'Zai' },
+        'sin': { arabic: 'س', name: 'Sin' },
+        'syin': { arabic: 'ش', name: 'Syin' },
+        'shad': { arabic: 'ص', name: 'Shad' }
+      };
+
+      // ----------------------------------------------------------------------
+      // 2. SISTEM SUARA (VOICE-FIRST & SFX SYNTHESIZER)
+      // ----------------------------------------------------------------------
+      class VoiceSystem {
+        constructor() {
+          this.synth = window.speechSynthesis || null;
+          this.idVoice = null;
+          this.audioCtx = null;
+          this.lastText = '';
+          this.unlocked = false;
+          this.initVoice();
+        }
+
+        unlock() {
+          if (this.unlocked) return;
+          try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+              this.audioCtx = new AudioContext();
+              if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+            }
+            if (this.synth) this.synth.speak(new SpeechSynthesisUtterance(''));
+            this.unlocked = true;
+          } catch (e) {}
+        }
+
+        initVoice() {
+          if (!this.synth) return;
+          const loadVoices = () => {
+            try {
+              const voices = this.synth.getVoices() || [];
+              this.idVoice = voices.find(v => v.lang && (v.lang.includes('id') || v.lang.includes('ID'))) || null;
+            } catch (e) {}
+          };
+          loadVoices();
+          if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+          }
+        }
+
+        speak(text, onEnd = null) {
+          if (!text) { if (onEnd) onEnd(); return; }
+          this.lastText = text;
+
+          if (!this.synth) {
+            if (onEnd) setTimeout(onEnd, 1200);
+            return;
+          }
+
+          try { this.synth.cancel(); } catch (e) {}
+
+          try {
+            const utter = new SpeechSynthesisUtterance(text);
+            if (this.idVoice) utter.voice = this.idVoice;
+            utter.lang = 'id-ID';
+            utter.rate = 0.88; // Tempo santai untuk balita 3-5 tahun
+            utter.pitch = 1.25; // Ceria & ramah
+            utter.onend = () => { if (onEnd) onEnd(); };
+            utter.onerror = () => { if (onEnd) onEnd(); };
+            this.synth.speak(utter);
+          } catch (e) {
+            if (onEnd) onEnd();
+          }
+        }
+
+        repeat() {
+          if (this.lastText) {
+            this.playTap();
+            setTimeout(() => this.speak(this.lastText), 150);
+          }
+        }
+
+        _getCtx() {
+          if (!this.audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) this.audioCtx = new AudioContext();
+          }
+          if (this.audioCtx && this.audioCtx.state === 'suspended') this.audioCtx.resume();
+          return this.audioCtx;
+        }
+
+        playTap() {
+          const ctx = this._getCtx();
+          if (!ctx) return;
+          try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const t = ctx.currentTime;
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(340, t);
+            osc.frequency.exponentialRampToValueAtTime(540, t + 0.08);
+            gain.gain.setValueAtTime(0.2, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.09);
+          } catch (e) {}
+        }
+
+        playCorrectFanfare() {
+          const ctx = this._getCtx();
+          if (!ctx) return;
+          try {
+            const t = ctx.currentTime;
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              const st = t + idx * 0.08;
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(freq, st);
+              gain.gain.setValueAtTime(0.25, st);
+              gain.gain.exponentialRampToValueAtTime(0.001, st + 0.35);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(st);
+              osc.stop(st + 0.35);
+            });
+          } catch (e) {}
+        }
+
+        playSoftRetry() {
+          const ctx = this._getCtx();
+          if (!ctx) return;
+          try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const t = ctx.currentTime;
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, t);
+            osc.frequency.linearRampToValueAtTime(392, t + 0.25);
+            gain.gain.setValueAtTime(0.2, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.3);
+          } catch (e) {}
+        }
+      }
+
+      const sound = new VoiceSystem();
+
+      // ----------------------------------------------------------------------
+      // 3. CANVAS DUNIA PETUALANGAN: KARAKTER BERJALAN & GERBANG RINTANGAN
+      // ----------------------------------------------------------------------
+      class WorldCanvasRenderer {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext('2d');
+
+          // State Karakter Petualang
+          this.characterX = 40;
+          this.targetStopX = 0;
+          this.isWalking = false;
+          this.walkCycle = 0;
+
+          // State Gerbang Rintangan
+          this.gateX = 0;
+          this.isGateOpen = false;
+          this.gateOpenAngle = 0;
+
+          this.theme = 'forest';
+          this.animFrame = null;
+
+          this.resize();
+          window.addEventListener('resize', () => this.resize());
+          this.renderLoop = this.renderLoop.bind(this);
+          requestAnimationFrame(this.renderLoop);
+        }
+
+        resize() {
+          this.width = this.canvas.clientWidth || window.innerWidth;
+          this.height = this.canvas.clientHeight || (window.innerHeight * 0.6);
+          this.canvas.width = this.width;
+          this.canvas.height = this.height;
+
+          // Posisi Gerbang di 68% Lebar Layar
+          this.gateX = this.width * 0.68;
+          // Karakter Berhenti Tepat di Depan Gerbang
+          this.targetStopX = this.gateX - 70;
+        }
+
+        startWalking() {
+          this.isWalking = true;
+        }
+
+        stopWalking() {
+          this.isWalking = false;
+        }
+
+        resetToStart() {
+          this.characterX = 30;
+          this.isGateOpen = false;
+          this.gateOpenAngle = 0;
+          this.startWalking();
+        }
+
+        openGate() {
+          this.isGateOpen = true;
+        }
+
+        setTheme(theme) {
+          this.theme = theme;
+        }
+
+        renderLoop() {
+          this.update();
+          this.draw();
+          requestAnimationFrame(this.renderLoop);
+        }
+
+        update() {
+          if (this.isWalking) {
+            this.walkCycle += 0.2;
+            // Jika gerbang masih tertutup, karakter WAJIB BERHENTI di depan gerbang
+            if (!this.isGateOpen) {
+              if (this.characterX < this.targetStopX) {
+                this.characterX += 2.2;
+              } else {
+                this.characterX = this.targetStopX;
+                this.stopWalking();
+                // Picu kemunculan pertanyaan kuis saat karakter tiba di gerbang
+                if (window.gameApp && !window.gameApp.isQuestionActive && !window.gameApp.isGateOpen) {
+                  window.gameApp.triggerQuestionAtGate();
+                }
+              }
+            } else {
+              // Jika gerbang sudah terbuka karena jawaban benar: Karakter melangkah melintasi gerbang!
+              this.characterX += 3.2;
+              if (this.characterX > this.width + 40) {
+                this.stopWalking();
+                if (window.gameApp) {
+                  window.gameApp.handleLevelCompleted();
+                }
+              }
+            }
+          }
+
+          // Animasi Pintu Gerbang Terbuka
+          if (this.isGateOpen && this.gateOpenAngle < Math.PI / 2) {
+            this.gateOpenAngle += 0.08;
+          }
+        }
+
+        draw() {
+          const ctx = this.ctx;
+          const w = this.width;
+          const h = this.height;
+
+          ctx.clearRect(0, 0, w, h);
+
+          // 1. Gambar Latar Belakang Sesuai Tema
+          this.drawBackground(ctx, w, h);
+
+          // 2. Gambar Jalanan Tanah / Jembatan
+          this.drawGround(ctx, w, h);
+
+          // 3. Gambar Gerbang Rintangan Tertutup/Terbuka
+          this.drawGate(ctx, this.gateX, h * 0.76);
+
+          // 4. Gambar Karakter Si Kecil Petualang
+          this.drawCharacter(ctx, this.characterX, h * 0.76);
+        }
+
+        drawBackground(ctx, w, h) {
+          // Langit
+          const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+          if (this.theme === 'cave') {
+            skyGrad.addColorStop(0, '#1e1b4b');
+            skyGrad.addColorStop(1, '#4338ca');
+          } else if (this.theme === 'castle') {
+            skyGrad.addColorStop(0, '#fef08a');
+            skyGrad.addColorStop(1, '#67e8f9');
+          } else {
+            skyGrad.addColorStop(0, '#38bdf8');
+            skyGrad.addColorStop(1, '#bae6fd');
+          }
+          ctx.fillStyle = skyGrad;
+          ctx.fillRect(0, 0, w, h);
+
+          // Matahari Ceria Kartun
+          if (this.theme !== 'cave') {
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.arc(w * 0.85, h * 0.22, 36, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fde047';
+            ctx.beginPath();
+            ctx.arc(w * 0.85, h * 0.22, 28, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Awan Kartun
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+          const drawCloud = (cx, cy, s) => {
+            ctx.beginPath();
+            ctx.arc(cx, cy, 22 * s, 0, Math.PI * 2);
+            ctx.arc(cx + 20 * s, cy - 8 * s, 26 * s, 0, Math.PI * 2);
+            ctx.arc(cx + 42 * s, cy, 20 * s, 0, Math.PI * 2);
+            ctx.fill();
+          };
+          drawCloud(w * 0.2, h * 0.25, 0.9);
+          drawCloud(w * 0.55, h * 0.18, 1.1);
+
+          // Pepohonan / Bukit Kartun di Belakang
+          if (this.theme === 'forest' || this.theme === 'bridge') {
+            ctx.fillStyle = '#16a34a';
+            ctx.beginPath();
+            ctx.arc(w * 0.15, h * 0.74, 55, Math.PI, 0);
+            ctx.arc(w * 0.45, h * 0.74, 75, Math.PI, 0);
+            ctx.arc(w * 0.85, h * 0.74, 60, Math.PI, 0);
+            ctx.fill();
+          }
+        }
+
+        drawGround(ctx, w, h) {
+          const groundY = h * 0.76;
+
+          // Lapisan Tanah / Rumput
+          ctx.fillStyle = '#86efac';
+          ctx.fillRect(0, groundY, w, h - groundY);
+
+          // Jalur Jalan Setapak Kartun
+          ctx.fillStyle = '#fde68a';
+          ctx.beginPath();
+          ctx.ellipse(w * 0.5, groundY + 25, w * 0.6, 24, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Garis Tepi Rumput
+          ctx.strokeStyle = '#22c55e';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(0, groundY);
+          ctx.lineTo(w, groundY);
+          ctx.stroke();
+        }
+
+        drawGate(ctx, gx, gy) {
+          ctx.save();
+          ctx.translate(gx, gy);
+
+          // Dua Tiang Kayu Gerbang
+          ctx.fillStyle = '#854d0e';
+          ctx.fillRect(-12, -100, 24, 100); // Tiang Kiri
+          ctx.fillRect(52, -100, 24, 100);  // Tiang Kanan
+
+          // Balok Atas Gerbang
+          ctx.fillStyle = '#a16207';
+          ctx.fillRect(-18, -112, 100, 18);
+
+          // Daun Pintu Gerbang yang Tertutup / Terbuka
+          if (!this.isGateOpen) {
+            // Pintu Tertutup
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(12, -95, 40, 95);
+
+            // Gembok Emas Bintang Terkunci
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath();
+            ctx.arc(32, -45, 14, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ca8a04';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Lubang Kunci
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(32, -47, 3, 0, Math.PI * 2);
+            ctx.fillRect(31, -47, 2, 7);
+            ctx.fill();
+          } else {
+            // Pintu Terbuka Mengayun
+            ctx.fillStyle = '#d97706';
+            ctx.beginPath();
+            ctx.moveTo(12, 0);
+            ctx.lineTo(12 - Math.cos(this.gateOpenAngle) * 35, -Math.sin(this.gateOpenAngle) * 20);
+            ctx.lineTo(12 - Math.cos(this.gateOpenAngle) * 35, -95 - Math.sin(this.gateOpenAngle) * 20);
+            ctx.lineTo(12, -95);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Sinar Bintang Lolos dari Gerbang
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.4)';
+            ctx.beginPath();
+            ctx.moveTo(12, -95);
+            ctx.lineTo(60, -95);
+            ctx.lineTo(85, 0);
+            ctx.lineTo(-5, 0);
+            ctx.closePath();
+            ctx.fill();
+          }
+
+          ctx.restore();
+        }
+
+        drawCharacter(ctx, cx, cy) {
+          ctx.save();
+          ctx.translate(cx, cy);
+
+          const bobbing = this.isWalking ? Math.sin(this.walkCycle * 2) * 3 : 0;
+          const legSwing = this.isWalking ? Math.sin(this.walkCycle) * 12 : 0;
+
+          // Bayangan Kaki Karakter
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+          ctx.beginPath();
+          ctx.ellipse(0, 2, 18, 6, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Kaki Kiri & Kanan
+          ctx.strokeStyle = '#1e3a8a';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(-5, -20);
+          ctx.lineTo(-5 + legSwing, 0);
+          ctx.moveTo(5, -20);
+          ctx.lineTo(5 - legSwing, 0);
+          ctx.stroke();
+
+          // Sepatu Merah Kartun
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.arc(-5 + legSwing, 0, 5, 0, Math.PI * 2);
+          ctx.arc(5 - legSwing, 0, 5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Badan & Baju Biru Si Kecil
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(-12, -45 + bobbing, 24, 26);
+
+          // Ransel Petualang Ceria di Punggung
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillRect(-18, -43 + bobbing, 7, 18);
+
+          // Kepala Si Kecil yang Lucu
+          ctx.fillStyle = '#fed7aa';
+          ctx.beginPath();
+          ctx.arc(0, -56 + bobbing, 16, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Topi Petualang Oranye
+          ctx.fillStyle = '#f97316';
+          ctx.beginPath();
+          ctx.arc(0, -66 + bobbing, 15, Math.PI, 0);
+          ctx.fill();
+          ctx.fillRect(-20, -66 + bobbing, 40, 4);
+
+          // Mata & Senyuman
+          ctx.fillStyle = '#1e293b';
+          ctx.beginPath();
+          ctx.arc(4, -58 + bobbing, 2.5, 0, Math.PI * 2); // Mata kanan menghadap depan
+          ctx.fill();
+
+          ctx.strokeStyle = '#ea580c';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(4, -53 + bobbing, 4, 0.2, Math.PI - 0.2);
+          ctx.stroke();
+
+          // Pipi Merona Pink
+          ctx.fillStyle = '#f472b6';
+          ctx.beginPath();
+          ctx.arc(2, -52 + bobbing, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.restore();
+        }
+      }
+
+      // ----------------------------------------------------------------------
+      // 4. CONTROLLER LOGIKA GAME UTAMA (PETUALANGAN SI KECIL)
+      // ----------------------------------------------------------------------
+      class PetualanganSiKecilGame {
+        constructor() {
+          this.world = null;
+
+          // State Logika Game Wajib
+          this.currentLevelIndex = 0;
+          this.currentQuestionIndex = 0;
+          this.currentMode = 'alphabet'; // 'alphabet' atau 'hijaiyah'
+          this.isQuestionActive = false;
+          this.isGateOpen = false;
+          this.starScore = 0;
+          this.canAnswer = false;
+
+          this.init();
+        }
+
+        init() {
+          const canvas = document.getElementById('world-canvas');
+          this.world = new WorldCanvasRenderer(canvas);
+
+          this.loadProgress();
+          this.bindEvents();
+          this.checkResumeAvailability();
+        }
+
+        bindEvents() {
+          // Tombol Buka Menu / Rumah
+          document.getElementById('btn-back-menu')?.addEventListener('click', () => {
+            sound.playTap();
+            this.showMainMenu();
+          });
+
+          // Tombol Ulangi Suara Pertanyaan
+          document.getElementById('btn-sound-replay')?.addEventListener('click', () => {
+            sound.repeat();
+          });
+
+          document.getElementById('question-banner')?.addEventListener('click', () => {
+            sound.repeat();
+          });
+
+          // Tombol Pilihan Menu Mode
+          document.getElementById('btn-start-alphabet')?.addEventListener('click', () => {
+            sound.unlock();
+            sound.playTap();
+            this.startNewAdventure('alphabet');
+          });
+
+          document.getElementById('btn-start-hijaiyah')?.addEventListener('click', () => {
+            sound.unlock();
+            sound.playTap();
+            this.startNewAdventure('hijaiyah');
+          });
+
+          document.getElementById('btn-resume-adventure')?.addEventListener('click', () => {
+            sound.unlock();
+            sound.playTap();
+            this.resumeAdventure();
+          });
+        }
+
+        // ================= PENYIMPANAN LOCALSTORAGE ================= //
+        loadProgress() {
+          try {
+            const saved = localStorage.getItem('petualangan_si_kecil_save');
+            if (saved) {
+              const data = JSON.parse(saved);
+              this.savedProgress = data;
+              this.starScore = data.starScore || 0;
+            }
+          } catch (e) {
+            this.savedProgress = null;
+          }
+        }
+
+        saveProgress() {
+          try {
+            const data = {
+              levelIndex: this.currentLevelIndex,
+              mode: this.currentMode,
+              starScore: this.starScore,
+              timestamp: Date.now()
+            };
+            localStorage.setItem('petualangan_si_kecil_save', JSON.stringify(data));
+          } catch (e) {}
+        }
+
+        checkResumeAvailability() {
+          const resumeBtn = document.getElementById('btn-resume-adventure');
+          const resumeDetail = document.getElementById('resume-detail');
+
+          if (this.savedProgress && resumeBtn && resumeDetail) {
+            const lvl = GAME_LEVELS[this.savedProgress.levelIndex] || GAME_LEVELS[0];
+            resumeDetail.innerText = `${lvl.title} · ${this.savedProgress.starScore} ⭐`;
+            resumeBtn.classList.remove('hidden');
+          }
+        }
+
+        showMainMenu() {
+          this.world.stopWalking();
+          this.isQuestionActive = false;
+          document.getElementById('main-menu-screen')?.classList.remove('hidden');
+          this.checkResumeAvailability();
+          sound.speak("Halo adik pintar! Ayo pilih Petualangan Alfabet atau Petualangan Hijaiyah!");
+        }
+
+        startNewAdventure(modeKey) {
+          this.currentMode = modeKey;
+          // Cari level pertama sesuai mode yang dipilih
+          this.currentLevelIndex = GAME_LEVELS.findIndex(lvl => lvl.mode === modeKey);
+          if (this.currentLevelIndex < 0) this.currentLevelIndex = 0;
+          this.currentQuestionIndex = 0;
+
+          document.getElementById('main-menu-screen')?.classList.add('hidden');
+          this.loadLevel(this.currentLevelIndex);
+        }
+
+        resumeAdventure() {
+          if (!this.savedProgress) {
+            this.startNewAdventure('alphabet');
+            return;
+          }
+          this.currentMode = this.savedProgress.mode || 'alphabet';
+          this.currentLevelIndex = this.savedProgress.levelIndex || 0;
+          this.currentQuestionIndex = 0;
+
+          document.getElementById('main-menu-screen')?.classList.add('hidden');
+          this.loadLevel(this.currentLevelIndex);
+        }
+
+        // ================= MEMUAT LEVEL PETUALANGAN ================= //
+        loadLevel(levelIdx) {
+          const levelData = GAME_LEVELS[levelIdx] || GAME_LEVELS[0];
+          this.currentQuestionIndex = 0;
+          this.isGateOpen = false;
+          this.isQuestionActive = false;
+
+          // Update Tampilan HUD
+          document.getElementById('level-label').innerText = `Level ${levelData.id}`;
+          document.getElementById('star-count').innerText = this.starScore;
+
+          // Update Tampilan Dunia
+          this.world.setTheme(levelData.theme);
+          this.world.resetToStart(); // Karakter mulai berjalan dari kiri ke gerbang
+
+          // Kunci Tampilan Kuis Sementara Karakter Sedang Berjalan
+          const quizZone = document.getElementById('quiz-zone');
+          if (quizZone) {
+            quizZone.classList.add('locked');
+            document.getElementById('question-prompt').innerText = "Karakter sedang berpetualang menuju gerbang...";
+            document.getElementById('choices-container').innerHTML = '';
+            document.getElementById('gate-icon').innerText = '🔒';
+            document.getElementById('gate-status-text').innerText = "Gerbang terkunci! Jawab benar untuk membuka.";
+          }
+
+          const modeWord = levelData.mode === 'hijaiyah' ? 'Huruf Hijaiyah' : 'Huruf Alfabet';
+          sound.speak(`Ayo berpetualang di ${levelData.title}! Karakter sedang berjalan menuju gerbang.`);
+        }
+
+        // ================= SAAT KARAKTER TIBA DI GERBANG (TANTANGAN KUIS) ================= //
+        triggerQuestionAtGate() {
+          const levelData = GAME_LEVELS[this.currentLevelIndex];
+          const qData = levelData.questions[this.currentQuestionIndex];
+
+          this.isQuestionActive = true;
+          this.isGateOpen = false;
+          this.canAnswer = true;
+
+          const quizZone = document.getElementById('quiz-zone');
+          if (quizZone) quizZone.classList.remove('locked');
+
+          // Render Tombol Pilihan Huruf Besar
+          this.renderChoices(qData, levelData.mode);
+
+          // Bentuk Teks Pertanyaan Suara
+          let speechPrompt = '';
+          let visualPrompt = '';
+
+          if (levelData.mode === 'hijaiyah') {
+            const targetInfo = HIJAIYAH_MAP[qData.target] || { arabic: qData.target, name: qData.target };
+            visualPrompt = `Dengarkan: Mana huruf ${targetInfo.name}?`;
+            speechPrompt = `Dengarkan baik-baik. Mana huruf ${targetInfo.name}? ${qData.hint}. Sentuh huruf ${targetInfo.name}!`;
+          } else {
+            visualPrompt = `Mana huruf ${qData.target}? (${qData.word})`;
+            speechPrompt = `Mana huruf ${qData.target}? ${qData.hint}. Sentuh huruf ${qData.target}!`;
+          }
+
+          document.getElementById('question-prompt').innerText = visualPrompt;
+          sound.speak(speechPrompt);
+        }
+
+        renderChoices(qData, mode) {
+          const container = document.getElementById('choices-container');
+          container.innerHTML = '';
+
+          const isHijaiyah = (mode === 'hijaiyah');
+
+          qData.options.forEach(optKey => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-card-btn';
+            btn.setAttribute('data-choice-key', optKey);
+
+            if (isHijaiyah) {
+              const hInfo = HIJAIYAH_MAP[optKey] || { arabic: optKey, name: optKey };
+              btn.innerHTML = `
+                <span class="choice-char arabic-font">${hInfo.arabic}</span>
+                <span class="choice-sub">${hInfo.name}</span>
+              `;
+            } else {
+              btn.innerHTML = `
+                <span class="choice-char">${optKey}</span>
+              `;
+            }
+
+            btn.addEventListener('click', () => {
+              if (!this.canAnswer) return;
+              this.handleChoiceSelected(optKey, qData.target, btn);
+            });
+
+            container.appendChild(btn);
+          });
+        }
+
+        // ================= VALIDASI JAWABAN KETAT ================= //
+        handleChoiceSelected(selectedKey, correctTarget, buttonElement) {
+          sound.playTap();
+
+          // VALIDASI JAVASCRIPT KETAT:
+          if (selectedKey === correctTarget) {
+            // JAWABAN BENAR!
+            this.canAnswer = false; // Kunci agar tidak klik ganda
+            this.starScore += 1;
+            this.saveProgress();
+
+            document.getElementById('star-count').innerText = this.starScore;
+            buttonElement.classList.add('correct-pop');
+
+            // Buka Gerbang Secara Fisik!
+            this.isGateOpen = true;
+            this.world.openGate();
+            document.getElementById('gate-icon').innerText = '🔓';
+            document.getElementById('gate-status-text').innerText = 'Yeay! Gerbang terbuka!';
+
+            sound.playCorrectFanfare();
+
+            // Ucapkan Pujian Ceria
+            const praises = [
+              'Hebat sekali! Jawabanmu benar!',
+              'Pintar sekali! Gerbang terbuka!',
+              'Luar biasa! Ayo kita lanjut berpetualang!'
+            ];
+            const praiseText = praises[Math.floor(Math.random() * praises.length)];
+
+            sound.speak(praiseText, () => {
+              // Setelah suara pujian selesai: Karakter melangkah melintasi gerbang!
+              setTimeout(() => {
+                this.isQuestionActive = false;
+                this.world.startWalking(); // Karakter berjalan melewati gerbang
+              }, 400);
+            });
+
+          } else {
+            // JAWABAN SALAH:
+            // ATURAN MUTLAK:
+            // 1. Karakter TIDAK BOLEH bergerak!
+            // 2. Gerbang TETAP TERTUTUP!
+            // 3. Tidak ada pengurangan nyawa atau hukuman!
+            sound.playSoftRetry();
+            buttonElement.classList.add('shake-soft');
+            setTimeout(() => buttonElement.classList.remove('shake-soft'), 500);
+
+            sound.speak("Yuk coba lagi ya! Dengarkan baik-baik dan cari bersama-sama.");
+          }
+        }
+
+        // ================= KETIKA KARAKTER SUDAH MELINTASI GERBANG ================= //
+        handleLevelCompleted() {
+          const levelData = GAME_LEVELS[this.currentLevelIndex];
+
+          // Cek apakah masih ada soal dalam level ini
+          if (this.currentQuestionIndex + 1 < levelData.questions.length) {
+            this.currentQuestionIndex++;
+            this.isGateOpen = false;
+            this.world.resetToStart(); // Lanjut ke gerbang berikutnya di level yang sama
+          } else {
+            // Level Selesai! Rayakan dengan Bintang Emas
+            this.triggerLevelCelebration();
+          }
+        }
+
+        triggerLevelCelebration() {
+          const overlay = document.getElementById('celebration-overlay');
+          overlay.classList.remove('hidden');
+
+          sound.speak("Horeee! Kamu berhasil menyelesaikan rintangan petualangan ini! Kamu anak yang sangat pintar!", () => {
+            setTimeout(() => {
+              overlay.classList.add('hidden');
+              // Lanjut ke Level Berikutnya
+              if (this.currentLevelIndex + 1 < GAME_LEVELS.length) {
+                this.currentLevelIndex++;
+                this.saveProgress();
+                this.loadLevel(this.currentLevelIndex);
+              } else {
+                // Semua 10 Level Selesai!
+                sound.speak("Luar biasa! Seluruh istana petualangan berhasil kamu taklukkan!");
+                this.showMainMenu();
+              }
+            }, 1800);
+          });
+        }
+      }
+
+      // Inisialisasi Game
+      window.addEventListener('DOMContentLoaded', () => {
+        window.gameApp = new PetualanganSiKecilGame();
+      });
+
+    })();
+  </script>
+</body>
+</html>
