@@ -12,7 +12,7 @@
   
   <style>
     /* ==========================================================================
-       STYLE ALPHABET RACING ADVENTURE (MOBILE-FIRST, PORTRAIT, RETINA READY)
+       STYLE ALPHABET RACING ADVENTURE (DRAG MOBIL LANGSUNG + D-PAD LENGKAP)
        ========================================================================== */
     * {
       box-sizing: border-box;
@@ -51,6 +51,11 @@
       height: 100%;
       display: block;
       z-index: 5;
+      touch-action: none;
+      cursor: grab;
+    }
+    #race-canvas:active {
+      cursor: grabbing;
     }
 
     /* ================= 1. TOP HUD (STATUS & AUDIO) ================= */
@@ -91,7 +96,6 @@
     .hud-circle-btn:active { transform: scale(0.9); }
     .btn-home { border-color: #f59e0b; background: #fef08a; }
     .btn-speaker { border-color: #10b981; background: #bbf7d0; animation: pulseSpeaker 1.8s infinite alternate ease-in-out; }
-    .btn-pause { border-color: #6366f1; background: #e0e7ff; }
 
     @keyframes pulseSpeaker {
       0% { transform: scale(1); }
@@ -114,40 +118,119 @@
       pointer-events: auto;
     }
 
-    /* ================= 2. KONTROL SETIR HP BAWAH ================= */
+    /* Hint Sentuh Langsung Mobil */
+    .touch-hint-pill {
+      position: absolute;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(6px);
+      color: #ffffff;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 2px solid #38bdf8;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 45;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      animation: floatHint 2s infinite ease-in-out;
+    }
+    @keyframes floatHint {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, -4px); }
+    }
+
+    /* ================= 2. KONTROL D-PAD (KIRI, KANAN, ATAS, BAWAH) ================= */
     .bottom-controls-layer {
       position: absolute;
-      bottom: 0;
+      bottom: 20px;
       left: 0;
       width: 100%;
       z-index: 40;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px env(safe-area-inset-bottom, 20px);
+      align-items: flex-end;
+      padding: 0 20px env(safe-area-inset-bottom, 14px);
       pointer-events: none;
     }
 
-    .steering-btn {
+    /* D-Pad 4 Arah di Kiri (Bisa Ditekan / Ditahan) */
+    .dpad-container {
       pointer-events: auto;
-      width: 84px;
-      height: 84px;
+      width: 150px;
+      height: 150px;
+      position: relative;
+      background: rgba(255, 255, 255, 0.28);
+      border: 3.5px solid rgba(255, 255, 255, 0.7);
       border-radius: 50%;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .dpad-btn {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
       background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-      border: 5px solid #ffffff;
+      border: 3px solid #ffffff;
       color: #ffffff;
-      font-size: 38px;
+      font-size: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.45), inset 0 -5px 0 #0369a1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
       transition: transform 0.08s ease, background 0.1s;
     }
-    .steering-btn:active {
+    .dpad-btn:active {
       transform: scale(0.9);
       background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     }
+
+    .dpad-up    { top: 4px; left: 50%; transform: translateX(-50%); }
+    .dpad-down  { bottom: 4px; left: 50%; transform: translateX(-50%); }
+    .dpad-left  { left: 4px; top: 50%; transform: translateY(-50%); }
+    .dpad-right { right: 4px; top: 50%; transform: translateY(-50%); }
+    .dpad-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+    }
+
+    /* Tombol Aksi Kanan Cepat (Kiri & Kanan Besar) */
+    .action-side-btns {
+      pointer-events: auto;
+      display: flex;
+      gap: 12px;
+    }
+
+    .steer-btn-huge {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border: 4px solid #ffffff;
+      color: #ffffff;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(217, 119, 6, 0.45);
+      transition: transform 0.08s ease;
+    }
+    .steer-btn-huge:active { transform: scale(0.9); }
 
     /* ================= 3. OVERLAY KUIS DI CHECKPOINT GERBANG ================= */
     #question-card-overlay {
@@ -157,8 +240,8 @@
       width: 100%;
       height: 100%;
       z-index: 70;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(5px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -186,7 +269,6 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
-    /* Banner Pertanyaan Suara */
     .question-banner-pill {
       width: 100%;
       background: #ffffff;
@@ -215,7 +297,6 @@
       line-height: 1.25;
     }
 
-    /* Tiga Pilihan Huruf Kartu Besar */
     .choices-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -254,7 +335,6 @@
       margin-top: 4px;
     }
 
-    /* Animasi Salah Lembut & Benar */
     .card-shake-soft {
       animation: shakeCard 0.4s ease-in-out;
       border-color: #f59e0b !important;
@@ -276,7 +356,6 @@
       100% { transform: scale(1); }
     }
 
-    /* Status Gerbang Info */
     .gate-lock-info {
       font-size: 13px;
       font-weight: 700;
@@ -329,7 +408,6 @@
       margin-bottom: 24px;
     }
 
-    /* Pilihan Mobil */
     .car-select-title {
       font-size: 14px;
       font-weight: 700;
@@ -366,7 +444,6 @@
       transform: scale(1.1);
     }
 
-    /* Tombol Mulai Balapan Besar */
     .btn-start-race-huge {
       background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
       color: #ffffff;
@@ -430,7 +507,6 @@
     }
     .btn-restart-game:active { transform: scale(0.95); }
 
-    /* Utilitas */
     .hidden { display: none !important; }
   </style>
 </head>
@@ -454,30 +530,45 @@
       </div>
     </header>
 
-    <!-- 2. Canvas Animasi Balap Mobil & Lintasan 3 Jalur -->
+    <!-- Hint Petunjuk Cara Mengemudi -->
+    <div class="touch-hint-pill" id="steering-hint">
+      <span>👆</span>
+      <span>Sentuh & geser mobil langsung, atau pakai tombol setir!</span>
+    </div>
+
+    <!-- 2. Canvas Animasi Balap Mobil & Lintasan -->
     <canvas id="race-canvas"></canvas>
 
-    <!-- 3. Tombol Kemudi Sentuh Layar HP (Kiri & Kanan) -->
+    <!-- 3. Tombol Setir D-PAD Lengkap (Atas, Bawah, Kiri, Kanan) -->
     <div class="bottom-controls-layer">
-      <button id="btn-steer-left" class="steering-btn" aria-label="Geser Kiri" title="Geser Kiri">⬅️</button>
-      <button id="btn-steer-right" class="steering-btn" aria-label="Geser Kanan" title="Geser Kanan">➡️</button>
+      <!-- D-Pad 4 Arah di Kiri Bawah -->
+      <div class="dpad-container">
+        <button id="btn-dpad-up" class="dpad-btn dpad-up" aria-label="Maju Cepat">⬆️</button>
+        <button id="btn-dpad-down" class="dpad-btn dpad-down" aria-label="Mundur Pelan">⬇️</button>
+        <button id="btn-dpad-left" class="dpad-btn dpad-left" aria-label="Belok Kiri">⬅️</button>
+        <button id="btn-dpad-right" class="dpad-btn dpad-right" aria-label="Belok Kanan">➡️</button>
+        <div class="dpad-center"></div>
+      </div>
+
+      <!-- Tombol Aksi Kanan Cepat (Kiri & Kanan Besar) -->
+      <div class="action-side-btns">
+        <button id="btn-steer-left-huge" class="steer-btn-huge" aria-label="Geser Kiri">⬅️</button>
+        <button id="btn-steer-right-huge" class="steer-btn-huge" aria-label="Geser Kanan">➡️</button>
+      </div>
     </div>
 
     <!-- 4. Overlay Panel Pertanyaan Alfabet di Checkpoint -->
     <div id="question-card-overlay" class="hidden">
       <div class="question-modal-box">
-        <!-- Banner Suara Pertanyaan -->
         <div id="btn-voice-prompt-box" class="question-banner-pill" title="Sentuh untuk mengulang suara">
           <span class="q-speaker-icon">🔊</span>
           <span id="question-prompt-text" class="q-text-prompt">Ayo cari huruf A!</span>
         </div>
 
-        <!-- Tiga Pilihan Huruf Kartun -->
         <div id="choices-container" class="choices-row">
           <!-- Render Tombol Pilihan Jawaban Dinamis -->
         </div>
 
-        <!-- Info Gerbang Terkunci -->
         <div class="gate-lock-info">
           <span>🔒</span>
           <span>Pilih huruf yang benar untuk membuka gerbang balap!</span>
@@ -515,7 +606,7 @@
   </div>
 
   <!-- ==========================================================================
-       LOGIKA GAME ENGINE VANILLA JS LENGKAP: STATE MACHINE & VOICE-FIRST
+       LOGIKA GAME ENGINE: SENTUH LANGSUNG MOBIL + D-PAD 4 ARAH + STATE MACHINE
        ========================================================================== -->
   <script>
     (function() {
@@ -609,8 +700,8 @@
             const utter = new SpeechSynthesisUtterance(text);
             if (this.idVoice) utter.voice = this.idVoice;
             utter.lang = 'id-ID';
-            utter.rate = 0.88; // Tempo ramah untuk anak 3-5 tahun
-            utter.pitch = 1.25; // Ceria & ekspresif
+            utter.rate = 0.88;
+            utter.pitch = 1.25;
             utter.onend = () => { if (onEnd) onEnd(); };
             utter.onerror = () => { if (onEnd) onEnd(); };
             this.synth.speak(utter);
@@ -649,7 +740,6 @@
           return this.audioCtx;
         }
 
-        // Suara Mesin Mobil Balap Ceria
         playEngineRev() {
           const ctx = this._getCtx();
           if (!ctx) return;
@@ -669,7 +759,6 @@
           } catch (e) {}
         }
 
-        // Suara Geser Jalur Setir (Whoosh)
         playSteerWhoosh() {
           const ctx = this._getCtx();
           if (!ctx) return;
@@ -689,7 +778,6 @@
           } catch (e) {}
         }
 
-        // Suara Gerbang Terbuka (Ting Ting Fanfare)
         playGateOpenSound() {
           const ctx = this._getCtx();
           if (!ctx) return;
@@ -752,34 +840,36 @@
       const audio = new RacingAudioSystem();
 
       // ----------------------------------------------------------------------
-      // 3. CANVAS 2D BALAPAN: 3 JALUR, MOBIL KARTUN, GERBANG CHECKPOINT
+      // 3. CANVAS 2D BALAPAN: BEBAS GERAK KE 4 ARAH (KIRI, KANAN, ATAS, BAWAH)
+      // DUKUNGAN GESTUR SENTUH LANGSUNG DI BODI MOBIL & LINTASAN
       // ----------------------------------------------------------------------
       class RaceTrackRenderer {
         constructor(canvas) {
           this.canvas = canvas;
           this.ctx = canvas.getContext('2d');
 
-          // Jalur Balap: 0 (Kiri), 1 (Tengah), 2 (Kanan)
-          this.currentLane = 1;
-          this.targetLaneX = 0;
-          this.currentCarX = 0;
+          // Posisi Bebas Mobil (X dan Y)
+          this.carX = 0;
           this.carY = 0;
+          this.targetCarX = 0;
+          this.targetCarY = 0;
 
           // Animasi Lintasan & Latar Bergerak
           this.roadOffset = 0;
           this.roadSpeed = 5;
 
           // State Checkpoint Gerbang 2D
-          this.gateY = -200; // Posisi vertikal gerbang
+          this.gateY = -200;
           this.isGateVisible = false;
           this.isGateOpen = false;
           this.gateOpenAngle = 0;
           this.gateLetter = 'A';
 
-          this.selectedCarColor = 'red'; // 'red', 'blue', 'yellow', 'green'
+          this.selectedCarColor = 'red';
 
           this.resize();
           window.addEventListener('resize', () => this.resize());
+          this.bindDirectTouch();
         }
 
         resize() {
@@ -788,36 +878,94 @@
           this.canvas.width = this.width;
           this.canvas.height = this.height;
 
-          // Hitung Koordinat 3 Jalur (Kiri, Tengah, Kanan)
-          const roadWidth = Math.min(this.width * 0.88, 460);
+          // Hitung Batas Lintasan Jalan
+          const roadWidth = Math.min(this.width * 0.9, 480);
           this.roadLeft = (this.width - roadWidth) / 2;
           this.roadRight = this.roadLeft + roadWidth;
           this.laneWidth = roadWidth / 3;
 
-          this.lanePositions = [
-            this.roadLeft + this.laneWidth * 0.5, // Jalur 0: Kiri
-            this.roadLeft + this.laneWidth * 1.5, // Jalur 1: Tengah
-            this.roadLeft + this.laneWidth * 2.5  // Jalur 2: Kanan
-          ];
-
-          this.carY = this.height * 0.74;
-          this.targetLaneX = this.lanePositions[this.currentLane];
-          if (!this.currentCarX) this.currentCarX = this.targetLaneX;
+          // Posisi Awal Mobil di Tengah Bawah
+          if (!this.carX) {
+            this.carX = this.width * 0.5;
+            this.carY = this.height * 0.72;
+            this.targetCarX = this.carX;
+            this.targetCarY = this.carY;
+          }
         }
 
-        setLane(laneIndex) {
-          if (laneIndex < 0 || laneIndex > 2) return;
-          this.currentLane = laneIndex;
-          this.targetLaneX = this.lanePositions[this.currentLane];
+        // ================= FITUR GESTUR SENTUH LANGSUNG MOBIL ================= //
+        bindDirectTouch() {
+          let isDraggingCar = false;
+
+          const getEventCoords = (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.touches ? e.touches[0] : e;
+            return {
+              x: touch.clientX - rect.left,
+              y: touch.clientY - rect.top
+            };
+          };
+
+          const handleStart = (e) => {
+            if (window.racingGame && window.racingGame.gameState !== 'DRIVING') return;
+            const p = getEventCoords(e);
+            // Cek apakah menyentuh area sekitar mobil atau lintasan
+            isDraggingCar = true;
+            this.moveCarTo(p.x, p.y);
+            audio.playSteerWhoosh();
+          };
+
+          const handleMove = (e) => {
+            if (!isDraggingCar) return;
+            if (window.racingGame && window.racingGame.gameState !== 'DRIVING') return;
+            e.preventDefault();
+            const p = getEventCoords(e);
+            this.moveCarTo(p.x, p.y);
+          };
+
+          const handleEnd = () => {
+            isDraggingCar = false;
+          };
+
+          this.canvas.addEventListener('touchstart', handleStart, { passive: false });
+          this.canvas.addEventListener('touchmove', handleMove, { passive: false });
+          window.addEventListener('touchend', handleEnd);
+
+          this.canvas.addEventListener('mousedown', handleStart);
+          window.addEventListener('mousemove', handleMove);
+          window.addEventListener('mouseup', handleEnd);
+        }
+
+        // Batasi gerakan mobil agar tetap berada dalam lintasan yang aman
+        moveCarTo(targetX, targetY) {
+          const minX = this.roadLeft + 35;
+          const maxX = this.roadRight - 35;
+          const minY = this.height * 0.25;
+          const maxY = this.height * 0.88;
+
+          this.targetCarX = Math.max(minX, Math.min(maxX, targetX));
+          this.targetCarY = Math.max(minY, Math.min(maxY, targetY));
+        }
+
+        // Kontrol Tombol Arah (Atas, Bawah, Kiri, Kanan)
+        moveUp() {
+          this.moveCarTo(this.targetCarX, this.targetCarY - 45);
           audio.playSteerWhoosh();
         }
 
-        steerLeft() {
-          if (this.currentLane > 0) this.setLane(this.currentLane - 1);
+        moveDown() {
+          this.moveCarTo(this.targetCarX, this.targetCarY + 45);
+          audio.playSteerWhoosh();
         }
 
-        steerRight() {
-          if (this.currentLane < 2) this.setLane(this.currentLane + 1);
+        moveLeft() {
+          this.moveCarTo(this.targetCarX - 55, this.targetCarY);
+          audio.playSteerWhoosh();
+        }
+
+        moveRight() {
+          this.moveCarTo(this.targetCarX + 55, this.targetCarY);
+          audio.playSteerWhoosh();
         }
 
         setCarColor(color) {
@@ -826,7 +974,7 @@
 
         spawnGate(letter) {
           this.gateLetter = letter;
-          this.gateY = -120; // Mulai dari atas layar
+          this.gateY = -140;
           this.isGateVisible = true;
           this.isGateOpen = false;
           this.gateOpenAngle = 0;
@@ -838,29 +986,27 @@
         }
 
         updateDriving(isDriving) {
-          // Gerakan Halus Perpindahan Jalur Mobil
-          this.currentCarX += (this.targetLaneX - this.currentCarX) * 0.22;
+          // Gerakan Halus Interpolasi Posisi Mobil
+          this.carX += (this.targetCarX - this.carX) * 0.24;
+          this.carY += (this.targetCarY - this.carY) * 0.24;
 
           if (isDriving) {
             this.roadOffset = (this.roadOffset + this.roadSpeed) % 60;
 
-            // Jika ada gerbang aktif, gerbang meluncur turun mendekati mobil
             if (this.isGateVisible && !this.isGateOpen) {
-              const stopTargetY = this.carY - 140; // Berhenti tepat di depan moncong mobil
+              const stopTargetY = this.carY - 140;
               if (this.gateY < stopTargetY) {
                 this.gateY += this.roadSpeed;
               } else {
                 this.gateY = stopTargetY;
-                // Mobil tiba tepat di Checkpoint!
-                return true; // Beri sinyal ke state machine
+                return true; // Mobil tiba di Checkpoint!
               }
             } else if (this.isGateOpen) {
-              // Gerbang terbuka: Gerbang terus berjalan ke bawah meninggalkan mobil
-              this.gateY += this.roadSpeed * 1.4;
+              this.gateY += this.roadSpeed * 1.5;
               if (this.gateOpenAngle < Math.PI / 2) {
                 this.gateOpenAngle += 0.08;
               }
-              if (this.gateY > this.height + 100) {
+              if (this.gateY > this.height + 120) {
                 this.isGateVisible = false;
               }
             }
@@ -881,21 +1027,19 @@
           // 2. Gambar Lintasan Jalan Raya 3 Jalur
           this.drawRoad(ctx, w, h);
 
-          // 3. Gambar Gerbang Checkpoint (Jika Sedang Aktif)
+          // 3. Gambar Gerbang Checkpoint
           if (this.isGateVisible) {
             this.drawGate(ctx, w);
           }
 
           // 4. Gambar Mobil Balap Kartun
-          this.drawCar(ctx, this.currentCarX, this.carY);
+          this.drawCar(ctx, this.carX, this.carY);
         }
 
         drawScenery(ctx, w, h) {
-          // Rumput Hijau Terang Ceria
           ctx.fillStyle = '#22c55e';
           ctx.fillRect(0, 0, w, h);
 
-          // Bukit-bukit Halus di Sisi Kiri & Kanan
           ctx.fillStyle = '#16a34a';
           ctx.beginPath();
           ctx.arc(this.roadLeft - 60, h * 0.3, 110, 0, Math.PI * 2);
@@ -904,7 +1048,6 @@
           ctx.arc(this.roadRight + 50, h * 0.8, 80, 0, Math.PI * 2);
           ctx.fill();
 
-          // Pepohonan Kartun Lucu
           const drawTree = (x, y) => {
             ctx.fillStyle = '#854d0e';
             ctx.fillRect(x - 6, y, 12, 22);
@@ -929,11 +1072,9 @@
           const rr = this.roadRight;
           const rw = rr - rl;
 
-          // Aspal Jalan Abu-Abu Tua Kartun
           ctx.fillStyle = '#334155';
           ctx.fillRect(rl, 0, rw, h);
 
-          // Garis Tepi Bahu Jalan Merah-Putih Balap (Kerb)
           const kerbHeight = 30;
           for (let y = -kerbHeight; y < h + kerbHeight; y += kerbHeight) {
             const isRed = Math.floor((y + this.roadOffset) / kerbHeight) % 2 === 0;
@@ -942,25 +1083,22 @@
             ctx.fillRect(rr, y + (this.roadOffset % kerbHeight), 12, kerbHeight);
           }
 
-          // Garis Putus-Putus Pembatas 3 Jalur
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 5;
           ctx.setLineDash([26, 24]);
           ctx.lineDashOffset = -this.roadOffset * 1.5;
 
-          // Garis Antara Jalur 1 & 2
           ctx.beginPath();
           ctx.moveTo(rl + this.laneWidth, 0);
           ctx.lineTo(rl + this.laneWidth, h);
           ctx.stroke();
 
-          // Garis Antara Jalur 2 & 3
           ctx.beginPath();
           ctx.moveTo(rl + this.laneWidth * 2, 0);
           ctx.lineTo(rl + this.laneWidth * 2, h);
           ctx.stroke();
 
-          ctx.setLineDash([]); // Reset dash
+          ctx.setLineDash([]);
         }
 
         drawGate(ctx, w) {
@@ -971,19 +1109,16 @@
 
           ctx.save();
 
-          // Tiang Gerbang Kiri & Kanan (Pilar Pelangi Balap)
           ctx.fillStyle = '#f59e0b';
           ctx.fillRect(rl, gy - 70, 24, 90);
           ctx.fillRect(rr - 24, gy - 70, 24, 90);
 
-          // Balok Atas Gerbang
           ctx.fillStyle = '#3b82f6';
           ctx.fillRect(rl - 6, gy - 85, gateW + 12, 28);
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 4;
           ctx.strokeRect(rl - 6, gy - 85, gateW + 12, 28);
 
-          // Lencana Huruf Alfabet Besar di Puncak Gerbang
           ctx.fillStyle = '#ef4444';
           ctx.beginPath();
           ctx.arc(w * 0.5, gy - 85, 34, 0, Math.PI * 2);
@@ -998,9 +1133,7 @@
           ctx.textBaseline = 'middle';
           ctx.fillText(this.gateLetter, w * 0.5, gy - 85);
 
-          // Daun Pintu Penghalang Jalan
           if (!this.isGateOpen) {
-            // Palang Gerbang Tertutup (Garis Belang Kuning-Hitam)
             ctx.fillStyle = '#facc15';
             ctx.fillRect(rl + 24, gy - 20, gateW - 48, 20);
             ctx.fillStyle = '#1e293b';
@@ -1013,7 +1146,6 @@
               ctx.fill();
             }
 
-            // Gembok Emas Bintang
             ctx.fillStyle = '#eab308';
             ctx.beginPath();
             ctx.arc(w * 0.5, gy - 10, 16, 0, Math.PI * 2);
@@ -1026,7 +1158,6 @@
             ctx.fillText('🔒', w * 0.5, gy - 9);
 
           } else {
-            // Palang Gerbang Terangkat Naik (Terbuka!)
             ctx.strokeStyle = '#22c55e';
             ctx.lineWidth = 14;
             ctx.beginPath();
@@ -1047,34 +1178,33 @@
           ctx.save();
           ctx.translate(cx, cy);
 
-          // Warna Mobil Kartun
           let bodyColor = '#ef4444';
           let roofColor = '#b91c1c';
           if (this.selectedCarColor === 'blue') { bodyColor = '#3b82f6'; roofColor = '#1d4ed8'; }
           if (this.selectedCarColor === 'yellow') { bodyColor = '#eab308'; roofColor = '#ca8a04'; }
           if (this.selectedCarColor === 'green') { bodyColor = '#10b981'; roofColor = '#047857'; }
 
-          // Bayangan Mobil di Aspal
+          // Bayangan
           ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
           ctx.beginPath();
           ctx.ellipse(0, 32, 34, 12, 0, 0, Math.PI * 2);
           ctx.fill();
 
-          // 4 Roda Ban Balap Hitam Tebal
+          // 4 Ban Balap
           ctx.fillStyle = '#0f172a';
-          ctx.fillRect(-34, -32, 12, 22); // Kiri Depan
-          ctx.fillRect(22, -32, 12, 22);  // Kanan Depan
-          ctx.fillRect(-34, 14, 12, 22);  // Kiri Belakang
-          ctx.fillRect(22, 14, 12, 22);   // Kanan Belakang
+          ctx.fillRect(-34, -32, 12, 22);
+          ctx.fillRect(22, -32, 12, 22);
+          ctx.fillRect(-34, 14, 12, 22);
+          ctx.fillRect(22, 14, 12, 22);
 
-          // Pelek Roda Kuning Ceria
+          // Pelek Roda
           ctx.fillStyle = '#facc15';
           ctx.fillRect(-32, -26, 8, 10);
           ctx.fillRect(24, -26, 8, 10);
           ctx.fillRect(-32, 20, 8, 10);
           ctx.fillRect(24, 20, 8, 10);
 
-          // Bodi Utama Mobil Balap Bulat Lucu
+          // Bodi Mobil
           ctx.fillStyle = bodyColor;
           ctx.beginPath();
           ctx.roundRect(-26, -38, 52, 74, 16);
@@ -1083,7 +1213,7 @@
           ctx.lineWidth = 3.5;
           ctx.stroke();
 
-          // Kaca Depan & Belakang Biru Cerah
+          // Kaca Depan & Belakang
           ctx.fillStyle = '#bae6fd';
           ctx.beginPath();
           ctx.roundRect(-18, -26, 36, 18, 8);
@@ -1098,14 +1228,14 @@
           ctx.roundRect(-16, -6, 32, 16, 6);
           ctx.fill();
 
-          // Lampu Depan Menyala Ceria
+          // Lampu Depan
           ctx.fillStyle = '#fef08a';
           ctx.beginPath();
           ctx.arc(-16, -37, 6, 0, Math.PI * 2);
           ctx.arc(16, -37, 6, 0, Math.PI * 2);
           ctx.fill();
 
-          // Spoiler Belakang Mobil Balap
+          // Spoiler Belakang
           ctx.fillStyle = bodyColor;
           ctx.fillRect(-28, 30, 56, 8);
 
@@ -1115,20 +1245,14 @@
 
       // ----------------------------------------------------------------------
       // 4. GAME CONTROLLER & STATE MACHINE
-      // State Logika Mutlak:
-      // DRIVING -> CHECKPOINT -> QUESTION_ACTIVE -> CORRECT_ANSWER -> GATE_OPEN -> DRIVING
-      // Jika Salah: QUESTION_ACTIVE -> WRONG_ANSWER -> QUESTION_ACTIVE (Soal Sama!)
       // ----------------------------------------------------------------------
       class AlphabetRacingGame {
         constructor() {
           this.track = null;
-
-          // State Machine Game
-          this.gameState = 'MENU'; // 'MENU', 'DRIVING', 'CHECKPOINT', 'QUESTION_ACTIVE', 'CORRECT_ANSWER', 'GATE_OPEN', 'FINISH'
-          this.currentCheckpointIndex = 0; // 0..25 (A..Z)
-          this.currentQuestionData = null; // Data soal checkpoint aktif
+          this.gameState = 'MENU';
+          this.currentCheckpointIndex = 0;
+          this.currentQuestionData = null;
           this.starScore = 0;
-          this.isPaused = false;
           this.canAnswer = false;
 
           this.init();
@@ -1141,13 +1265,12 @@
           this.loadProgress();
           this.bindEvents();
 
-          // Jalankan Loop Animasi Game Balap
           this.gameLoop = this.gameLoop.bind(this);
           requestAnimationFrame(this.gameLoop);
         }
 
         bindEvents() {
-          // Tombol Mulai Balapan di Menu
+          // Tombol Mulai di Menu
           document.getElementById('btn-start-race')?.addEventListener('click', () => {
             audio.unlock();
             audio.playEngineRev();
@@ -1165,19 +1288,35 @@
             });
           });
 
-          // Tombol Setir HP Kiri & Kanan
-          document.getElementById('btn-steer-left')?.addEventListener('click', () => {
-            if (this.gameState === 'DRIVING') this.track.steerLeft();
+          // Kontrol D-PAD 4 Arah (Atas, Bawah, Kiri, Kanan)
+          document.getElementById('btn-dpad-up')?.addEventListener('click', () => {
+            if (this.gameState === 'DRIVING') this.track.moveUp();
           });
-          document.getElementById('btn-steer-right')?.addEventListener('click', () => {
-            if (this.gameState === 'DRIVING') this.track.steerRight();
+          document.getElementById('btn-dpad-down')?.addEventListener('click', () => {
+            if (this.gameState === 'DRIVING') this.track.moveDown();
+          });
+          document.getElementById('btn-dpad-left')?.addEventListener('click', () => {
+            if (this.gameState === 'DRIVING') this.track.moveLeft();
+          });
+          document.getElementById('btn-dpad-right')?.addEventListener('click', () => {
+            if (this.gameState === 'DRIVING') this.track.moveRight();
           });
 
-          // Kontrol Keyboard untuk Pengujian Laptop/Komputer (ArrowLeft, ArrowRight)
+          // Tombol Kiri & Kanan Besar Tambahan
+          document.getElementById('btn-steer-left-huge')?.addEventListener('click', () => {
+            if (this.gameState === 'DRIVING') this.track.moveLeft();
+          });
+          document.getElementById('btn-steer-right-huge')?.addEventListener('click', () => {
+            if (this.gameState === 'DRIVING') this.track.moveRight();
+          });
+
+          // Keyboard Arrows & WASD (Atas, Bawah, Kiri, Kanan)
           window.addEventListener('keydown', (e) => {
             if (this.gameState === 'DRIVING') {
-              if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') this.track.steerLeft();
-              if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') this.track.steerRight();
+              if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') this.track.moveLeft();
+              if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') this.track.moveRight();
+              if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') this.track.moveUp();
+              if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') this.track.moveDown();
             }
           });
 
@@ -1187,7 +1326,7 @@
             this.showMainMenu();
           });
 
-          // Tombol Ulangi Suara Pertanyaan
+          // Tombol Replay Suara
           document.getElementById('btn-repeat-voice')?.addEventListener('click', () => {
             audio.repeatQuestion();
           });
@@ -1196,7 +1335,7 @@
             audio.repeatQuestion();
           });
 
-          // Tombol Main Lagi di Layar Finis
+          // Tombol Main Lagi
           document.getElementById('btn-restart-race')?.addEventListener('click', () => {
             audio.unlock();
             audio.playEngineRev();
@@ -1249,7 +1388,6 @@
           this.resumeRace();
         }
 
-        // ================= RESUME RACE (DRIVING MODE) ================= //
         resumeRace() {
           this.gameState = 'DRIVING';
           document.getElementById('question-card-overlay')?.classList.add('hidden');
@@ -1257,20 +1395,16 @@
           const cpData = ALPHABET_CHECKPOINTS[this.currentCheckpointIndex];
           document.getElementById('checkpoint-label').innerText = `Gerbang ${cpData.letter} (${this.currentCheckpointIndex + 1}/26)`;
 
-          // Munculkan Gerbang Alfabet Checkpoint di Depan Lintasan
           this.track.spawnGate(cpData.letter);
         }
 
-        // ================= KETIKA MOBIL TIBA DI CHECKPOINT ================= //
         handleCarArrivedAtCheckpoint() {
-          // Cegah eksekusi ganda jika sudah dalam kuis
           if (this.gameState !== 'DRIVING') return;
 
           this.gameState = 'CHECKPOINT';
           this.showQuestionForCurrentCheckpoint();
         }
 
-        // ================= ATURAN PALING PENTING: SATU SOAL PER CHECKPOINT ================= //
         showQuestionForCurrentCheckpoint() {
           this.gameState = 'QUESTION_ACTIVE';
           this.canAnswer = true;
@@ -1278,18 +1412,15 @@
           const cpData = ALPHABET_CHECKPOINTS[this.currentCheckpointIndex];
           this.currentQuestionData = cpData;
 
-          // Buat 3 Pilihan Huruf (1 Benar, 2 Pengecoh)
           let choices = [cpData.letter];
           let otherLetters = ALPHABET_CHECKPOINTS.map(x => x.letter).filter(l => l !== cpData.letter);
           otherLetters.sort(() => Math.random() - 0.5);
           choices.push(otherLetters[0], otherLetters[1]);
-          choices.sort(() => Math.random() - 0.5); // Acak posisi tombol
+          choices.sort(() => Math.random() - 0.5);
 
-          // Update Teks Tampilan Pertanyaan
           const promptText = cpData.prompt;
           document.getElementById('question-prompt-text').innerText = promptText;
 
-          // Render 3 Tombol Huruf Besar
           const container = document.getElementById('choices-container');
           container.innerHTML = '';
 
@@ -1298,7 +1429,6 @@
             btn.className = 'choice-card-btn';
             btn.setAttribute('data-letter', letter);
 
-            // Cari kata pendukung untuk huruf tersebut
             const matchedInfo = ALPHABET_CHECKPOINTS.find(x => x.letter === letter);
 
             btn.innerHTML = `
@@ -1314,20 +1444,15 @@
             container.appendChild(btn);
           });
 
-          // Tampilkan Overlay Kuis
           document.getElementById('question-card-overlay')?.classList.remove('hidden');
-
-          // Putar Suara Pertanyaan Secara Otomatis
           audio.speakQuestion(promptText);
         }
 
-        // ================= VALIDASI JAWABAN KETAT ================= //
         checkAnswer(selectedLetter, correctLetter, btnElement) {
           audio.playTapSound();
 
           if (selectedLetter === correctLetter) {
-            // JAWABAN BENAR!
-            this.canAnswer = false; // Kunci input agar tidak klik ganda
+            this.canAnswer = false;
             this.gameState = 'CORRECT_ANSWER';
 
             this.starScore += 1;
@@ -1336,11 +1461,9 @@
 
             btnElement.classList.add('card-correct-pop');
 
-            // Buka Gerbang Balap
             this.gameState = 'GATE_OPEN';
             this.track.openGate();
 
-            // Ucapkan Pujian Ceria & Lanjutkan Mobil Otomatis
             audio.speakCorrect(() => {
               setTimeout(() => {
                 this.handleCheckpointResolved();
@@ -1348,11 +1471,6 @@
             });
 
           } else {
-            // JAWABAN SALAH:
-            // ATURAN MUTLAK:
-            // - Jangan ganti soal!
-            // - Jangan membuka gerbang!
-            // - Mobil tetap berhenti!
             audio.playSoftTryAgain();
             btnElement.classList.add('card-shake-soft');
             setTimeout(() => btnElement.classList.remove('card-shake-soft'), 500);
@@ -1361,14 +1479,11 @@
           }
         }
 
-        // ================= CHECKPOINT SELESAI, LANJUTKAN BALAPAN ================= //
         handleCheckpointResolved() {
-          // Tandai checkpoint saat ini selesai
           if (this.currentCheckpointIndex + 1 < ALPHABET_CHECKPOINTS.length) {
             this.currentCheckpointIndex++;
-            this.resumeRace(); // Mobil kembali melaju otomatis ke huruf berikutnya!
+            this.resumeRace();
           } else {
-            // Berhasil Menyelesaikan Seluruh 26 Huruf A-Z!
             this.finishGame();
           }
         }
@@ -1383,7 +1498,6 @@
           audio.speakQuestion("Horeee! Selamat! Kamu berhasil menyelesaikan semua gerbang alfabet A sampai Z! Kamu adalah juara balap sejati!");
         }
 
-        // ================= LOOP GAME ANIMASI ================= //
         gameLoop() {
           const isDriving = (this.gameState === 'DRIVING' || this.gameState === 'GATE_OPEN');
           const hitCheckpoint = this.track.updateDriving(isDriving);
@@ -1397,7 +1511,6 @@
         }
       }
 
-      // Jalankan Game saat DOM Siap
       window.addEventListener('DOMContentLoaded', () => {
         window.racingGame = new AlphabetRacingGame();
       });
