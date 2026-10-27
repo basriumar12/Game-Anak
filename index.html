@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Adventure Quest: The Lost Crystals — Game Edukasi Platformer</title>
+  <title>Petualangan Si Kecil: Kristal Ajaib (Usia 3–4 Tahun)</title>
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       ADVENTURE QUEST: THE LOST CRYSTALS — STYLING
+       ADVENTURE QUEST KHUSUS BALITA 3-4 TAHUN (BEBAS BACA & HITUNG, FULLSCREEN)
        ========================================================================== */
     * {
       box-sizing: border-box;
@@ -28,7 +28,7 @@
       height: 100%;
       overflow: hidden;
       font-family: 'Fredoka', 'Nunito', sans-serif;
-      background: #090d16;
+      background: #0284c7;
       touch-action: none;
     }
 
@@ -39,6 +39,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      background: #38bdf8;
     }
 
     /* Canvas Game Engine 2D Platformer */
@@ -52,7 +53,7 @@
       z-index: 5;
     }
 
-    /* ================= 1. TOP HUD (STATUS, KRISTAL, KOIN & AUDIO) ================= */
+    /* ================= 1. TOP HUD (STATUS & AUDIO) ================= */
     .top-hud {
       position: absolute;
       top: 0;
@@ -74,67 +75,55 @@
     }
 
     .hud-circle-btn {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.95);
-      border: 3px solid #38bdf8;
+      background: #ffffff;
+      border: 4px solid #38bdf8;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 26px;
       cursor: pointer;
       box-shadow: 0 6px 14px rgba(0,0,0,0.3);
       transition: transform 0.1s ease;
     }
     .hud-circle-btn:active { transform: scale(0.9); }
     .btn-home { border-color: #f59e0b; background: #fef08a; }
-    .btn-speaker { border-color: #10b981; background: #bbf7d0; }
-    .btn-mode-switch { border-color: #ec4899; background: #fce7f3; font-size: 16px; font-weight: 800; width: auto; padding: 0 14px; border-radius: 24px; gap: 6px; }
+    .btn-speaker { border-color: #10b981; background: #bbf7d0; animation: pulseBtn 1.8s infinite alternate ease-in-out; }
+    .btn-fullscreen { border-color: #ec4899; background: #fce7f3; }
 
-    /* Kristal & Koin Badge */
+    @keyframes pulseBtn {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.08); }
+    }
+
+    /* Kristal & Koin Pill Balita */
     .hud-stat-pill {
-      background: rgba(15, 23, 42, 0.85);
-      border: 3px solid #38bdf8;
+      background: rgba(255, 255, 255, 0.95);
+      border: 3.5px solid #f59e0b;
       padding: 6px 14px;
       border-radius: 26px;
-      color: #ffffff;
-      font-size: 15px;
+      color: #b45309;
+      font-size: 16px;
       font-weight: 800;
       display: flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      gap: 6px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
 
-    .crystal-dots-wrap {
-      display: flex;
-      gap: 4px;
-    }
-    .c-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 4px;
-      transform: rotate(45deg);
-      background: #475569;
-      box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
-    }
-    .c-dot.unlocked {
-      background: #38bdf8;
-      box-shadow: 0 0 8px #38bdf8;
-    }
-
-    /* ================= 2. KONTROL TOUCHSCREEN HP ================= */
+    /* ================= 2. KONTROL TOUCHSCREEN HP SUPER JELAS & BESAR ================= */
     .bottom-controls-layer {
       position: absolute;
-      bottom: 16px;
+      bottom: 14px;
       left: 0;
       width: 100%;
-      z-index: 45;
+      z-index: 100; /* Pastikan selalu berada di paling atas canvas */
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      padding: 0 20px env(safe-area-inset-bottom, 12px);
+      padding: 0 16px env(safe-area-inset-bottom, 14px);
       pointer-events: none;
     }
 
@@ -144,140 +133,127 @@
       gap: 14px;
     }
 
-    .touch-btn {
-      width: 72px;
-      height: 72px;
+    /* Tombol Kiri, Kanan, Lompat Berukuran Sangat Besar Untuk Balita */
+    .touch-btn-huge {
+      width: 82px;
+      height: 82px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.85);
-      border: 4px solid #38bdf8;
-      color: #0369a1;
-      font-size: 32px;
+      background: #ffffff;
+      border: 5px solid #0284c7;
+      color: #0284c7;
+      font-size: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35), inset 0 -4px 0 #bae6fd;
       transition: transform 0.08s ease, background 0.1s;
     }
-    .touch-btn:active {
+    .touch-btn-huge:active {
       transform: scale(0.9);
-      background: #38bdf8;
+      background: #0284c7;
       color: #ffffff;
     }
 
     .actions-group {
       pointer-events: auto;
       display: flex;
-      gap: 14px;
+      gap: 12px;
     }
 
-    .btn-action-jump {
+    .btn-jump-huge {
+      width: 86px;
+      height: 86px;
       background: linear-gradient(135deg, #22c55e, #16a34a);
-      border-color: #ffffff;
+      border: 5px solid #ffffff;
       color: #ffffff;
-      font-size: 28px;
+      font-size: 38px;
+      box-shadow: 0 8px 24px rgba(22, 163, 74, 0.45);
     }
 
-    .btn-action-interact {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      border-color: #ffffff;
-      color: #ffffff;
-      font-size: 26px;
-      display: flex;
-      flex-direction: column;
-      font-size: 11px;
-      font-weight: 800;
-    }
-    .btn-action-interact span { font-size: 22px; }
-
-    /* ================= 3. OVERLAY TANTANGAN EDUKASI MODULAR ================= */
+    /* ================= 3. OVERLAY KUIS BALITA 3-4 TAHUN (GAMBAR HEWAN & WARNA) ================= */
     #challenge-modal {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 80;
+      z-index: 150;
       background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(6px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
     }
 
     .challenge-card {
       width: 100%;
-      max-width: 440px;
+      max-width: 420px;
       background: #ffffff;
       border: 6px solid #f59e0b;
-      border-radius: 34px;
-      padding: 24px 20px;
+      border-radius: 36px;
+      padding: 22px 18px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       animation: popCard 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     @keyframes popCard {
-      0% { transform: scale(0.5); opacity: 0; }
+      0% { transform: scale(0.4); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
-    }
-
-    .challenge-badge-category {
-      background: #fef08a;
-      color: #b45309;
-      font-size: 13px;
-      font-weight: 800;
-      padding: 4px 14px;
-      border-radius: 20px;
-      border: 2px solid #f59e0b;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .challenge-prompt-box {
       width: 100%;
-      background: #f8fafc;
-      border: 3px solid #cbd5e1;
-      border-radius: 20px;
-      padding: 12px 16px;
+      background: #f0fdf4;
+      border: 3.5px solid #22c55e;
+      border-radius: 22px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       cursor: pointer;
     }
-    .challenge-speaker-icon { font-size: 28px; }
-    .challenge-text { font-size: 17px; font-weight: 800; color: #1e293b; line-height: 1.3; }
+    .challenge-speaker-icon { font-size: 32px; }
+    .challenge-text { font-size: 17px; font-weight: 800; color: #166534; line-height: 1.25; }
 
-    .choices-grid {
+    /* Pilihan Gambar Raksasa untuk Balita (3 Kolom Kartu) */
+    .choices-row-toddler {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+
+    .choice-card-toddler {
+      aspect-ratio: 1;
+      background: #ffffff;
+      border: 4.5px solid #38bdf8;
+      border-radius: 26px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .choice-option-btn {
-      width: 100%;
-      padding: 14px 18px;
-      background: #ffffff;
-      border: 3.5px solid #38bdf8;
-      border-radius: 20px;
-      font-family: inherit;
-      font-size: 17px;
-      font-weight: 800;
-      color: #0369a1;
-      cursor: pointer;
-      display: flex;
       align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 6px 14px rgba(2, 132, 199, 0.15);
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(2, 132, 199, 0.2), inset 0 -4px 0 #bae6fd;
       transition: transform 0.1s ease, border-color 0.15s ease;
     }
-    .choice-option-btn:active { transform: scale(0.97); }
+    .choice-card-toddler:active { transform: scale(0.92); }
+
+    .choice-emoji-giant {
+      font-size: 50px;
+      line-height: 1;
+    }
+    .choice-name-sub {
+      font-size: 13px;
+      font-weight: 800;
+      color: #64748b;
+      margin-top: 4px;
+    }
 
     .card-shake {
       animation: shakeAnim 0.4s ease-in-out;
@@ -297,19 +273,19 @@
     }
     @keyframes popWin {
       0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+      50% { transform: scale(1.1); }
       100% { transform: scale(1); }
     }
 
-    /* ================= 4. MENU UTAMA, PILIH DUNIA & KATEGORI ================= */
+    /* ================= 4. MENU UTAMA ================= */
     #menu-screen {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 100;
-      background: linear-gradient(180deg, #090d16 0%, #1e1b4b 60%, #312e81 100%);
+      z-index: 120;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -320,7 +296,7 @@
     }
 
     .game-logo-art {
-      font-size: 72px;
+      font-size: 80px;
       margin-bottom: 6px;
       animation: floatLogo 2s infinite ease-in-out;
     }
@@ -332,55 +308,47 @@
     .game-title {
       font-size: 32px;
       font-weight: 800;
-      letter-spacing: 0.5px;
-      text-shadow: 0 4px 14px rgba(0,0,0,0.5);
+      text-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     .game-subtitle {
-      font-size: 15px;
-      color: #93c5fd;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    /* Selector Kategori Edukasi Modular */
-    .category-dock-title {
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #facc15;
-      margin-bottom: 8px;
+      font-size: 16px;
+      color: #fef08a;
+      font-weight: 700;
+      margin-top: 4px;
+      margin-bottom: 24px;
     }
 
     .category-chips-row {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
       justify-content: center;
-      max-width: 460px;
-      margin-bottom: 24px;
+      max-width: 440px;
+      margin-bottom: 26px;
     }
 
     .chip-btn {
-      background: rgba(255, 255, 255, 0.15);
-      border: 2px solid rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.2);
+      border: 3px solid #ffffff;
       color: #ffffff;
-      padding: 8px 14px;
-      border-radius: 20px;
+      padding: 10px 16px;
+      border-radius: 24px;
       font-family: inherit;
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
       transition: all 0.12s;
     }
     .chip-btn.active {
-      background: #38bdf8;
+      background: #facc15;
       border-color: #ffffff;
-      color: #0f172a;
-      box-shadow: 0 0 12px #38bdf8;
+      color: #854d0e;
+      box-shadow: 0 6px 14px rgba(250, 204, 21, 0.4);
+      transform: scale(1.05);
     }
 
     .btn-play-adventure {
@@ -389,12 +357,12 @@
       border: 5px solid #ffffff;
       border-radius: 40px;
       padding: 16px 48px;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 800;
       font-family: inherit;
       cursor: pointer;
-      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5);
-      transition: transform 0.1s ease;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5), inset 0 -4px 0 #15803d;
+      animation: pulseBtn 1.8s infinite ease-in-out;
     }
     .btn-play-adventure:active { transform: scale(0.95); }
 
@@ -405,7 +373,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 110;
+      z-index: 160;
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(8px);
       display: flex;
@@ -443,27 +411,16 @@
       <div class="hud-group">
         <button id="btn-back-home" class="hud-circle-btn btn-home" aria-label="Menu Utama" title="Menu Utama">🏠</button>
         <button id="btn-repeat-voice" class="hud-circle-btn btn-speaker" aria-label="Ulangi Suara" title="Ulangi Suara">🔊</button>
-        <!-- Tombol Ganti Mode Balap / Petualangan Cepat -->
-        <button id="btn-switch-game-mode" class="hud-circle-btn btn-mode-switch" title="Ganti Mode Permainan">
-          <span>🎮</span>
-          <span id="game-mode-tag">Petualangan</span>
-        </button>
+        <!-- Tombol Layar Penuh (Fullscreen HP) -->
+        <button id="btn-toggle-fullscreen" class="hud-circle-btn btn-fullscreen" aria-label="Layar Penuh" title="Layar Penuh HP">⛶</button>
       </div>
 
       <div class="hud-group">
         <div class="hud-stat-pill">
           <span>🪙</span>
           <span id="coin-counter">0</span>
-        </div>
-        <div class="hud-stat-pill">
           <span>💎</span>
-          <div class="crystal-dots-wrap" id="crystal-dots">
-            <div class="c-dot"></div>
-            <div class="c-dot"></div>
-            <div class="c-dot"></div>
-            <div class="c-dot"></div>
-            <div class="c-dot"></div>
-          </div>
+          <span id="crystal-counter">0</span>
         </div>
       </div>
     </header>
@@ -471,132 +428,102 @@
     <!-- 2. Canvas 2D Game Petualangan Platformer -->
     <canvas id="adventure-canvas"></canvas>
 
-    <!-- 3. Tombol Kontrol Layar Sentuh HP -->
+    <!-- 3. Tombol Kontrol Layar Sentuh HP (Tampil Nyata & Jelas di Atas Canvas) -->
     <div class="bottom-controls-layer">
-      <!-- Tombol Gerak Kiri & Kanan -->
+      <!-- Tombol Gerak Kiri & Kanan Super Besar -->
       <div class="dpad-walk-group">
-        <button id="btn-move-left" class="touch-btn" aria-label="Jalan Kiri">◀</button>
-        <button id="btn-move-right" class="touch-btn" aria-label="Jalan Kanan">▶</button>
+        <button id="btn-move-left" class="touch-btn-huge" aria-label="Jalan Kiri">◀</button>
+        <button id="btn-move-right" class="touch-btn-huge" aria-label="Jalan Kanan">▶</button>
       </div>
 
-      <!-- Tombol Aksi Lompat & Interaksi -->
+      <!-- Tombol Aksi Lompat Besar -->
       <div class="actions-group">
-        <button id="btn-interact" class="touch-btn btn-action-interact" aria-label="Interaksi">
-          <span>✋</span>
-          BUKA
-        </button>
-        <button id="btn-jump" class="touch-btn btn-action-jump" aria-label="Lompat">▲</button>
+        <button id="btn-jump" class="touch-btn-huge btn-jump-huge" aria-label="Lompat">▲</button>
       </div>
     </div>
 
-    <!-- 4. Modal Tantangan Edukasi Modular (Muncul di Gerbang / Peti / Kristal) -->
+    <!-- 4. Modal Tantangan Edukasi Khusus Anak 3-4 Tahun (Gambar Hewan, Buah, & Huruf Besar) -->
     <div id="challenge-modal" class="hidden">
       <div class="challenge-card">
-        <span class="challenge-badge-category" id="challenge-category-label">Matematika Dasar</span>
-
         <div id="challenge-speech-bar" class="challenge-prompt-box">
           <span class="challenge-speaker-icon">🔊</span>
-          <span id="challenge-prompt-text" class="challenge-text">Berapa hasil dari 2 + 3?</span>
+          <span id="challenge-prompt-text" class="challenge-text">Mana gambar Kucing Meong?</span>
         </div>
 
-        <div id="challenge-choices-container" class="choices-grid">
-          <!-- Tombol Pilihan Jawaban Dinamis -->
+        <div id="challenge-choices-container" class="choices-row-toddler">
+          <!-- Tombol Kartu Bergambar Raksasa Dinamis -->
         </div>
       </div>
     </div>
 
-    <!-- 5. Layar Menu Utama (Pilih Dunia & Kategori Edukasi) -->
+    <!-- 5. Layar Menu Utama (Pilih Kategori Ramah Balita) -->
     <div id="menu-screen">
-      <div class="game-logo-art">💎✨</div>
-      <h1 class="game-title">ADVENTURE QUEST</h1>
-      <p class="game-subtitle">The Lost Crystals & Edukasi Cerdas</p>
+      <div class="game-logo-art">💎🦁</div>
+      <h1 class="game-title">Petualangan Si Kecil</h1>
+      <p class="game-subtitle">Khusus Balita Usia 3 dan 4 Tahun</p>
 
-      <p class="category-dock-title">Pilih Pelajaran Edukasi:</p>
       <div class="category-chips-row" id="category-chips-wrap">
-        <button class="chip-btn active" data-cat="math">🔢 Matematika</button>
-        <button class="chip-btn" data-cat="english">🔤 English</button>
-        <button class="chip-btn" data-cat="indo">🇮🇩 B. Indonesia</button>
-        <button class="chip-btn" data-cat="science">🌱 Sains & Alam</button>
-        <button class="chip-btn" data-cat="coding">💻 Koding & Logika</button>
-        <button class="chip-btn" data-cat="hijaiyah">📖 Hijaiyah</button>
+        <button class="chip-btn active" data-cat="animals">🐱 Tebak Hewan</button>
+        <button class="chip-btn" data-cat="fruits">🍎 Tebak Buah</button>
+        <button class="chip-btn" data-cat="letters">🔤 Huruf A, B, C</button>
+        <button class="chip-btn" data-cat="colors">🎨 Tebak Warna</button>
       </div>
 
-      <button id="btn-start-quest" class="btn-play-adventure">MULAI PETUALANGAN! 🚀</button>
+      <button id="btn-start-quest" class="btn-play-adventure">MULAI MAIN! ▶️</button>
     </div>
 
-    <!-- 6. Modal Kemenangan Wilayah (Dapat Kristal) -->
+    <!-- 6. Modal Kemenangan (Dapat Kristal) -->
     <div id="victory-modal" class="hidden">
-      <div class="trophy-badge">💎👑</div>
-      <h2 style="font-size: 28px; font-weight: 800; color: #38bdf8; margin-top: 10px;">KRISTAL DITEMUKAN!</h2>
+      <div class="trophy-badge">💎✨</div>
+      <h2 style="font-size: 28px; font-weight: 800; color: #38bdf8; margin-top: 10px;">HEBAT SEKALI!</h2>
       <p id="victory-desc" style="font-size: 16px; margin-top: 6px; opacity: 0.95;">
-        Kamu berhasil menyelamatkan Kristal Hutan Ajaib!
+        Kamu berhasil mendapatkan Kristal Ajaib!
       </p>
-      <button id="btn-next-world" class="btn-next-world">Lanjut ke Wilayah Berikutnya! 🗺️</button>
+      <button id="btn-next-world" class="btn-next-world">Main Lagi! 🚀</button>
     </div>
 
   </div>
 
   <!-- ==========================================================================
-       ENGINE LOGIKA GAME PLATFORMER 2D, MODULAR EDUKASI & AUDIO SYNTHESIZER
+       ENGINE LOGIKA GAME PLATFORMER 2D BALITA (FULLSCREEN & TOUCH EVENTS)
        ========================================================================== -->
   <script>
     (function() {
       'use strict';
 
       // ----------------------------------------------------------------------
-      // 1. DATA EDUKASI MODULAR (BISA DIGANTI BEBAS)
+      // 1. DATA SOAL KHUSUS BALITA 3-4 TAHUN (BEBAS BACA & BEBAS HITUNGANGKA)
+      // Visual EMOJI RAKSASA & SUARA JELAS
       // ----------------------------------------------------------------------
-      const EDUCATION_DATABASE = {
-        math: [
-          { q: 'Berapakah 2 + 3?', options: ['5', '6', '4'], answer: '5', hint: 'Dua ditambah tiga sama dengan lima!' },
-          { q: 'Mana bilangan yang lebih besar?', options: ['9', '4', '2'], answer: '9', hint: 'Sembilan adalah angka paling besar!' },
-          { q: 'Berapakah 10 dikurangi 4?', options: ['6', '5', '7'], answer: '6', hint: 'Sepuluh dikurangi empat adalah enam!' },
-          { q: 'Berapakah 3 + 4?', options: ['7', '8', '6'], answer: '7', hint: 'Tiga ditambah empat adalah tujuh!' },
-          { q: 'Jika punya 4 apel lalu dapat 2 lagi, berapa totalnya?', options: ['6', '5', '7'], answer: '6', hint: 'Empat ditambah dua adalah enam!' }
+      const TODDLER_DATABASE = {
+        animals: [
+          { q: 'Mana hewan Kucing yang berbunyi meong meong?', options: [{ e: '🐱', n: 'Kucing' }, { e: '🐶', n: 'Anjing' }, { e: '🦆', n: 'Bebek' }], answer: 'Kucing' },
+          { q: 'Mana hewan Bebek yang berbunyi kwek kwek?', options: [{ e: '🦆', n: 'Bebek' }, { e: '🐸', n: 'Katak' }, { e: '🐱', n: 'Kucing' }], answer: 'Bebek' },
+          { q: 'Mana hewan Kodok yang suka melompat?', options: [{ e: '🐸', n: 'Kodok' }, { e: '🐰', n: 'Kelinci' }, { e: '🦁', n: 'Singa' }], answer: 'Kodok' },
+          { q: 'Mana hewan Kelinci berbulu putih yang suka wortel?', options: [{ e: '🐰', n: 'Kelinci' }, { e: '🐱', n: 'Kucing' }, { e: '🐶', n: 'Anjing' }], answer: 'Kelinci' },
+          { q: 'Mana hewan Singa si raja hutan yang gagah?', options: [{ e: '🦁', n: 'Singa' }, { e: '🐵', n: 'Monyet' }, { e: '🐘', n: 'Gajah' }], answer: 'Singa' }
         ],
-        english: [
-          { q: 'What is the English word for "Apel"?', options: ['Apple', 'Banana', 'Orange'], answer: 'Apple', hint: 'Apel dalam bahasa Inggris adalah Apple!' },
-          { q: 'Which word means "Kucing"?', options: ['Cat', 'Dog', 'Bird'], answer: 'Cat', hint: 'Kucing dalam bahasa Inggris adalah Cat!' },
-          { q: 'Choose the correct word for "Buku":', options: ['Book', 'Pencil', 'Bag'], answer: 'Book', hint: 'Buku dalam bahasa Inggris adalah Book!' },
-          { q: 'What color is "Merah"?', options: ['Red', 'Blue', 'Green'], answer: 'Red', hint: 'Warna merah adalah Red!' },
-          { q: 'What is "Matahari" in English?', options: ['Sun', 'Moon', 'Star'], answer: 'Sun', hint: 'Matahari adalah Sun!' }
+        fruits: [
+          { q: 'Mana buah Apel merah yang manis?', options: [{ e: '🍎', n: 'Apel' }, { e: '🍌', n: 'Pisang' }, { e: '🍇', n: 'Anggur' }], answer: 'Apel' },
+          { q: 'Mana buah Pisang kuning kesukaan monyet?', options: [{ e: '🍌', n: 'Pisang' }, { e: '🍓', n: 'Stroberi' }, { e: '🍊', n: 'Jeruk' }], answer: 'Pisang' },
+          { q: 'Mana buah Stroberi merah yang berbintik?', options: [{ e: '🍓', n: 'Stroberi' }, { e: '🍎', n: 'Apel' }, { e: '🍉', n: 'Semangka' }], answer: 'Stroberi' },
+          { q: 'Mana buah Semangka segar?', options: [{ e: '🍉', n: 'Semangka' }, { e: '🍌', n: 'Pisang' }, { e: '🍊', n: 'Jeruk' }], answer: 'Semangka' }
         ],
-        indo: [
-          { q: 'Huruf pertama dari kata "Gajah" adalah...', options: ['G', 'J', 'H'], answer: 'G', hint: 'Gajah diawali dengan huruf G!' },
-          { q: 'Lawan kata dari kata "Besar" adalah...', options: ['Kecil', 'Tinggi', 'Panjang'], answer: 'Kecil', hint: 'Lawan kata besar adalah kecil!' },
-          { q: 'Hewan yang bisa terbang di udara adalah...', options: ['Burung', 'Ikan', 'Kucing'], answer: 'Burung', hint: 'Burung memiliki sayap untuk terbang!' },
-          { q: 'Huruf vokal pada kata "BOLA" adalah...', options: ['O dan A', 'B dan L', 'B dan O'], answer: 'O dan A', hint: 'Huruf vokal adalah A, I, U, E, O!' }
+        letters: [
+          { q: 'Ayo sentuh huruf A! A seperti Apel!', options: [{ e: 'A', n: 'Huruf A' }, { e: 'B', n: 'Huruf B' }, { e: 'C', n: 'Huruf C' }], answer: 'Huruf A' },
+          { q: 'Ayo sentuh huruf B! B seperti Bola!', options: [{ e: 'B', n: 'Huruf B' }, { e: 'D', n: 'Huruf D' }, { e: 'A', n: 'Huruf A' }], answer: 'Huruf B' },
+          { q: 'Ayo sentuh huruf C! C seperti Ceri!', options: [{ e: 'C', n: 'Huruf C' }, { e: 'O', n: 'Huruf O' }, { e: 'B', n: 'Huruf B' }], answer: 'Huruf C' }
         ],
-        science: [
-          { q: 'Bagian tumbuhan yang menyerap air dari dalam tanah adalah...', options: ['Akar', 'Daun', 'Bunga'], answer: 'Akar', hint: 'Akar bertugas menyerap air dari tanah!' },
-          { q: 'Hewan yang bernapas menggunakan insang di air adalah...', options: ['Ikan', 'Kelinci', 'Kambing'], answer: 'Ikan', hint: 'Ikan hidup di air dan bernapas dengan insang!' },
-          { q: 'Benda langit yang menerangi bumi di siang hari adalah...', options: ['Matahari', 'Bulan', 'Bintang'], answer: 'Matahari', hint: 'Matahari memberikan cahaya di siang hari!' }
-        ],
-        coding: [
-          { q: 'Apa fungsi dari perintah IF dalam koding?', options: ['Pilihan kondisi', 'Mengulang lagu', 'Mematikan layar'], answer: 'Pilihan kondisi', hint: 'IF digunakan untuk memeriksa kondisi!' },
-          { q: 'Untuk mengulang gerakan berjalan 5 kali, kita gunakan...', options: ['Loop / Perulangan', 'Stop', 'Hapus'], answer: 'Loop / Perulangan', hint: 'Loop digunakan untuk mengulang aksi!' },
-          { q: 'Jika karakter menabrak dinding, apa yang harus dilakukan?', options: ['Berhenti / Berbalik', 'Menembus', 'Hilang'], answer: 'Berhenti / Berbalik', hint: 'Karakter harus berhenti saat bertemu rintangan!' }
-        ],
-        hijaiyah: [
-          { q: 'Mana huruf Alif (ا)?', options: ['ا', 'ب', 'ت'], answer: 'ا', hint: 'Huruf Alif tegak lurus seperti tiang!' },
-          { q: 'Mana huruf Ba (ب) dengan satu titik di bawah?', options: ['ب', 'ت', 'ث'], answer: 'ب', hint: 'Huruf Ba memiliki satu titik di bawah!' },
-          { q: 'Mana huruf Ta (ت) dengan dua titik di atas?', options: ['ت', 'ب', 'ث'], answer: 'ت', hint: 'Huruf Ta memiliki dua titik di atas!' }
+        colors: [
+          { q: 'Mana warna Merah seperti api?', options: [{ e: '🔴', n: 'Merah' }, { e: '🔵', n: 'Biru' }, { e: '🟡', n: 'Kuning' }], answer: 'Merah' },
+          { q: 'Mana warna Biru seperti langit?', options: [{ e: '🔵', n: 'Biru' }, { e: '🟢', n: 'Hijau' }, { e: '🔴', n: 'Merah' }], answer: 'Biru' },
+          { q: 'Mana warna Kuning seperti matahari?', options: [{ e: '🟡', n: 'Kuning' }, { e: '🔵', n: 'Biru' }, { e: '🔴', n: 'Merah' }], answer: 'Kuning' },
+          { q: 'Mana warna Hijau seperti daun pohon?', options: [{ e: '🟢', n: 'Hijau' }, { e: '🟡', n: 'Kuning' }, { e: '🔴', n: 'Merah' }], answer: 'Hijau' }
         ]
       };
 
       // ----------------------------------------------------------------------
-      // 2. 5 WILAYAH PETUALANGAN (WORLDS & CRYSTALS)
-      // ----------------------------------------------------------------------
-      const WORLDS = [
-        { id: 1, name: 'Enchanted Forest', theme: 'forest', skyColor: '#1e3a5f', groundColor: '#15803d', crystalName: 'Kristal Hutan Hijau' },
-        { id: 2, name: 'Desert of Secrets', theme: 'desert', skyColor: '#78350f', groundColor: '#d97706', crystalName: 'Kristal Pasir Emas' },
-        { id: 3, name: 'Frozen Mountain', theme: 'snow', skyColor: '#0f172a', groundColor: '#38bdf8', crystalName: 'Kristal Es Abadi' },
-        { id: 4, name: 'Sky Islands', theme: 'sky', skyColor: '#0284c7', groundColor: '#a855f7', crystalName: 'Kristal Langit Biru' },
-        { id: 5, name: 'Dark Castle', theme: 'castle', skyColor: '#18181b', groundColor: '#475569', crystalName: 'Kristal Mahkota Kerajaan' }
-      ];
-
-      // ----------------------------------------------------------------------
-      // 3. AUDIO ENGINE & SYNTHESIZER
+      // 2. AUDIO SYNTHESIZER
       // ----------------------------------------------------------------------
       class SoundEngine {
         constructor() {
@@ -629,8 +556,8 @@
             const u = new SpeechSynthesisUtterance(text);
             if (this.idVoice) u.voice = this.idVoice;
             u.lang = 'id-ID';
-            u.rate = 0.9;
-            u.pitch = 1.2;
+            u.rate = 0.88; // Tempo tenang untuk anak 3-4 tahun
+            u.pitch = 1.25; // Ceria kartun
             u.onend = () => { if (onEnd) onEnd(); };
             u.onerror = () => { if (onEnd) onEnd(); };
             this.synth.speak(u);
@@ -661,7 +588,7 @@
             const gain = c.createGain();
             osc.type = 'sine';
             osc.frequency.setValueAtTime(260, t);
-            osc.frequency.exponentialRampToValueAtTime(540, t + 0.12);
+            osc.frequency.exponentialRampToValueAtTime(560, t + 0.12);
             gain.gain.setValueAtTime(0.2, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
             osc.connect(gain);
@@ -679,8 +606,8 @@
             const osc = c.createOscillator();
             const gain = c.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(987.77, t); // B5
-            osc.frequency.setValueAtTime(1318.51, t + 0.08); // E6
+            osc.frequency.setValueAtTime(987.77, t);
+            osc.frequency.setValueAtTime(1318.51, t + 0.08);
             gain.gain.setValueAtTime(0.25, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
             osc.connect(gain);
@@ -690,12 +617,12 @@
           } catch(e) {}
         }
 
-        playCrystalUnlock() {
+        playWin() {
           const c = this._getCtx();
           if (!c) return;
           try {
             const t = c.currentTime;
-            [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
               const osc = c.createOscillator();
               const gain = c.createGain();
               const st = t + (i * 0.09);
@@ -718,15 +645,15 @@
             const t = c.currentTime;
             const osc = c.createOscillator();
             const gain = c.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(280, t);
-            osc.frequency.linearRampToValueAtTime(180, t + 0.25);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(360, t);
+            osc.frequency.linearRampToValueAtTime(280, t + 0.22);
             gain.gain.setValueAtTime(0.18, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
             osc.connect(gain);
             gain.connect(c.destination);
             osc.start(t);
-            osc.stop(t + 0.3);
+            osc.stop(t + 0.26);
           } catch(e) {}
         }
       }
@@ -734,7 +661,7 @@
       const audio = new SoundEngine();
 
       // ----------------------------------------------------------------------
-      // 4. PLATFORMER 2D ENGINE (PHYSICS, CAMERA, PARALLAX, TILES)
+      // 3. CANVAS 2D DUNIA PETUALANGAN ANAK
       // ----------------------------------------------------------------------
       class AdventureWorldEngine {
         constructor(canvas, onTriggerChallenge, onCollectCrystal) {
@@ -743,34 +670,28 @@
           this.onTriggerChallenge = onTriggerChallenge;
           this.onCollectCrystal = onCollectCrystal;
 
-          // Kamera Scrolling Mengikuti Karakter
           this.cameraX = 0;
-          this.worldWidth = 3200; // Panjang level horizontal
+          this.worldWidth = 2800;
 
-          // Karakter Petualang
+          // Karakter Kartun Lucu
           this.hero = {
             x: 80,
             y: 350,
-            width: 38,
-            height: 52,
+            width: 44,
+            height: 56,
             vx: 0,
             vy: 0,
-            speed: 5.5,
-            jumpStrength: 13.5,
+            speed: 5.2,
+            jumpStrength: 13.8,
             isGrounded: false,
-            facingRight: true,
-            walkFrame: 0
+            facingRight: true
           };
 
-          // Kontrol Input
-          this.keys = { left: false, right: false, jump: false, interact: false };
-
-          // Elemen Dunia
+          this.keys = { left: false, right: false, jump: false };
           this.platforms = [];
           this.coins = [];
           this.gates = [];
           this.crystalTarget = null;
-          this.currentWorldIndex = 0;
 
           this.resize();
           window.addEventListener('resize', () => this.resize());
@@ -783,51 +704,40 @@
           this.canvas.height = this.height;
         }
 
-        loadWorld(worldIdx) {
-          this.currentWorldIndex = worldIdx;
-          const wData = WORLDS[worldIdx] || WORLDS[0];
-
-          // Reset Posisi Karakter
+        loadWorld() {
           this.hero.x = 80;
           this.hero.y = this.height * 0.6;
           this.hero.vx = 0;
           this.hero.vy = 0;
           this.cameraX = 0;
 
-          // Buat Platform, Jurang, dan Tantangan
+          // Platform Ramah Balita (Jarak Mudah Dilompati)
           this.platforms = [
-            { x: 0, y: this.height * 0.8, w: 700, h: 200 },       // Ground Awal
-            { x: 780, y: this.height * 0.72, w: 220, h: 40 },     // Platform Melayang 1
-            { x: 1080, y: this.height * 0.64, w: 260, h: 40 },    // Platform Melayang 2
-            { x: 1420, y: this.height * 0.8, w: 800, h: 200 },    // Ground Tengah
-            { x: 2320, y: this.height * 0.7, w: 240, h: 40 },     // Platform Melayang 3
-            { x: 2640, y: this.height * 0.8, w: 600, h: 200 }     // Ground Akhir (Kuil Kristal)
+            { x: 0, y: this.height * 0.78, w: 750, h: 220 },
+            { x: 800, y: this.height * 0.72, w: 280, h: 44 },
+            { x: 1140, y: this.height * 0.65, w: 280, h: 44 },
+            { x: 1480, y: this.height * 0.78, w: 800, h: 220 },
+            { x: 2340, y: this.height * 0.78, w: 500, h: 220 }
           ];
 
-          // Sebar Koin Emas
           this.coins = [
-            { x: 250, y: this.height * 0.72, collected: false },
-            { x: 380, y: this.height * 0.72, collected: false },
-            { x: 860, y: this.height * 0.62, collected: false },
-            { x: 1180, y: this.height * 0.54, collected: false },
-            { x: 1600, y: this.height * 0.72, collected: false },
-            { x: 1800, y: this.height * 0.72, collected: false },
-            { x: 2420, y: this.height * 0.62, collected: false }
+            { x: 280, y: this.height * 0.7, collected: false },
+            { x: 420, y: this.height * 0.7, collected: false },
+            { x: 920, y: this.height * 0.64, collected: false },
+            { x: 1260, y: this.height * 0.57, collected: false },
+            { x: 1680, y: this.height * 0.7, collected: false }
           ];
 
-          // Gerbang Ajaib Tantangan Edukasi di Tengah Lintasan
+          // Gerbang Ajaib Tantangan
           this.gates = [
-            { x: 1750, y: this.height * 0.8 - 140, w: 40, h: 140, isOpen: false, id: 1, name: 'Gerbang Kuno' }
+            { x: 1820, y: this.height * 0.78 - 140, w: 45, h: 140, isOpen: false }
           ];
 
-          // Kristal Kekuatan Utama di Ujung Level
+          // Kristal Emas di Akhir Lintasan
           this.crystalTarget = {
-            x: 2980,
-            y: this.height * 0.8 - 90,
-            w: 48,
-            h: 48,
-            collected: false,
-            name: wData.crystalName
+            x: 2600,
+            y: this.height * 0.78 - 90,
+            collected: false
           };
         }
 
@@ -836,23 +746,21 @@
 
           const h = this.hero;
 
-          // 1. Gerakan Horizontal
+          // Gerakan Kiri / Kanan
           if (this.keys.left) {
             h.vx = -h.speed;
             h.facingRight = false;
-            h.walkFrame += 0.2;
           } else if (this.keys.right) {
             h.vx = h.speed;
             h.facingRight = true;
-            h.walkFrame += 0.2;
           } else {
-            h.vx *= 0.7; // Deselerasi halus
+            h.vx *= 0.65;
           }
 
           h.x += h.vx;
 
-          // 2. Gravitasi & Lompat
-          h.vy += 0.65; // Gaya gravitasi
+          // Gravitasi & Lompat
+          h.vy += 0.65;
           h.y += h.vy;
 
           if (this.keys.jump && h.isGrounded) {
@@ -861,7 +769,7 @@
             audio.playJump();
           }
 
-          // 3. Deteksi Tabrakan dengan Platform
+          // Tabrakan Platform
           h.isGrounded = false;
           for (let p of this.platforms) {
             if (
@@ -877,48 +785,46 @@
             }
           }
 
-          // Batasi jika jatuh ke jurang -> Kembalikan ke platform terdekat
-          if (h.y > this.height + 60) {
-            h.x = Math.max(80, h.x - 300);
+          // Jika Jatuh ke Jurang -> Kembalikan ke tempat aman
+          if (h.y > this.height + 40) {
+            h.x = Math.max(80, h.x - 260);
             h.y = this.height * 0.5;
             h.vy = 0;
           }
 
-          // 4. Deteksi Tabrakan dengan Gerbang Terkunci
+          // Tabrakan Gerbang Terkunci
           for (let gate of this.gates) {
             if (!gate.isOpen) {
               if (h.x + h.width >= gate.x && h.x <= gate.x + gate.w && h.y + h.height > gate.y) {
-                // Karakter tertahan di depan gerbang!
                 h.x = gate.x - h.width;
                 h.vx = 0;
-                // Picu tantangan jika belum terbuka
                 if (this.onTriggerChallenge) this.onTriggerChallenge(gate);
               }
             }
           }
 
-          // 5. Pengumpulan Koin
+          // Koin
           for (let c of this.coins) {
-            if (!c.collected && Math.hypot((h.x + 19) - c.x, (h.y + 26) - c.y) < 32) {
+            if (!c.collected && Math.hypot((h.x + 22) - c.x, (h.y + 28) - c.y) < 36) {
               c.collected = true;
               audio.playCoin();
               if (window.questApp) window.questApp.addCoin();
             }
           }
 
-          // 6. Pengumpulan Kristal di Akhir Level
+          // Kristal
           if (this.crystalTarget && !this.crystalTarget.collected) {
             const ct = this.crystalTarget;
-            if (Math.hypot((h.x + 19) - (ct.x + 24), (h.y + 26) - (ct.y + 24)) < 44) {
+            if (Math.hypot((h.x + 22) - (ct.x + 20), (h.y + 28) - (ct.y + 20)) < 45) {
               ct.collected = true;
-              audio.playCrystalUnlock();
-              if (this.onCollectCrystal) this.onCollectCrystal(ct);
+              audio.playWin();
+              if (this.onCollectCrystal) this.onCollectCrystal();
             }
           }
 
-          // 7. Kamera Mengikuti Karakter Secara Halus
-          const targetCamX = h.x - this.width * 0.35;
-          this.cameraX += (targetCamX - this.cameraX) * 0.12;
+          // Kamera Mengikuti Karakter
+          const targetCamX = h.x - this.width * 0.32;
+          this.cameraX += (targetCamX - this.cameraX) * 0.14;
           this.cameraX = Math.max(0, Math.min(this.worldWidth - this.width, this.cameraX));
         }
 
@@ -926,45 +832,39 @@
           const ctx = this.ctx;
           const w = this.width;
           const h = this.height;
-          const wData = WORLDS[this.currentWorldIndex] || WORLDS[0];
 
           ctx.clearRect(0, 0, w, h);
 
-          // 1. Langit & Latar Belakang Parallax
-          ctx.fillStyle = wData.skyColor;
+          // Langit Biru Kartun Ceria
+          ctx.fillStyle = '#38bdf8';
           ctx.fillRect(0, 0, w, h);
 
-          // Lapisan Gunung Parallax Jauh
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-          for (let i = 0; i < 8; i++) {
-            const gx = (i * 500) - (this.cameraX * 0.2);
-            ctx.beginPath();
-            ctx.arc(gx, h * 0.75, 240, Math.PI, 0);
-            ctx.fill();
-          }
+          // Matahari Ceria
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.arc(w * 0.85, h * 0.22, 42, 0, Math.PI * 2);
+          ctx.fill();
 
           ctx.save();
           ctx.translate(-this.cameraX, 0);
 
-          // 2. Gambar Platform Tanah & Melayang
+          // Platform Tanah Hijau Ramah Balita
           for (let p of this.platforms) {
-            // Atas Rumput / Permukaan
-            ctx.fillStyle = wData.groundColor;
+            ctx.fillStyle = '#22c55e';
             ctx.beginPath();
-            ctx.roundRect(p.x, p.y, p.w, 18, [8, 8, 0, 0]);
+            ctx.roundRect(p.x, p.y, p.w, 20, [10, 10, 0, 0]);
             ctx.fill();
 
-            // Badan Tanah Bawah
-            ctx.fillStyle = '#334155';
-            ctx.fillRect(p.x, p.y + 18, p.w, p.h - 18);
+            ctx.fillStyle = '#854d0e';
+            ctx.fillRect(p.x, p.y + 20, p.w, p.h - 20);
           }
 
-          // 3. Gambar Koin Emas Berputar
+          // Koin Emas
           for (let c of this.coins) {
             if (!c.collected) {
               ctx.fillStyle = '#facc15';
               ctx.beginPath();
-              ctx.arc(c.x, c.y, 11, 0, Math.PI * 2);
+              ctx.arc(c.x, c.y, 13, 0, Math.PI * 2);
               ctx.fill();
               ctx.strokeStyle = '#ca8a04';
               ctx.lineWidth = 3;
@@ -972,35 +872,32 @@
             }
           }
 
-          // 4. Gambar Gerbang Ajaib
+          // Gerbang Ajaib
           for (let gate of this.gates) {
             ctx.fillStyle = gate.isOpen ? '#22c55e' : '#f59e0b';
             ctx.fillRect(gate.x, gate.y, gate.w, gate.h);
             ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 4;
             ctx.strokeRect(gate.x, gate.y, gate.w, gate.h);
 
-            // Gembok Simbol
             ctx.fillStyle = '#ffffff';
-            ctx.font = '22px sans-serif';
+            ctx.font = '24px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(gate.isOpen ? '🔓' : '🔒', gate.x + 20, gate.y + 60);
+            ctx.fillText(gate.isOpen ? '🔓' : '🔒', gate.x + 22, gate.y + 70);
           }
 
-          // 5. Gambar Kristal Utama di Akhir Level
+          // Kristal Berlian
           if (this.crystalTarget && !this.crystalTarget.collected) {
             const ct = this.crystalTarget;
             ctx.save();
-            ctx.translate(ct.x + 24, ct.y + 24);
+            ctx.translate(ct.x + 20, ct.y + 20);
             ctx.rotate(Date.now() * 0.002);
-
-            // Kristal Berlian Bercahaya
-            ctx.fillStyle = '#38bdf8';
+            ctx.fillStyle = '#facc15';
             ctx.beginPath();
-            ctx.moveTo(0, -24);
-            ctx.lineTo(18, 0);
-            ctx.lineTo(0, 24);
-            ctx.lineTo(-18, 0);
+            ctx.moveTo(0, -26);
+            ctx.lineTo(20, 0);
+            ctx.lineTo(0, 26);
+            ctx.lineTo(-20, 0);
             ctx.closePath();
             ctx.fill();
             ctx.strokeStyle = '#ffffff';
@@ -1009,7 +906,7 @@
             ctx.restore();
           }
 
-          // 6. Gambar Karakter Petualang
+          // Karakter Anak Lucu
           this.drawHero(ctx);
 
           ctx.restore();
@@ -1022,31 +919,34 @@
           if (!h.facingRight) ctx.scale(-1, 1);
 
           // Bayangan Kaki
-          ctx.fillStyle = 'rgba(0,0,0,0.3)';
+          ctx.fillStyle = 'rgba(0,0,0,0.25)';
           ctx.beginPath();
-          ctx.ellipse(0, 24, 16, 6, 0, 0, Math.PI * 2);
+          ctx.ellipse(0, 26, 18, 6, 0, 0, Math.PI * 2);
           ctx.fill();
 
-          // Badan & Baju Petualang
-          ctx.fillStyle = '#38bdf8';
+          // Baju Biru
+          ctx.fillStyle = '#0284c7';
           ctx.beginPath();
-          ctx.roundRect(-14, -12, 28, 28, 6);
+          ctx.roundRect(-16, -12, 32, 30, 8);
           ctx.fill();
 
-          // Syal / Jubah Merah Petualang
+          // Kepala
+          ctx.fillStyle = '#fed7aa';
+          ctx.beginPath();
+          ctx.arc(0, -22, 14, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Topi Merah Petualang
           ctx.fillStyle = '#ef4444';
-          ctx.fillRect(-12, -14, 24, 6);
-
-          // Kepala & Topi
-          ctx.fillStyle = '#fde047';
           ctx.beginPath();
-          ctx.arc(0, -22, 12, 0, Math.PI * 2);
+          ctx.arc(0, -28, 14, Math.PI, 0);
           ctx.fill();
+          ctx.fillRect(-18, -28, 36, 4);
 
-          // Mata Petualang Ceria
+          // Mata
           ctx.fillStyle = '#0f172a';
           ctx.beginPath();
-          ctx.arc(4, -22, 2.5, 0, Math.PI * 2);
+          ctx.arc(5, -23, 2.8, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.restore();
@@ -1054,15 +954,14 @@
       }
 
       // ----------------------------------------------------------------------
-      // 5. CONTROLLER UTAMA ADVENTURE QUEST (LOGIKA EDUKASI & PROGRESS)
+      // 4. CONTROLLER UTAMA & FITUR FULLSCREEN HP
       // ----------------------------------------------------------------------
       class AdventureQuestApp {
         constructor() {
           this.worldEngine = null;
-          this.currentCategory = 'math';
-          this.currentWorldIdx = 0;
+          this.currentCategory = 'animals';
           this.coins = 0;
-          this.crystalsUnlocked = 0;
+          this.crystals = 0;
           this.activeGate = null;
           this.activeQuestion = null;
           this.isPaused = false;
@@ -1075,83 +974,43 @@
           this.worldEngine = new AdventureWorldEngine(
             canvas,
             (gate) => this.triggerGateChallenge(gate),
-            (crystal) => this.handleCrystalObtained(crystal)
+            () => this.handleCrystalObtained()
           );
 
-          this.loadStorage();
-          this.bindEvents();
+          this.bindControls();
 
-          // Game Animation Loop
           this.gameLoop = this.gameLoop.bind(this);
           requestAnimationFrame(this.gameLoop);
-        }
-
-        loadStorage() {
-          try {
-            const saved = localStorage.getItem('adventure_quest_save');
-            if (saved) {
-              const data = JSON.parse(saved);
-              this.coins = data.coins || 0;
-              this.crystalsUnlocked = data.crystalsUnlocked || 0;
-              this.currentWorldIdx = data.worldIndex || 0;
-              this.currentCategory = data.category || 'math';
-
-              document.getElementById('coin-counter').innerText = this.coins;
-              this.updateCrystalHUD();
-            }
-          } catch(e) {}
-        }
-
-        saveStorage() {
-          try {
-            const data = {
-              coins: this.coins,
-              crystalsUnlocked: this.crystalsUnlocked,
-              worldIndex: this.currentWorldIdx,
-              category: this.currentCategory
-            };
-            localStorage.setItem('adventure_quest_save', JSON.stringify(data));
-          } catch(e) {}
         }
 
         addCoin() {
           this.coins++;
           document.getElementById('coin-counter').innerText = this.coins;
-          this.saveStorage();
         }
 
-        updateCrystalHUD() {
-          const dots = document.querySelectorAll('#crystal-dots .c-dot');
-          dots.forEach((dot, idx) => {
-            if (idx < this.crystalsUnlocked) dot.classList.add('unlocked');
-            else dot.classList.remove('unlocked');
-          });
-        }
-
-        bindEvents() {
-          // Tombol Mulai Petualangan di Menu
+        bindControls() {
+          // Tombol Mulai
           document.getElementById('btn-start-quest')?.addEventListener('click', () => {
             document.getElementById('menu-screen').classList.add('hidden');
-            this.worldEngine.loadWorld(this.currentWorldIdx);
-            audio.speak("Selamat datang di Crystal Kingdom! Jelajahi wilayah dan temukan lima kristal kekuatan!");
+            this.worldEngine.loadWorld();
+            audio.speak("Halo adik pintar! Ayo jalan dan kumpulkan koin emas!");
           });
 
-          // Pilihan Chip Kategori Edukasi
+          // Pilihan Kategori Ramah Balita
           document.querySelectorAll('.chip-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
               document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
               e.currentTarget.classList.add('active');
               this.currentCategory = e.currentTarget.getAttribute('data-cat');
-              this.saveStorage();
             });
           });
 
-          // Tombol Home Menu
+          // Tombol Home
           document.getElementById('btn-back-home')?.addEventListener('click', () => {
             document.getElementById('menu-screen').classList.remove('hidden');
           });
 
-          // Tombol Replay Suara
+          // Tombol Ulangi Suara
           document.getElementById('btn-repeat-voice')?.addEventListener('click', () => {
             audio.repeat();
           });
@@ -1160,22 +1019,16 @@
             audio.repeat();
           });
 
-          // Tombol Ganti Mode Cepat (Balap Mobil vs Petualangan)
-          document.getElementById('btn-switch-game-mode')?.addEventListener('click', () => {
-            const isRacing = confirm("Mau ganti ke mode Alphabet Racing Adventure (Balap Mobil) sekarang?");
-            if (isRacing) {
-              window.location.reload();
+          // FITUR FULLSCREEN HP: BISA DITEKAN KAPAN SAJA
+          document.getElementById('btn-toggle-fullscreen')?.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+              if (document.exitFullscreen) document.exitFullscreen();
             }
           });
 
-          // Tombol Lanjut Wilayah Berikutnya
-          document.getElementById('btn-next-world')?.addEventListener('click', () => {
-            document.getElementById('victory-modal').classList.add('hidden');
-            this.currentWorldIdx = (this.currentWorldIdx + 1) % WORLDS.length;
-            this.worldEngine.loadWorld(this.currentWorldIdx);
-          });
-
-          // Kontrol Layar Sentuh HP (Kiri, Kanan, Lompat)
+          // KONTROL LAYAR SENTUH HP SUPER BESAR (KIRI, KANAN, LOMPAT)
           const setKey = (k, v) => { this.worldEngine.keys[k] = v; };
 
           const bindTouch = (id, keyName) => {
@@ -1191,58 +1044,50 @@
           bindTouch('btn-move-right', 'right');
           bindTouch('btn-jump', 'jump');
 
-          // Tombol Interaksi Buka Peti / Gerbang
-          document.getElementById('btn-interact')?.addEventListener('click', () => {
-            if (this.activeGate && !this.activeGate.isOpen) {
-              this.showChallengeUI();
-            }
-          });
-
-          // Keyboard Arrows & WASD (Pengujian di Komputer)
+          // Dukung Keyboard Laptop/PC
           window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') setKey('left', true);
-            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') setKey('right', true);
-            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') setKey('jump', true);
-            if (e.key === 'e' || e.key === 'E') {
-              if (this.activeGate && !this.activeGate.isOpen) this.showChallengeUI();
-            }
+            if (e.key === 'ArrowLeft' || e.key === 'a') setKey('left', true);
+            if (e.key === 'ArrowRight' || e.key === 'd') setKey('right', true);
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') setKey('jump', true);
+          });
+          window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') setKey('left', false);
+            if (e.key === 'ArrowRight' || e.key === 'd') setKey('right', false);
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') setKey('jump', false);
           });
 
-          window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') setKey('left', false);
-            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') setKey('right', false);
-            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') setKey('jump', false);
+          // Tombol Main Lagi di Layar Menang
+          document.getElementById('btn-next-world')?.addEventListener('click', () => {
+            document.getElementById('victory-modal').classList.add('hidden');
+            this.worldEngine.loadWorld();
+            this.isPaused = false;
           });
         }
 
-        // ================= TANTANGAN EDUKASI STATE MACHINE ================= //
+        // ================= KUIS BERGAMBAR RAKSASA UNTUK BALITA ================= //
         triggerGateChallenge(gate) {
           this.activeGate = gate;
-          this.showChallengeUI();
-        }
-
-        showChallengeUI() {
           this.isPaused = true;
 
-          // Ambil kumpulan soal sesuai kategori aktif
-          const qList = EDUCATION_DATABASE[this.currentCategory] || EDUCATION_DATABASE.math;
+          const qList = TODDLER_DATABASE[this.currentCategory] || TODDLER_DATABASE.animals;
           const q = qList[Math.floor(Math.random() * qList.length)];
           this.activeQuestion = q;
 
-          document.getElementById('challenge-category-label').innerText = `Kategori: ${this.currentCategory.toUpperCase()}`;
           document.getElementById('challenge-prompt-text').innerText = q.q;
 
-          // Render Pilihan Jawaban
           const container = document.getElementById('challenge-choices-container');
           container.innerHTML = '';
 
           q.options.forEach(opt => {
             const btn = document.createElement('button');
-            btn.className = 'choice-option-btn';
-            btn.innerText = opt;
+            btn.className = 'choice-card-toddler';
+            btn.innerHTML = `
+              <span class="choice-emoji-giant">${opt.e}</span>
+              <span class="choice-name-sub">${opt.n}</span>
+            `;
 
             btn.addEventListener('click', () => {
-              this.handleAnswerCheck(opt, q, btn);
+              this.handleAnswerCheck(opt.n, q, btn);
             });
 
             container.appendChild(btn);
@@ -1252,11 +1097,11 @@
           audio.speak(q.q);
         }
 
-        handleAnswerCheck(selected, qData, btnElem) {
-          if (selected === qData.answer) {
+        handleAnswerCheck(selectedName, qData, btnElem) {
+          if (selectedName === qData.answer) {
             // Jawaban Benar!
             btnElem.classList.add('card-correct');
-            audio.speak("Benar sekali! Pintar! Gerbang berhasil kamu buka!", () => {
+            audio.speak("Horeee! Pintar sekali! Gerbang terbuka!", () => {
               setTimeout(() => {
                 document.getElementById('challenge-modal').classList.add('hidden');
                 this.isPaused = false;
@@ -1268,22 +1113,16 @@
             audio.playWrong();
             btnElem.classList.add('card-shake');
             setTimeout(() => btnElem.classList.remove('card-shake'), 500);
-            audio.speak("Yuk coba lagi ya! " + (qData.hint || 'Perhatikan baik-baik.'));
+            audio.speak("Yuk coba lagi ya! Cari yang cocok!");
           }
         }
 
-        handleCrystalObtained(crystal) {
+        handleCrystalObtained() {
           this.isPaused = true;
-          this.crystalsUnlocked++;
-          this.saveStorage();
-          this.updateCrystalHUD();
-
-          const vModal = document.getElementById('victory-modal');
-          const vDesc = document.getElementById('victory-desc');
-          vDesc.innerText = `Hebat sekali! Kamu berhasil mendapatkan ${crystal.name}!`;
-          vModal.classList.remove('hidden');
-
-          audio.speak(`Horeee! Selamat! ${crystal.name} berhasil kamu amankan! Kerajaan Crystal semakin damai!`);
+          this.crystals++;
+          document.getElementById('crystal-counter').innerText = this.crystals;
+          document.getElementById('victory-modal').classList.remove('hidden');
+          audio.speak("Horeee! Selamat adik pintar! Kamu berhasil menemukan Kristal Ajaib!");
         }
 
         gameLoop() {
