@@ -3,16 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Petualangan Si Kecil: Kristal Ajaib (Usia 3–4 Tahun)</title>
+  <meta name="theme-color" content="#38bdf8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Game Anak">
+
+  <title>Petualangan Si Kecil: Kristal Ajaib</title>
   
+  <link rel="manifest" href="manifest.json">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2338bdf8%22/><text x=%2250%%22 y=%2268%%22 font-size=%2260%22 text-anchor=%22middle%22>💎</text></svg>">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       ADVENTURE QUEST KHUSUS BALITA 3-4 TAHUN (BEBAS BACA & HITUNG, FULLSCREEN)
+       PETUALANGAN SI KECIL (HIGH-FPS 60-120Hz SMOOTH + PWA READY)
        ========================================================================== */
     * {
       box-sizing: border-box;
@@ -51,6 +59,8 @@
       height: 100%;
       display: block;
       z-index: 5;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
     }
 
     /* ================= 1. TOP HUD (STATUS & AUDIO) ================= */
@@ -92,6 +102,7 @@
     .btn-home { border-color: #f59e0b; background: #fef08a; }
     .btn-speaker { border-color: #10b981; background: #bbf7d0; animation: pulseBtn 1.8s infinite alternate ease-in-out; }
     .btn-fullscreen { border-color: #ec4899; background: #fce7f3; }
+    .btn-pwa-install { border-color: #3b82f6; background: #dbeafe; font-size: 14px; font-weight: 800; width: auto; padding: 0 14px; border-radius: 26px; gap: 5px; color: #1d4ed8; }
 
     @keyframes pulseBtn {
       0% { transform: scale(1); }
@@ -119,7 +130,7 @@
       bottom: 14px;
       left: 0;
       width: 100%;
-      z-index: 100; /* Pastikan selalu berada di paling atas canvas */
+      z-index: 100;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
@@ -133,10 +144,9 @@
       gap: 14px;
     }
 
-    /* Tombol Kiri, Kanan, Lompat Berukuran Sangat Besar Untuk Balita */
     .touch-btn-huge {
-      width: 82px;
-      height: 82px;
+      width: 84px;
+      height: 84px;
       border-radius: 50%;
       background: #ffffff;
       border: 5px solid #0284c7;
@@ -162,8 +172,8 @@
     }
 
     .btn-jump-huge {
-      width: 86px;
-      height: 86px;
+      width: 88px;
+      height: 88px;
       background: linear-gradient(135deg, #22c55e, #16a34a);
       border: 5px solid #ffffff;
       color: #ffffff;
@@ -171,7 +181,7 @@
       box-shadow: 0 8px 24px rgba(22, 163, 74, 0.45);
     }
 
-    /* ================= 3. OVERLAY KUIS BALITA 3-4 TAHUN (GAMBAR HEWAN & WARNA) ================= */
+    /* ================= 3. OVERLAY KUIS BALITA 3-4 TAHUN ================= */
     #challenge-modal {
       position: absolute;
       top: 0;
@@ -221,7 +231,6 @@
     .challenge-speaker-icon { font-size: 32px; }
     .challenge-text { font-size: 17px; font-weight: 800; color: #166534; line-height: 1.25; }
 
-    /* Pilihan Gambar Raksasa untuk Balita (3 Kolom Kartu) */
     .choices-row-toddler {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -411,8 +420,12 @@
       <div class="hud-group">
         <button id="btn-back-home" class="hud-circle-btn btn-home" aria-label="Menu Utama" title="Menu Utama">🏠</button>
         <button id="btn-repeat-voice" class="hud-circle-btn btn-speaker" aria-label="Ulangi Suara" title="Ulangi Suara">🔊</button>
-        <!-- Tombol Layar Penuh (Fullscreen HP) -->
         <button id="btn-toggle-fullscreen" class="hud-circle-btn btn-fullscreen" aria-label="Layar Penuh" title="Layar Penuh HP">⛶</button>
+        <!-- Tombol Pasang PWA (Install App di Layar Utama HP) -->
+        <button id="btn-install-pwa" class="hud-circle-btn btn-pwa-install hidden" aria-label="Install Aplikasi" title="Pasang di HP">
+          <span>📲</span>
+          <span>Pasang</span>
+        </button>
       </div>
 
       <div class="hud-group">
@@ -428,21 +441,19 @@
     <!-- 2. Canvas 2D Game Petualangan Platformer -->
     <canvas id="adventure-canvas"></canvas>
 
-    <!-- 3. Tombol Kontrol Layar Sentuh HP (Tampil Nyata & Jelas di Atas Canvas) -->
+    <!-- 3. Tombol Kontrol Layar Sentuh HP -->
     <div class="bottom-controls-layer">
-      <!-- Tombol Gerak Kiri & Kanan Super Besar -->
       <div class="dpad-walk-group">
         <button id="btn-move-left" class="touch-btn-huge" aria-label="Jalan Kiri">◀</button>
         <button id="btn-move-right" class="touch-btn-huge" aria-label="Jalan Kanan">▶</button>
       </div>
 
-      <!-- Tombol Aksi Lompat Besar -->
       <div class="actions-group">
         <button id="btn-jump" class="touch-btn-huge btn-jump-huge" aria-label="Lompat">▲</button>
       </div>
     </div>
 
-    <!-- 4. Modal Tantangan Edukasi Khusus Anak 3-4 Tahun (Gambar Hewan, Buah, & Huruf Besar) -->
+    <!-- 4. Modal Tantangan Edukasi Khusus Anak 3-4 Tahun -->
     <div id="challenge-modal" class="hidden">
       <div class="challenge-card">
         <div id="challenge-speech-bar" class="challenge-prompt-box">
@@ -451,12 +462,12 @@
         </div>
 
         <div id="challenge-choices-container" class="choices-row-toddler">
-          <!-- Tombol Kartu Bergambar Raksasa Dinamis -->
+          <!-- Tombol Pilihan Jawaban Dinamis -->
         </div>
       </div>
     </div>
 
-    <!-- 5. Layar Menu Utama (Pilih Kategori Ramah Balita) -->
+    <!-- 5. Layar Menu Utama -->
     <div id="menu-screen">
       <div class="game-logo-art">💎🦁</div>
       <h1 class="game-title">Petualangan Si Kecil</h1>
@@ -472,7 +483,7 @@
       <button id="btn-start-quest" class="btn-play-adventure">MULAI MAIN! ▶️</button>
     </div>
 
-    <!-- 6. Modal Kemenangan (Dapat Kristal) -->
+    <!-- 6. Modal Kemenangan -->
     <div id="victory-modal" class="hidden">
       <div class="trophy-badge">💎✨</div>
       <h2 style="font-size: 28px; font-weight: 800; color: #38bdf8; margin-top: 10px;">HEBAT SEKALI!</h2>
@@ -485,15 +496,41 @@
   </div>
 
   <!-- ==========================================================================
-       ENGINE LOGIKA GAME PLATFORMER 2D BALITA (FULLSCREEN & TOUCH EVENTS)
+       ENGINE LOGIKA: DELTA TIME FISIKA HALUS (60-120Hz) + PWA SERVICE WORKER
        ========================================================================== -->
   <script>
     (function() {
       'use strict';
 
       // ----------------------------------------------------------------------
-      // 1. DATA SOAL KHUSUS BALITA 3-4 TAHUN (BEBAS BACA & BEBAS HITUNGANGKA)
-      // Visual EMOJI RAKSASA & SUARA JELAS
+      // 1. REGISTRASI PWA (SERVICE WORKER & INSTALL PROMPT)
+      // ----------------------------------------------------------------------
+      let deferredPrompt = null;
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('btn-install-pwa');
+        if (installBtn) installBtn.classList.remove('hidden');
+      });
+
+      document.getElementById('btn-install-pwa')?.addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => {
+            deferredPrompt = null;
+            document.getElementById('btn-install-pwa')?.classList.add('hidden');
+          });
+        }
+      });
+
+      // ----------------------------------------------------------------------
+      // 2. DATA SOAL BALITA 3-4 TAHUN (BEBAS BACA & HITUNG)
       // ----------------------------------------------------------------------
       const TODDLER_DATABASE = {
         animals: [
@@ -523,7 +560,7 @@
       };
 
       // ----------------------------------------------------------------------
-      // 2. AUDIO SYNTHESIZER
+      // 3. AUDIO SYNTHESIZER
       // ----------------------------------------------------------------------
       class SoundEngine {
         constructor() {
@@ -556,8 +593,8 @@
             const u = new SpeechSynthesisUtterance(text);
             if (this.idVoice) u.voice = this.idVoice;
             u.lang = 'id-ID';
-            u.rate = 0.88; // Tempo tenang untuk anak 3-4 tahun
-            u.pitch = 1.25; // Ceria kartun
+            u.rate = 0.88;
+            u.pitch = 1.25;
             u.onend = () => { if (onEnd) onEnd(); };
             u.onerror = () => { if (onEnd) onEnd(); };
             this.synth.speak(u);
@@ -661,7 +698,7 @@
       const audio = new SoundEngine();
 
       // ----------------------------------------------------------------------
-      // 3. CANVAS 2D DUNIA PETUALANGAN ANAK
+      // 4. CANVAS 2D ENGINE DENGAN DELTA TIME SMOOTH (60-120 FPS RETINA)
       // ----------------------------------------------------------------------
       class AdventureWorldEngine {
         constructor(canvas, onTriggerChallenge, onCollectCrystal) {
@@ -673,7 +710,7 @@
           this.cameraX = 0;
           this.worldWidth = 2800;
 
-          // Karakter Kartun Lucu
+          // Karakter Petualang dengan Fisika Halus
           this.hero = {
             x: 80,
             y: 350,
@@ -681,10 +718,12 @@
             height: 56,
             vx: 0,
             vy: 0,
-            speed: 5.2,
-            jumpStrength: 13.8,
+            baseSpeed: 320, // Pixel per detik (frame-rate independent)
+            jumpSpeed: 580,
+            gravity: 1200,
             isGrounded: false,
-            facingRight: true
+            facingRight: true,
+            walkCycle: 0
           };
 
           this.keys = { left: false, right: false, jump: false };
@@ -698,10 +737,19 @@
         }
 
         resize() {
-          this.width = window.innerWidth;
-          this.height = window.innerHeight;
-          this.canvas.width = this.width;
-          this.canvas.height = this.height;
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+
+          this.width = w;
+          this.height = h;
+          this.canvas.width = w * dpr;
+          this.canvas.height = h * dpr;
+          this.canvas.style.width = w + 'px';
+          this.canvas.style.height = h + 'px';
+
+          this.ctx.resetTransform?.();
+          this.ctx.scale(dpr, dpr);
         }
 
         loadWorld() {
@@ -711,7 +759,7 @@
           this.hero.vy = 0;
           this.cameraX = 0;
 
-          // Platform Ramah Balita (Jarak Mudah Dilompati)
+          // Platform Ramah Balita
           this.platforms = [
             { x: 0, y: this.height * 0.78, w: 750, h: 220 },
             { x: 800, y: this.height * 0.72, w: 280, h: 44 },
@@ -728,12 +776,10 @@
             { x: 1680, y: this.height * 0.7, collected: false }
           ];
 
-          // Gerbang Ajaib Tantangan
           this.gates = [
             { x: 1820, y: this.height * 0.78 - 140, w: 45, h: 140, isOpen: false }
           ];
 
-          // Kristal Emas di Akhir Lintasan
           this.crystalTarget = {
             x: 2600,
             y: this.height * 0.78 - 90,
@@ -741,42 +787,46 @@
           };
         }
 
-        updatePhysics(isPaused) {
+        // Pembaruan Fisika Menggunakan Delta Time (Mulus di 60fps & 120fps HP)
+        updatePhysics(dt, isPaused) {
           if (isPaused) return;
 
           const h = this.hero;
 
-          // Gerakan Kiri / Kanan
+          // 1. Gerakan Horizontal Mulus
+          let targetVx = 0;
           if (this.keys.left) {
-            h.vx = -h.speed;
+            targetVx = -h.baseSpeed;
             h.facingRight = false;
+            h.walkCycle += dt * 10;
           } else if (this.keys.right) {
-            h.vx = h.speed;
+            targetVx = h.baseSpeed;
             h.facingRight = true;
-          } else {
-            h.vx *= 0.65;
+            h.walkCycle += dt * 10;
           }
 
-          h.x += h.vx;
+          // Interpolasi kecepatan halus (lerp)
+          h.vx += (targetVx - h.vx) * Math.min(1, dt * 14);
+          h.x += h.vx * dt;
 
-          // Gravitasi & Lompat
-          h.vy += 0.65;
-          h.y += h.vy;
+          // 2. Gravitasi & Lompat
+          h.vy += h.gravity * dt;
+          h.y += h.vy * dt;
 
           if (this.keys.jump && h.isGrounded) {
-            h.vy = -h.jumpStrength;
+            h.vy = -h.jumpSpeed;
             h.isGrounded = false;
             audio.playJump();
           }
 
-          // Tabrakan Platform
+          // 3. Tabrakan Platform
           h.isGrounded = false;
           for (let p of this.platforms) {
             if (
               h.x + h.width > p.x &&
               h.x < p.x + p.w &&
               h.y + h.height >= p.y &&
-              h.y + h.height <= p.y + 24 &&
+              h.y + h.height <= p.y + 28 &&
               h.vy >= 0
             ) {
               h.y = p.y - h.height;
@@ -805,7 +855,7 @@
 
           // Koin
           for (let c of this.coins) {
-            if (!c.collected && Math.hypot((h.x + 22) - c.x, (h.y + 28) - c.y) < 36) {
+            if (!c.collected && Math.hypot((h.x + 22) - c.x, (h.y + 28) - c.y) < 38) {
               c.collected = true;
               audio.playCoin();
               if (window.questApp) window.questApp.addCoin();
@@ -822,9 +872,9 @@
             }
           }
 
-          // Kamera Mengikuti Karakter
+          // 4. Kamera Mengikuti Karakter Secara Sangat Halus (Smooth Dampening)
           const targetCamX = h.x - this.width * 0.32;
-          this.cameraX += (targetCamX - this.cameraX) * 0.14;
+          this.cameraX += (targetCamX - this.cameraX) * Math.min(1, dt * 6);
           this.cameraX = Math.max(0, Math.min(this.worldWidth - this.width, this.cameraX));
         }
 
@@ -846,7 +896,7 @@
           ctx.fill();
 
           ctx.save();
-          ctx.translate(-this.cameraX, 0);
+          ctx.translate(-Math.round(this.cameraX), 0);
 
           // Platform Tanah Hijau Ramah Balita
           for (let p of this.platforms) {
@@ -918,6 +968,8 @@
           ctx.translate(h.x + h.width / 2, h.y + h.height / 2);
           if (!h.facingRight) ctx.scale(-1, 1);
 
+          const bobbing = Math.abs(h.vx) > 10 ? Math.sin(h.walkCycle) * 3 : 0;
+
           // Bayangan Kaki
           ctx.fillStyle = 'rgba(0,0,0,0.25)';
           ctx.beginPath();
@@ -927,26 +979,26 @@
           // Baju Biru
           ctx.fillStyle = '#0284c7';
           ctx.beginPath();
-          ctx.roundRect(-16, -12, 32, 30, 8);
+          ctx.roundRect(-16, -12 + bobbing, 32, 30, 8);
           ctx.fill();
 
           // Kepala
           ctx.fillStyle = '#fed7aa';
           ctx.beginPath();
-          ctx.arc(0, -22, 14, 0, Math.PI * 2);
+          ctx.arc(0, -22 + bobbing, 14, 0, Math.PI * 2);
           ctx.fill();
 
           // Topi Merah Petualang
           ctx.fillStyle = '#ef4444';
           ctx.beginPath();
-          ctx.arc(0, -28, 14, Math.PI, 0);
+          ctx.arc(0, -28 + bobbing, 14, Math.PI, 0);
           ctx.fill();
-          ctx.fillRect(-18, -28, 36, 4);
+          ctx.fillRect(-18, -28 + bobbing, 36, 4);
 
           // Mata
           ctx.fillStyle = '#0f172a';
           ctx.beginPath();
-          ctx.arc(5, -23, 2.8, 0, Math.PI * 2);
+          ctx.arc(5, -23 + bobbing, 2.8, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.restore();
@@ -954,7 +1006,7 @@
       }
 
       // ----------------------------------------------------------------------
-      // 4. CONTROLLER UTAMA & FITUR FULLSCREEN HP
+      // 5. CONTROLLER UTAMA & FITUR FULLSCREEN HP
       // ----------------------------------------------------------------------
       class AdventureQuestApp {
         constructor() {
@@ -965,6 +1017,7 @@
           this.activeGate = null;
           this.activeQuestion = null;
           this.isPaused = false;
+          this.lastTime = 0;
 
           this.init();
         }
@@ -980,7 +1033,10 @@
           this.bindControls();
 
           this.gameLoop = this.gameLoop.bind(this);
-          requestAnimationFrame(this.gameLoop);
+          requestAnimationFrame((time) => {
+            this.lastTime = time;
+            this.gameLoop(time);
+          });
         }
 
         addCoin() {
@@ -1019,7 +1075,7 @@
             audio.repeat();
           });
 
-          // FITUR FULLSCREEN HP: BISA DITEKAN KAPAN SAJA
+          // FITUR FULLSCREEN HP
           document.getElementById('btn-toggle-fullscreen')?.addEventListener('click', () => {
             if (!document.fullscreenElement) {
               document.documentElement.requestFullscreen().catch(() => {});
@@ -1028,7 +1084,7 @@
             }
           });
 
-          // KONTROL LAYAR SENTUH HP SUPER BESAR (KIRI, KANAN, LOMPAT)
+          // KONTROL LAYAR SENTUH HP
           const setKey = (k, v) => { this.worldEngine.keys[k] = v; };
 
           const bindTouch = (id, keyName) => {
@@ -1064,7 +1120,6 @@
           });
         }
 
-        // ================= KUIS BERGAMBAR RAKSASA UNTUK BALITA ================= //
         triggerGateChallenge(gate) {
           this.activeGate = gate;
           this.isPaused = true;
@@ -1099,7 +1154,6 @@
 
         handleAnswerCheck(selectedName, qData, btnElem) {
           if (selectedName === qData.answer) {
-            // Jawaban Benar!
             btnElem.classList.add('card-correct');
             audio.speak("Horeee! Pintar sekali! Gerbang terbuka!", () => {
               setTimeout(() => {
@@ -1109,7 +1163,6 @@
               }, 400);
             });
           } else {
-            // Jawaban Salah: Tetap di tempat, jangan ganti soal!
             audio.playWrong();
             btnElem.classList.add('card-shake');
             setTimeout(() => btnElem.classList.remove('card-shake'), 500);
@@ -1125,9 +1178,14 @@
           audio.speak("Horeee! Selamat adik pintar! Kamu berhasil menemukan Kristal Ajaib!");
         }
 
-        gameLoop() {
-          this.worldEngine.updatePhysics(this.isPaused);
+        // Loop Game Halus dengan Perhitungan Delta Time (High FPS Safe)
+        gameLoop(currentTime) {
+          const dt = Math.min((currentTime - this.lastTime) / 1000, 0.05); // Cap max dt 50ms untuk menghindari frame drop
+          this.lastTime = currentTime;
+
+          this.worldEngine.updatePhysics(dt, this.isPaused);
           this.worldEngine.draw();
+
           requestAnimationFrame(this.gameLoop);
         }
       }
