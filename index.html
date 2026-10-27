@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Spider-Hero & Obby Roblox Kids — Edukasi Pintar</title>
+  <title>Spider-Hero & Obby Roblox Kids — Eksplorasi Bebas</title>
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕷️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -215,7 +215,30 @@
     .btn-jump { background: linear-gradient(135deg, #10b981, #059669); }
     .btn-web-sling { background: linear-gradient(135deg, #ef4444, #b91c1c); }
 
-    /* ================= 3. ZONA TANTANGAN KUIS EDUKASI ROBLOX / SPIDER ================= */
+    /* Petunjuk Banner Ringan Saat Eksplorasi */
+    .explore-hint-banner {
+      position: absolute;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(6px);
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 30px;
+      border: 2px solid #38bdf8;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    /* ================= 3. POPUP TANTANGAN INTERAKTIF (HANYA MUNCUL DI GERBANG / PUNCAK) ================= */
     #challenge-overlay-card {
       position: absolute;
       bottom: 120px;
@@ -224,17 +247,22 @@
       width: 90%;
       max-width: 440px;
       z-index: 60;
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
       border: 5px solid #ef4444;
       border-radius: 32px;
       padding: 16px 18px;
-      box-shadow: 0 16px 36px rgba(0,0,0,0.4);
+      box-shadow: 0 20px 45px rgba(0,0,0,0.45);
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: popBounceCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popBounceCard {
+      0% { transform: translate(-50%, 40px) scale(0.8); opacity: 0; }
+      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
     }
 
     .challenge-speech-bar {
@@ -449,6 +477,12 @@
       </div>
     </header>
 
+    <!-- Banner Ringan Saat Anak Sedang Eksplorasi Bebas -->
+    <div id="explore-banner" class="explore-hint-banner">
+      <span id="explore-banner-icon">🎮</span>
+      <span id="explore-banner-text">Ayo jalan-jalan bebas! Panjat gedung atau lewati balok!</span>
+    </div>
+
     <!-- Kontrol Sentuh HP (Joystick Kiri & Tombol Aksi Kanan) -->
     <div class="mobile-controls-layer">
       <!-- Virtual Joystick Touch Kiri -->
@@ -469,12 +503,12 @@
       </div>
     </div>
 
-    <!-- Zona Tantangan Edukasi Interaktif (Muncul Saat Tiba di Target Gedung/Obby) -->
-    <div id="challenge-overlay-card">
+    <!-- Zona Tantangan Edukasi Interaktif (HANYA MUNCUL KETIKA TIBA DI TARGET/PUNCAK) -->
+    <div id="challenge-overlay-card" class="hidden">
       <div class="challenge-speech-bar" id="speech-trigger-box">
         <span class="speech-icon">🔊</span>
         <span class="speech-text" id="challenge-prompt-text">
-          Ayo tembak jaring ke huruf A untuk memanjat gedung!
+          Ayo sentuh huruf yang benar untuk membuka peti rahasia!
         </span>
       </div>
 
@@ -491,7 +525,7 @@
         <p id="celebration-detail" style="font-size: 15px; color: #64748b; font-weight: 600; margin-top: 6px;">
           Spider-Hero berhasil memanjat puncak gedung!
         </p>
-        <button id="btn-next-mission" class="btn-super-next">Misi Berikutnya! 🚀</button>
+        <button id="btn-next-mission" class="btn-super-next">Main Lagi! 🚀</button>
       </div>
     </div>
 
@@ -510,7 +544,7 @@
           <span class="card-mode-icon">🕷️</span>
           <div class="card-mode-info">
             <h4>Spider-Hero Panjat Gedung</h4>
-            <p>Tembak jaring laba-laba & panjat menara huruf</p>
+            <p>Main bebas, jalan-jalan, tembak jaring & panjat menara</p>
           </div>
         </button>
 
@@ -519,7 +553,7 @@
           <span class="card-mode-icon">🧱</span>
           <div class="card-mode-info">
             <h4>Roblox Obby Parkour</h4>
-            <p>Lompat platform warna-warni & cari balok huruf</p>
+            <p>Main bebas lompat platform balok warna-warni</p>
           </div>
         </button>
 
@@ -528,7 +562,7 @@
           <span class="card-mode-icon">🕌</span>
           <div class="card-mode-info">
             <h4>Taman Hijaiyah Hero</h4>
-            <p>Mengenal huruf Alif sampai Ya di kota suci</p>
+            <p>Jalan-jalan di kota suci menemukan bintang huruf</p>
           </div>
         </button>
       </div>
@@ -537,44 +571,44 @@
   </div>
 
   <!-- ==========================================================================
-       SCRIPT ENGINE 3D THREE.JS: SPIDERMAN WEB-SLINGING, ROBLOX OBBY & AUDIO
+       SCRIPT ENGINE 3D THREE.JS: EKSPLORASI BEBAS DULU, TANTANGAN MUNCUL DI TARGET
        ========================================================================== -->
   <script>
     (function() {
       'use strict';
 
       // ----------------------------------------------------------------------
-      // 1. DATA MISI EDUKASI SPIDERMAN, ROBLOX & HIJAIYAH
+      // 1. DATA MISI EDUKASI
       // ----------------------------------------------------------------------
       const SPIDER_MISSIONS = [
-        { letter: 'A', name: 'A', word: 'Apel', desc: 'A untuk Apel Merah! Tembak jaring ke huruf A!' },
-        { letter: 'B', name: 'B', word: 'Bola', desc: 'B untuk Bola Bundar! Tembak jaring ke huruf B!' },
-        { letter: 'C', name: 'C', word: 'Ceri', desc: 'C untuk Ceri Manis! Tembak jaring ke huruf C!' },
-        { letter: 'D', name: 'D', word: 'Donat', desc: 'D untuk Donat Cokelat! Tembak jaring ke huruf D!' },
-        { letter: 'E', name: 'E', word: 'Elang', desc: 'E untuk Elang Terbang! Tembak jaring ke huruf E!' },
-        { letter: 'F', name: 'F', word: 'Flamingo', desc: 'F untuk Flamingo Cantik! Tembak jaring ke huruf F!' }
+        { letter: 'A', name: 'A', word: 'Apel', desc: 'Kamu sampai di atas gedung! Mana huruf A untuk Apel?' },
+        { letter: 'B', name: 'B', word: 'Bola', desc: 'Kamu sampai di atas gedung! Mana huruf B untuk Bola?' },
+        { letter: 'C', name: 'C', word: 'Ceri', desc: 'Kamu sampai di atas gedung! Mana huruf C untuk Ceri?' },
+        { letter: 'D', name: 'D', word: 'Donat', desc: 'Kamu sampai di atas gedung! Mana huruf D untuk Donat?' },
+        { letter: 'E', name: 'E', word: 'Elang', desc: 'Kamu sampai di atas gedung! Mana huruf E untuk Elang?' },
+        { letter: 'F', name: 'F', word: 'Flamingo', desc: 'Kamu sampai di atas gedung! Mana huruf F untuk Flamingo?' }
       ];
 
       const ROBLOX_OBBY_MISSIONS = [
-        { letter: 'G', name: 'G', word: 'Gajah', desc: 'Lompat ke platform balok huruf G!' },
-        { letter: 'H', name: 'H', word: 'Harimau', desc: 'Lompat ke platform balok huruf H!' },
-        { letter: 'I', name: 'I', word: 'Ikan', desc: 'Lompat ke platform balok huruf I!' },
-        { letter: 'J', name: 'J', word: 'Jerapah', desc: 'Lompat ke platform balok huruf J!' },
-        { letter: 'K', name: 'K', word: 'Kelinci', desc: 'Lompat ke platform balok huruf K!' },
-        { letter: 'L', name: 'L', word: 'Lumba-lumba', desc: 'Lompat ke platform balok huruf L!' }
+        { letter: 'G', name: 'G', word: 'Gajah', desc: 'Hore sampai di garis akhir! Mana balok huruf G?' },
+        { letter: 'H', name: 'H', word: 'Harimau', desc: 'Hore sampai di garis akhir! Mana balok huruf H?' },
+        { letter: 'I', name: 'I', word: 'Ikan', desc: 'Hore sampai di garis akhir! Mana balok huruf I?' },
+        { letter: 'J', name: 'J', word: 'Jerapah', desc: 'Hore sampai di garis akhir! Mana balok huruf J?' },
+        { letter: 'K', name: 'K', word: 'Kelinci', desc: 'Hore sampai di garis akhir! Mana balok huruf K?' },
+        { letter: 'L', name: 'L', word: 'Lumba-lumba', desc: 'Hore sampai di garis akhir! Mana balok huruf L?' }
       ];
 
       const HIJAIYAH_MISSIONS = [
-        { id: 'alif', arabic: 'ا', name: 'Alif', desc: 'Tegak lurus seperti tiang! Tembak jaring ke huruf Alif!' },
-        { id: 'ba', arabic: 'ب', name: 'Ba', desc: 'Ada satu titik di bawah perahu! Cari huruf Ba!' },
-        { id: 'ta', arabic: 'ت', name: 'Ta', desc: 'Ada dua titik mata di atas perahu! Cari huruf Ta!' },
-        { id: 'tsa', arabic: 'ث', name: 'Tsa', desc: 'Ada tiga titik bintang di atas! Cari huruf Tsa!' },
-        { id: 'jim', arabic: 'ج', name: 'Jim', desc: 'Ada satu titik di dalam perutnya! Cari huruf Jim!' },
-        { id: 'ha', arabic: 'ح', name: 'Ha', desc: 'Bersih tanpa titik! Cari huruf Ha!' }
+        { id: 'alif', arabic: 'ا', name: 'Alif', desc: 'Selamat datang di puncak menara! Mana huruf Alif?' },
+        { id: 'ba', arabic: 'ب', name: 'Ba', desc: 'Selamat datang di puncak menara! Mana huruf Ba dengan titik di bawah?' },
+        { id: 'ta', arabic: 'ت', name: 'Ta', desc: 'Selamat datang di puncak menara! Mana huruf Ta dengan dua titik di atas?' },
+        { id: 'tsa', arabic: 'ث', name: 'Tsa', desc: 'Selamat datang di puncak menara! Mana huruf Tsa dengan tiga titik?' },
+        { id: 'jim', arabic: 'ج', name: 'Jim', desc: 'Selamat datang di puncak menara! Mana huruf Jim dengan titik di perut?' },
+        { id: 'ha', arabic: 'ح', name: 'Ha', desc: 'Selamat datang di puncak menara! Mana huruf Ha tanpa titik?' }
       ];
 
       // ----------------------------------------------------------------------
-      // 2. SISTEM SUARA & EFEK SFX WEB-SLINGING & JUMP
+      // 2. SISTEM SUARA & EFEK SFX
       // ----------------------------------------------------------------------
       class SoundEngine {
         constructor() {
@@ -646,7 +680,6 @@
           return this.audioCtx;
         }
 
-        // Efek Suara Tembak Jaring Spiderman (Thwip!)
         playWebThwip() {
           const c = this._getCtx();
           if (!c) return;
@@ -655,8 +688,8 @@
             const osc = c.createOscillator();
             const gain = c.createGain();
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(800, t);
-            osc.frequency.exponentialRampToValueAtTime(2200, t + 0.12);
+            osc.frequency.setValueAtTime(700, t);
+            osc.frequency.exponentialRampToValueAtTime(2400, t + 0.12);
             gain.gain.setValueAtTime(0.3, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
             osc.connect(gain);
@@ -666,7 +699,6 @@
           } catch(e) {}
         }
 
-        // Efek Suara Lompat Obby Roblox (Boing!)
         playJumpBoing() {
           const c = this._getCtx();
           if (!c) return;
@@ -676,7 +708,7 @@
             const gain = c.createGain();
             osc.type = 'sine';
             osc.frequency.setValueAtTime(240, t);
-            osc.frequency.exponentialRampToValueAtTime(600, t + 0.15);
+            osc.frequency.exponentialRampToValueAtTime(620, t + 0.15);
             gain.gain.setValueAtTime(0.25, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
             osc.connect(gain);
@@ -686,7 +718,6 @@
           } catch(e) {}
         }
 
-        // Efek Kemenangan
         playVictory() {
           const c = this._getCtx();
           if (!c) return;
@@ -749,27 +780,28 @@
       const sounds = new SoundEngine();
 
       // ----------------------------------------------------------------------
-      // 3. ENGINE 3D TAMPILAN SPIDERMAN & ROBLOX OBBY (THREE.JS)
+      // 3. ENGINE 3D TAMPILAN THREE.JS
       // ----------------------------------------------------------------------
       class ThreeDWorldManager {
-        constructor(canvas) {
+        constructor(canvas, onTargetReached) {
           this.canvas = canvas;
+          this.onTargetReached = onTargetReached;
           this.scene = null;
           this.camera = null;
           this.renderer = null;
 
           // Karakter 3D
           this.characterGroup = null;
-          this.characterType = 'spiderman'; // 'spiderman' atau 'roblox'
-          this.charPos = { x: 0, y: 0.8, z: 0 };
-          this.charVelocity = { x: 0, y: 0, z: 0 };
+          this.characterType = 'spiderman';
           this.isClimbing = false;
           this.isJumping = false;
-
-          // Jaring Laba-laba 3D (Cylinder / Line)
           this.webLine = null;
 
-          // Gedung & Balok Obby
+          // Target Puncak / Akhir Obby
+          this.targetMesh = null;
+          this.hasTriggeredTarget = false;
+
+          // Grup Dunia
           this.environmentGroup = new THREE.Group();
 
           this.initThree();
@@ -782,7 +814,7 @@
           const height = window.innerHeight;
 
           this.scene = new THREE.Scene();
-          this.scene.background = new THREE.Color('#38bdf8'); // Langit cerah
+          this.scene.background = new THREE.Color('#38bdf8');
 
           this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
           this.camera.position.set(0, 5, 11);
@@ -792,7 +824,6 @@
           this.renderer.setSize(width, height);
           this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-          // Pencahayaan Ceria
           const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
           hemiLight.position.set(0, 20, 0);
           this.scene.add(hemiLight);
@@ -815,29 +846,25 @@
           });
         }
 
-        // ================= DESAIN KARAKTER 3D ================= //
         buildCharacter(type) {
           if (this.characterGroup) this.scene.remove(this.characterGroup);
           this.characterType = type;
           this.characterGroup = new THREE.Group();
 
           if (type === 'spiderman') {
-            // SPIDERMAN 3D (Setelan Merah & Biru Kartun)
-            // Badan
-            const bodyGeo = new THREE.BoxGeometry(0.8, 1.0, 0.5);
             const redMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
             const blueMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 });
+
+            const bodyGeo = new THREE.BoxGeometry(0.8, 1.0, 0.5);
             const spideyBody = new THREE.Mesh(bodyGeo, redMat);
             spideyBody.position.y = 0.5;
             this.characterGroup.add(spideyBody);
 
-            // Kepala dengan Topeng Spiderman
             const headGeo = new THREE.SphereGeometry(0.45, 16, 16);
             const head = new THREE.Mesh(headGeo, redMat);
             head.position.y = 1.35;
             this.characterGroup.add(head);
 
-            // Mata Putih Spiderman
             const eyeGeo = new THREE.BoxGeometry(0.18, 0.1, 0.05);
             const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
             const leftEye = new THREE.Mesh(eyeGeo, whiteMat);
@@ -848,7 +875,6 @@
             rightEye.rotation.z = -0.2;
             this.characterGroup.add(leftEye, rightEye);
 
-            // Kaki Biru
             const legGeo = new THREE.BoxGeometry(0.3, 0.8, 0.35);
             const leftLeg = new THREE.Mesh(legGeo, blueMat);
             leftLeg.position.set(-0.25, -0.4, 0);
@@ -857,24 +883,20 @@
             this.characterGroup.add(leftLeg, rightLeg);
 
           } else {
-            // ROBLOX NOOB AVATAR (Kuning, Biru, Hijau Roblox Klasik)
             const yellowMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
             const blueMat = new THREE.MeshLambertMaterial({ color: 0x0284c7 });
             const greenMat = new THREE.MeshLambertMaterial({ color: 0x22c55e });
 
-            // Kepala Kotak Kuning Roblox
             const headGeo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
             const head = new THREE.Mesh(headGeo, yellowMat);
             head.position.y = 1.45;
             this.characterGroup.add(head);
 
-            // Badan Kotak Biru Roblox
             const bodyGeo = new THREE.BoxGeometry(1.0, 1.0, 0.5);
             const robloxBody = new THREE.Mesh(bodyGeo, blueMat);
             robloxBody.position.y = 0.5;
             this.characterGroup.add(robloxBody);
 
-            // Kaki Hijau Roblox
             const legGeo = new THREE.BoxGeometry(0.45, 0.9, 0.45);
             const leftLeg = new THREE.Mesh(legGeo, greenMat);
             leftLeg.position.set(-0.26, -0.45, 0);
@@ -883,18 +905,18 @@
             this.characterGroup.add(leftLeg, rightLeg);
           }
 
-          this.characterGroup.position.set(this.charPos.x, this.charPos.y, this.charPos.z);
+          this.characterGroup.position.set(0, 0.8, 0);
           this.scene.add(this.characterGroup);
         }
 
-        // ================= KOTA GEDUNG SPIDERMAN & OBBY ROBLOX ================= //
         buildCityEnvironment() {
+          this.hasTriggeredTarget = false;
           while (this.environmentGroup.children.length > 0) {
             this.environmentGroup.remove(this.environmentGroup.children[0]);
           }
 
-          // Lantai Jalan / Rumput Luas
-          const groundGeo = new THREE.PlaneGeometry(80, 80);
+          // Lantai Jalan Luas (Anak Bebas Berlari)
+          const groundGeo = new THREE.PlaneGeometry(100, 100);
           groundGeo.rotateX(-Math.PI / 2);
           const groundMat = new THREE.MeshLambertMaterial({ color: 0x86efac });
           const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -902,65 +924,74 @@
           this.environmentGroup.add(ground);
 
           if (this.characterType === 'spiderman') {
-            // GEDUNG MENARA BESAR UNTUK DIPANJAT
-            const towerGeo = new THREE.BoxGeometry(5, 16, 5);
+            // GEDUNG BESAR DI DEPAN UNTUK DIPANJAT KAPAN SAJA
+            const towerGeo = new THREE.BoxGeometry(5.5, 16, 5.5);
             const towerMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
             const tower = new THREE.Mesh(towerGeo, towerMat);
             tower.position.set(0, 7.5, -4);
             this.environmentGroup.add(tower);
 
-            // Jendela-jendela Gedung Bercahaya
+            // Jendela-jendela
             for (let y = 1; y < 14; y += 2) {
               for (let x = -1.6; x <= 1.6; x += 1.6) {
                 const winGeo = new THREE.PlaneGeometry(0.8, 1.0);
                 const winMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
                 const win = new THREE.Mesh(winGeo, winMat);
-                win.position.set(x, y, -1.48);
+                win.position.set(x, y, -1.22);
                 this.environmentGroup.add(win);
               }
             }
 
-            // Target Bintang Emas di Puncak Gedung
-            const starGeo = new THREE.OctahedronGeometry(0.8);
+            // Bintang Emas Puncak Gedung
+            const starGeo = new THREE.OctahedronGeometry(0.9);
             const starMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
-            this.goalStar = new THREE.Mesh(starGeo, starMat);
-            this.goalStar.position.set(0, 16.5, -4);
-            this.environmentGroup.add(this.goalStar);
+            this.targetMesh = new THREE.Mesh(starGeo, starMat);
+            this.targetMesh.position.set(0, 16.2, -4);
+            this.environmentGroup.add(this.targetMesh);
 
           } else {
-            // ROBLOX OBBY PARKOUR (PLATFORM BALOK WARNA-WARNI MELAYANG)
+            // ROBLOX OBBY PLATFORM BALOK WARNA-WARNI
             const colors = [0xef4444, 0xf59e0b, 0x10b981, 0x3b82f6, 0x8b5cf6];
-            for (let i = 0; i < 7; i++) {
-              const platGeo = new THREE.BoxGeometry(2.5, 0.4, 2.5);
+            for (let i = 0; i < 6; i++) {
+              const platGeo = new THREE.BoxGeometry(3, 0.5, 3);
               const platMat = new THREE.MeshLambertMaterial({ color: colors[i % colors.length] });
               const plat = new THREE.Mesh(platGeo, platMat);
-              plat.position.set((i % 2 === 0 ? 1 : -1) * 1.5, i * 1.6, -i * 2.5);
+              plat.position.set((i % 2 === 0 ? 1 : -1) * 1.6, i * 1.5, -i * 2.8);
               this.environmentGroup.add(plat);
             }
+
+            // Bintang Finish Obby di Platform Terakhir
+            const starGeo = new THREE.OctahedronGeometry(0.9);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+            this.targetMesh = new THREE.Mesh(starGeo, starMat);
+            this.targetMesh.position.set(-1.6, 5 * 1.5 + 1.2, -5 * 2.8);
+            this.environmentGroup.add(this.targetMesh);
           }
         }
 
-        // ================= TEMBAK JARING & PANJAT GEDUNG ================= //
-        shootWebAndClimb(onClimbed) {
+        // Tembak Jaring Bebas & Panjat
+        shootWebAndClimb() {
+          if (this.isClimbing) return;
           sounds.playWebThwip();
           this.isClimbing = true;
 
-          // Buat Tali Jaring Laba-Laba
+          // Buat Tali Jaring Laba-laba 3D
           if (this.webLine) this.scene.remove(this.webLine);
-          const points = [];
-          points.push(new THREE.Vector3(this.characterGroup.position.x, this.characterGroup.position.y + 1, this.characterGroup.position.z));
-          points.push(new THREE.Vector3(0, 15, -4)); // Menancap ke puncak gedung
+          const points = [
+            new THREE.Vector3(this.characterGroup.position.x, this.characterGroup.position.y + 1, this.characterGroup.position.z),
+            new THREE.Vector3(0, 15.5, -4)
+          ];
           const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
           const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 4 });
           this.webLine = new THREE.Line(lineGeo, lineMat);
           this.scene.add(this.webLine);
 
-          // Animasi Karakter Terangkat Melayang ke Atas
+          // Panjat ke Atas Gedung
           const climbInterval = setInterval(() => {
-            if (this.characterGroup.position.y < 15) {
-              this.characterGroup.position.y += 0.4;
+            if (this.characterGroup.position.y < 15.5) {
+              this.characterGroup.position.y += 0.35;
               this.characterGroup.position.z -= 0.08;
-              this.characterGroup.rotation.y += 0.2; // Gaya akrobatik spiderman berputar
+              this.characterGroup.rotation.y += 0.18;
               this.camera.position.y = this.characterGroup.position.y + 4;
             } else {
               clearInterval(climbInterval);
@@ -969,22 +1000,36 @@
                 this.scene.remove(this.webLine);
                 this.webLine = null;
               }
-              if (onClimbed) onClimbed();
+              // Karakter tiba di puncak gedung! Munculkan kuis huruf
+              if (!this.hasTriggeredTarget) {
+                this.hasTriggeredTarget = true;
+                if (this.onTargetReached) this.onTargetReached();
+              }
             }
           }, 30);
         }
 
+        // Lompat Bebas (Bisa Ditekan Kapan Saja)
         jumpAction() {
           if (this.isJumping || this.isClimbing) return;
           sounds.playJumpBoing();
           this.isJumping = true;
-          let jumpVelocity = 0.35;
+          let velY = 0.35;
+          const origY = this.characterGroup.position.y;
 
           const jumpLoop = setInterval(() => {
-            this.characterGroup.position.y += jumpVelocity;
-            jumpVelocity -= 0.03;
-            if (this.characterGroup.position.y <= 0.8) {
-              this.characterGroup.position.y = 0.8;
+            this.characterGroup.position.y += velY;
+            this.characterGroup.position.z -= 0.05; // Sedikit maju saat lompat
+            velY -= 0.03;
+
+            // Periksa jika mendekati finish obby
+            if (this.characterType === 'roblox' && this.characterGroup.position.z <= -12 && !this.hasTriggeredTarget) {
+              this.hasTriggeredTarget = true;
+              if (this.onTargetReached) this.onTargetReached();
+            }
+
+            if (this.characterGroup.position.y <= origY) {
+              this.characterGroup.position.y = origY;
               this.isJumping = false;
               clearInterval(jumpLoop);
             }
@@ -992,6 +1037,7 @@
         }
 
         resetCharacterPosition() {
+          this.hasTriggeredTarget = false;
           this.characterGroup.position.set(0, 0.8, 0);
           this.characterGroup.rotation.set(0, 0, 0);
           this.camera.position.set(0, 5, 11);
@@ -1001,10 +1047,10 @@
         animate() {
           requestAnimationFrame(this.animate);
 
-          // Animasi Putar Bintang Emas Puncak
-          if (this.goalStar) {
-            this.goalStar.rotation.y += 0.03;
-            this.goalStar.rotation.x += 0.02;
+          // Animasi Bintang Target Berputar Menarik Perhatian Anak
+          if (this.targetMesh) {
+            this.targetMesh.rotation.y += 0.03;
+            this.targetMesh.rotation.x += 0.02;
           }
 
           this.renderer.render(this.scene, this.camera);
@@ -1012,22 +1058,26 @@
       }
 
       // ----------------------------------------------------------------------
-      // 4. LOGIKA PERMAINAN UTAMA (SPIDER-HERO & ROBLOX CONTROLLER)
+      // 4. CONTROLLER GAME PLAY-FIRST (MAIN DULU, BARU TANYA)
       // ----------------------------------------------------------------------
       class SuperheroGameApp {
         constructor() {
           this.world3D = null;
-          this.activeMode = 'spiderman'; // 'spiderman', 'roblox', 'hijaiyah'
+          this.activeMode = 'spiderman';
           this.currentMissionIndex = 0;
           this.starScore = 0;
-          this.canAnswer = true;
+          this.canAnswer = false;
+          this.isQuestionActive = false;
 
           this.init();
         }
 
         init() {
           const canvas = document.getElementById('three-canvas');
-          this.world3D = new ThreeDWorldManager(canvas);
+          // Callback saat anak berhasil memanjat puncak gedung atau menyelesaikan obby!
+          this.world3D = new ThreeDWorldManager(canvas, () => {
+            this.triggerQuestionAtTarget();
+          });
 
           this.bindControls();
           this.loadScore();
@@ -1076,6 +1126,7 @@
           document.getElementById('btn-back-home')?.addEventListener('click', () => {
             sounds.playTap();
             document.getElementById('start-modal-screen').classList.remove('hidden');
+            this.hideQuestionCard();
           });
 
           // Tombol Replay Suara
@@ -1087,24 +1138,21 @@
             sounds.repeat();
           });
 
-          // Tombol Aksi Tembak Jaring Spiderman
+          // AKSI BEBAS: Tembak Jaring Spiderman (Anak Bebas Memanjat Kapan Saja!)
           document.getElementById('btn-shoot-web')?.addEventListener('click', () => {
-            sounds.playTap();
-            if (this.activeMode === 'spiderman') {
-              sounds.speak("Jawab huruf yang tepat agar jaring bisa menancap ke puncak gedung!");
-            }
+            this.world3D.shootWebAndClimb();
           });
 
-          // Tombol Lompat Obby
+          // AKSI BEBAS: Lompat Karakter (Anak Bebas Melompat Kapan Saja!)
           document.getElementById('btn-hero-jump')?.addEventListener('click', () => {
             this.world3D.jumpAction();
           });
 
-          // Tombol Lanjut di Popup Menang
+          // Tombol Main Lagi di Popup
           document.getElementById('btn-next-mission')?.addEventListener('click', () => {
             sounds.playTap();
             document.getElementById('celebration-popup').classList.add('hidden');
-            this.nextMission();
+            this.nextPlayRound();
           });
 
           // Joystick Sentuh Virtual untuk HP
@@ -1140,10 +1188,17 @@
 
             thumb.style.transform = `translate(${dx}px, ${dy}px)`;
 
-            // Gerakkan Karakter 3D Secara Halus
-            if (this.world3D.characterGroup) {
-              this.world3D.characterGroup.position.x += dx * 0.005;
+            // Gerakan Bebas Karakter 3D
+            if (this.world3D.characterGroup && !this.world3D.isClimbing) {
+              this.world3D.characterGroup.position.x += dx * 0.006;
+              this.world3D.characterGroup.position.z += dy * 0.006;
               this.world3D.characterGroup.rotation.y = -Math.atan2(dy, dx) - Math.PI / 2;
+
+              // Jika anak berjalan mendekati gedung/target secara manual
+              if (this.world3D.characterGroup.position.z <= -3 && !this.world3D.hasTriggeredTarget && this.activeMode === 'spiderman') {
+                // Anak menyentuh gedung, bantu otomatis memanjat
+                this.world3D.shootWebAndClimb();
+              }
             }
           };
 
@@ -1164,38 +1219,55 @@
         setGameMode(mode) {
           this.activeMode = mode;
           this.currentMissionIndex = 0;
+          this.hideQuestionCard();
           this.world3D.buildCharacter(mode === 'roblox' ? 'roblox' : 'spiderman');
           this.world3D.buildCityEnvironment();
           this.world3D.resetCharacterPosition();
 
-          this.loadMission();
+          // Sapaan Ceria Singkat di Awal Permainan
+          const bannerText = document.getElementById('explore-banner-text');
+          if (mode === 'spiderman') {
+            bannerText.innerText = "Ayo main bebas! Tekan JARING untuk panjat gedung!";
+            sounds.speak("Ayo main bebas! Tekan tombol jaring untuk memanjat gedung!");
+          } else if (mode === 'roblox') {
+            bannerText.innerText = "Ayo main bebas! Tekan LOMPAT untuk lewati balok!";
+            sounds.speak("Ayo main bebas! Tekan tombol lompat untuk melewati rintangan!");
+          } else {
+            bannerText.innerText = "Ayo temukan bintang rahasia di menara suci!";
+            sounds.speak("Ayo jalan-jalan dan temukan bintang rahasia!");
+          }
         }
 
-        getCurrentList() {
-          if (this.activeMode === 'roblox') return ROBLOX_OBBY_MISSIONS;
-          if (this.activeMode === 'hijaiyah') return HIJAIYAH_MISSIONS;
-          return SPIDER_MISSIONS;
+        hideQuestionCard() {
+          this.isQuestionActive = false;
+          this.canAnswer = false;
+          document.getElementById('challenge-overlay-card')?.classList.add('hidden');
+          document.getElementById('explore-banner')?.classList.remove('hidden');
         }
 
-        loadMission() {
+        // ================= KUIS HANYA MUNCUL KETIKA TIBA DI TARGET/PUNCAK ================= //
+        triggerQuestionAtTarget() {
+          this.isQuestionActive = true;
           this.canAnswer = true;
+
+          document.getElementById('explore-banner')?.classList.add('hidden');
+          const card = document.getElementById('challenge-overlay-card');
+          card.classList.remove('hidden');
+
           const list = this.getCurrentList();
           const mission = list[this.currentMissionIndex % list.length];
           const isHijaiyah = (this.activeMode === 'hijaiyah');
 
-          // Buat 3 Pilihan (1 Benar, 2 Pengecoh)
           let choices = [mission];
           let others = list.filter(m => (isHijaiyah ? m.id !== mission.id : m.letter !== mission.letter));
           others.sort(() => Math.random() - 0.5);
           choices.push(others[0], others[1]);
           choices.sort(() => Math.random() - 0.5);
 
-          // Update Teks Instruksi
           const promptEl = document.getElementById('challenge-prompt-text');
           promptEl.innerText = mission.desc;
           sounds.speak(mission.desc);
 
-          // Render Tombol Pilihan Huruf Kartun
           const container = document.getElementById('choices-container');
           container.innerHTML = '';
 
@@ -1224,6 +1296,12 @@
           });
         }
 
+        getCurrentList() {
+          if (this.activeMode === 'roblox') return ROBLOX_OBBY_MISSIONS;
+          if (this.activeMode === 'hijaiyah') return HIJAIYAH_MISSIONS;
+          return SPIDER_MISSIONS;
+        }
+
         handleChoiceAnswer(selected, target, btnElem) {
           sounds.playTap();
           const isCorrect = (this.activeMode === 'hijaiyah') ? (selected.id === target.id) : (selected.letter === target.letter);
@@ -1234,21 +1312,10 @@
             btnElem.style.borderColor = '#10b981';
             btnElem.style.background = '#dcfce7';
 
-            if (this.activeMode === 'spiderman' || this.activeMode === 'hijaiyah') {
-              // Animasi Spiderman Tembak Jaring & Panjat Gedung ke Puncak!
-              this.world3D.shootWebAndClimb(() => {
-                this.showCelebrationPopup();
-              });
-            } else {
-              // Mode Roblox Obby: Karakter Melompat Parkour Melewati Balok!
-              this.world3D.jumpAction();
-              setTimeout(() => {
-                this.showCelebrationPopup();
-              }, 600);
-            }
+            this.hideQuestionCard();
+            this.showCelebrationPopup();
 
           } else {
-            // Salah Lembut
             sounds.playSoftTryAgain();
             btnElem.style.transform = 'scale(0.88)';
             setTimeout(() => btnElem.style.transform = 'scale(1)', 200);
@@ -1262,27 +1329,26 @@
           const detail = document.getElementById('celebration-detail');
 
           if (this.activeMode === 'spiderman') {
-            detail.innerText = "Yeeay! Spider-Hero berhasil menembak jaring dan memanjat gedung sampai ke puncak!";
-            sounds.speak("Horeee! Spider Hero berhasil memanjat puncak menara! Kamu anak yang sangat hebat!");
+            detail.innerText = "Yeeay! Spider-Hero berhasil memanjat puncak dan mendapatkan bintang emas!";
+            sounds.speak("Horeee! Jawabanmu benar dan kamu mendapatkan bintang emas! Hebat sekali!");
           } else if (this.activeMode === 'roblox') {
             detail.innerText = "Keren sekali! Karakter Obby kamu berhasil parkour di platform balok huruf!";
-            sounds.speak("Luar biasa! Karakter Roblox kamu berhasil melewati rintangan Obby!");
+            sounds.speak("Luar biasa! Kamu berhasil melewati rintangan Obby dan mendapatkan bintang!");
           } else {
-            detail.innerText = "Alhamdulillah! Huruf Hijaiyah berhasil kamu temukan!";
-            sounds.speak("Alhamdulillah! Kamu hebat sekali menemukan huruf Hijaiyah!");
+            detail.innerText = "Alhamdulillah! Bintang huruf Hijaiyah berhasil kamu temukan!";
+            sounds.speak("Alhamdulillah! Jawabanmu benar dan kamu dapat bintang baru!");
           }
 
           popup.classList.remove('hidden');
         }
 
-        nextMission() {
+        nextPlayRound() {
           this.currentMissionIndex++;
+          this.hideQuestionCard();
           this.world3D.resetCharacterPosition();
-          this.loadMission();
         }
       }
 
-      // Start saat Halaman Siap
       window.addEventListener('DOMContentLoaded', () => {
         window.heroGame = new SuperheroGameApp();
       });
