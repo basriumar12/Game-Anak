@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Petualangan Si Kecil — Playlearning Lingokids Style</title>
+  <title>Spider-Hero & Obby Roblox Kids — Edukasi Pintar</title>
   
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦁</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕷️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Fredoka:wght@400;600;700;800&family=Mali:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
+  
+  <!-- Three.js (3D Engine untuk Roblox Obby & Spiderman) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   
   <style>
-    /* ==========================================================================
-       STYLE UTAMA LINGOKIDS STYLE — PLAYLEARNING KIDS
-       Warna-warni pastel ceria, tombol chunky/bubbly, ramah jari balita (3-5 th)
-       ========================================================================== */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -24,37 +23,35 @@
       -webkit-user-select: none;
     }
 
-    :root {
-      --primary-color: #ff6b81;
-      --secondary-color: #2ed573;
-      --accent-color: #ffa502;
-      --sky-top: #70a1ff;
-      --sky-bottom: #a1c4fd;
-      --card-border: 4px solid #ffffff;
-      --bubble-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 -4px 0 rgba(0,0,0,0.12);
-    }
-
-    html, body {
+    body, html {
       width: 100%;
       height: 100%;
       overflow: hidden;
       font-family: 'Fredoka', 'Nunito', sans-serif;
-      background: #70a1ff;
-      touch-action: manipulation;
+      background: #0f172a;
+      touch-action: none;
     }
 
-    #app-viewport {
+    #game-viewport {
       position: relative;
       width: 100vw;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
-      background: linear-gradient(180deg, #70a1ff 0%, #a1c4fd 60%, #e0c3fc 100%);
     }
 
-    /* ================= 1. HEADER HUD ATAS ================= */
-    .app-header {
+    /* 3D WebGL Canvas */
+    #three-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    /* ================= 1. TOP HUD (STATUS & AUDIO) ================= */
+    .top-hud {
       position: absolute;
       top: 0;
       left: 0;
@@ -67,484 +64,295 @@
       pointer-events: none;
     }
 
-    .header-actions {
+    .hud-group {
       display: flex;
       gap: 10px;
       align-items: center;
       pointer-events: auto;
     }
 
-    .bubble-btn {
+    .btn-circle {
       width: 52px;
       height: 52px;
       border-radius: 50%;
       background: #ffffff;
-      border: 4px solid #ff4757;
+      border: 4px solid #ef4444;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 26px;
       cursor: pointer;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.2), inset 0 -4px 0 rgba(0,0,0,0.15);
-      transition: transform 0.12s ease;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.3), inset 0 -4px 0 rgba(0,0,0,0.15);
+      transition: transform 0.1s ease;
     }
-    .bubble-btn:active { transform: scale(0.9); }
-    .btn-home { border-color: #ffa502; background: #fff2a8; }
-    .btn-speaker { 
-      border-color: #2ed573; 
-      background: #cbfbe2; 
-      animation: pulseBtn 1.8s infinite alternate ease-in-out; 
-    }
+    .btn-circle:active { transform: scale(0.9); }
+    .btn-home { border-color: #f59e0b; background: #fef08a; }
+    .btn-speaker { border-color: #10b981; background: #bbf7d0; animation: pulseBtn 1.8s infinite alternate; }
 
     @keyframes pulseBtn {
       0% { transform: scale(1); }
       100% { transform: scale(1.08); }
     }
 
-    /* Score & Star Counter Lingokids Style */
-    .score-badge {
-      background: #ffffff;
-      border: 4px solid #ffa502;
-      border-radius: 30px;
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid #f59e0b;
       padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #b45309;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+    }
+
+    /* Mode Selector Pill di Atas */
+    .mode-switch-pill {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      border: 3px solid #38bdf8;
+      border-radius: 30px;
+      padding: 4px;
+      display: flex;
+      gap: 4px;
       pointer-events: auto;
-      font-weight: 800;
-      font-size: 16px;
-      color: #e67e22;
     }
 
-    .star-rot {
-      display: inline-block;
-      animation: starRotate 4s infinite linear;
-    }
-    @keyframes starRotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* ================= 2. MASCOT GUIDE BAR (LEO SI SINGA) ================= */
-    .mascot-guide-bar {
-      position: absolute;
-      top: 66px;
-      left: 14px;
-      right: 14px;
-      z-index: 45;
-      background: rgba(255, 255, 255, 0.94);
-      border: 3px solid #ff6b81;
-      border-radius: 24px;
-      padding: 8px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      cursor: pointer;
-      transition: transform 0.15s ease;
-    }
-    .mascot-guide-bar:active { transform: scale(0.98); }
-
-    .mascot-avatar {
-      font-size: 38px;
-      line-height: 1;
-      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
-      animation: mascotBounce 2s infinite ease-in-out;
-    }
-    @keyframes mascotBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .mascot-speech-text {
-      flex: 1;
-      font-size: 15px;
+    .mode-pill-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 13px;
       font-weight: 700;
-      color: #2f3542;
-      line-height: 1.25;
-    }
-
-    .mascot-tap-hint {
-      font-size: 22px;
-      color: #2ed573;
-    }
-
-    /* ================= 3. AREA PLAYGROUND INTERAKTIF ================= */
-    #playground-area {
-      position: absolute;
-      top: 135px;
-      bottom: 84px;
-      left: 0;
-      width: 100%;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 16px;
-      overflow-y: auto;
-    }
-
-    /* A. MINI-GAME 1: FEED THE ANIMAL (FEEDING FOOD SORT) */
-    .feed-game-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-    }
-
-    .animal-target-box {
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 6px dashed #ff4757;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 10px 25px rgba(255, 71, 87, 0.25);
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .animal-mouth-open {
-      transform: scale(1.15) !important;
-      background: #ffeaa7 !important;
-      border-style: solid !important;
-    }
-
-    .animal-target-face {
-      font-size: 72px;
-      line-height: 1;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12));
-    }
-
-    .animal-target-badge {
-      position: absolute;
-      bottom: -14px;
-      background: #ff4757;
-      color: #ffffff;
-      font-size: 18px;
-      font-weight: 800;
-      padding: 4px 14px;
+      padding: 6px 12px;
       border-radius: 20px;
-      border: 3px solid #ffffff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-
-    .feed-items-dock {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
-
-    .food-bubble-item {
-      width: 90px;
-      height: 90px;
-      background: #ffffff;
-      border: 4px solid #2ed573;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: grab;
-      touch-action: none;
-      box-shadow: 0 8px 18px rgba(46, 213, 115, 0.25), inset 0 -4px 0 #bbf7d0;
-      transition: transform 0.1s ease;
-      position: relative;
-    }
-    .food-bubble-item:active { cursor: grabbing; transform: scale(1.12); }
-
-    .food-emoji { font-size: 38px; line-height: 1; pointer-events: none; }
-    .food-letter { 
-      font-size: 18px; 
-      font-weight: 800; 
-      color: #2ed573; 
-      pointer-events: none;
-      margin-top: 2px;
-    }
-
-    /* B. MINI-GAME 2: BALLOON POPPING */
-    .balloon-sky-container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .flying-balloon {
-      position: absolute;
-      width: 96px;
-      height: 120px;
-      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 10px 10px 15px rgba(255,255,255,0.4);
       cursor: pointer;
-      user-select: none;
-      transition: transform 0.1s;
-    }
-    .flying-balloon:active { transform: scale(0.9); }
-    .balloon-tail {
-      position: absolute;
-      bottom: -10px;
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-bottom: 10px solid rgba(0,0,0,0.25);
-    }
-    .balloon-char {
-      font-size: 44px;
-      font-weight: 800;
-      line-height: 1;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    }
-    .balloon-char.arabic-font {
-      font-family: 'Amiri', serif;
-      font-size: 50px;
-    }
-
-    /* C. MINI-GAME 3: TRACING CANVAS GORES JARI */
-    .tracing-box-container {
-      width: 100%;
-      max-width: 360px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .tracing-canvas-card {
-      position: relative;
-      width: 280px;
-      height: 280px;
-      background: #ffffff;
-      border: 6px solid #ffa502;
-      border-radius: 36px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+      transition: all 0.15s ease;
       display: flex;
       align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      touch-action: none;
+      gap: 5px;
     }
 
-    .tracing-canvas-card canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 10;
+    .mode-pill-btn.active {
+      background: #38bdf8;
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
     }
 
-    .trace-guide-char {
-      font-size: 190px;
-      font-weight: 800;
-      color: #f1f2f6;
-      border: 4px dashed #ced6e0;
-      border-radius: 20px;
-      width: 230px;
-      height: 230px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      pointer-events: none;
-      line-height: 1;
-    }
-    .trace-guide-char.arabic-font {
-      font-family: 'Amiri', serif;
-      font-size: 210px;
-    }
-
-    .trace-progress-bar {
-      margin-top: 14px;
-      width: 80%;
-      height: 18px;
-      background: #ffffff;
-      border: 3px solid #ffa502;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .trace-progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #ffa502, #2ed573);
-      border-radius: 20px;
-      transition: width 0.15s ease;
-    }
-
-    /* D. MINI-GAME 4: POPPING BUBBLES / HIJAIYAH */
-    .counting-grid-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      width: 100%;
-      max-width: 340px;
-    }
-
-    .count-bubble-btn {
-      aspect-ratio: 1;
-      background: #ffffff;
-      border: 4px solid #1e90ff;
-      border-radius: 28px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 8px 16px rgba(30, 144, 255, 0.25), inset 0 -4px 0 #70a1ff;
-      transition: transform 0.1s ease;
-    }
-    .count-bubble-btn:active { transform: scale(0.92); }
-    .count-num { font-size: 42px; font-weight: 800; color: #1e90ff; }
-    .count-sub { font-size: 13px; font-weight: 700; color: #747d8c; }
-
-    /* ================= 4. DOCK NAVIGASI MODE BAWAH (LINGOKIDS TABS) ================= */
-    .bottom-tabs-dock {
+    /* ================= 2. SPIDERMAN WEB-SHOOTER & KONTROL HP ================= */
+    .mobile-controls-layer {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 76px;
-      z-index: 40;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      border-top: 3px solid #dfe4ea;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding-bottom: env(safe-area-inset-bottom, 8px);
+      height: 100%;
+      z-index: 30;
+      pointer-events: none;
     }
 
-    .tab-item-btn {
+    /* Joystick Virtual Kiri */
+    .virtual-joystick-base {
+      position: absolute;
+      bottom: 24px;
+      left: 20px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      border: 4px solid rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .virtual-joystick-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #38bdf8;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      position: absolute;
+      pointer-events: none;
+    }
+
+    /* Tombol Aksi Kanan (Lompat / Tembak Jaring / Panjat Gedung) */
+    .action-buttons-group {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .action-btn-large {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      border: 5px solid #ffffff;
+      color: #ffffff;
+      font-size: 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: none;
-      border: none;
       cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+      transition: transform 0.1s ease;
       font-family: inherit;
-      color: #747d8c;
-      font-size: 11px;
-      font-weight: 700;
-      gap: 3px;
-      transition: transform 0.12s ease;
     }
-    .tab-item-btn:active { transform: scale(0.9); }
-    .tab-item-btn.active {
-      color: #ff4757;
-    }
-    .tab-icon-wrap {
-      width: 44px;
-      height: 44px;
-      border-radius: 20px;
+    .action-btn-large:active { transform: scale(0.9); }
+    .action-btn-large span { font-size: 10px; font-weight: 800; margin-top: -2px; }
+
+    .btn-jump { background: linear-gradient(135deg, #10b981, #059669); }
+    .btn-web-sling { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+
+    /* ================= 3. ZONA TANTANGAN KUIS EDUKASI ROBLOX / SPIDER ================= */
+    #challenge-overlay-card {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 440px;
+      z-index: 60;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border: 5px solid #ef4444;
+      border-radius: 32px;
+      padding: 16px 18px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.4);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      background: #f1f2f6;
-      transition: all 0.2s ease;
-    }
-    .tab-item-btn.active .tab-icon-wrap {
-      background: #ff6b81;
-      color: #ffffff;
-      transform: translateY(-4px);
-      box-shadow: 0 6px 12px rgba(255, 107, 129, 0.35);
+      gap: 12px;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* ================= 5. POPUP REWARD & CELEBRATION (LINGOKIDS STYLE) ================= */
-    #celebration-screen {
+    .challenge-speech-bar {
+      width: 100%;
+      background: #fef2f2;
+      border: 3px solid #f87171;
+      border-radius: 20px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .speech-icon { font-size: 26px; }
+    .speech-text {
+      font-size: 15px;
+      font-weight: 800;
+      color: #991b1b;
+      line-height: 1.25;
+    }
+
+    .choices-bubble-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .bubble-choice-btn {
+      flex: 1;
+      aspect-ratio: 1;
+      max-height: 84px;
+      background: #ffffff;
+      border: 4px solid #38bdf8;
+      border-radius: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15), inset 0 -4px 0 #bae6fd;
+      transition: transform 0.1s ease;
+    }
+    .bubble-choice-btn:active { transform: scale(0.92); }
+    .choice-main-char { font-size: 38px; font-weight: 800; color: #0284c7; line-height: 1; }
+    .choice-main-char.arabic { font-family: 'Amiri', serif; font-size: 46px; color: #059669; }
+    .choice-sub-text { font-size: 11px; font-weight: 700; color: #64748b; margin-top: 2px; }
+
+    /* ================= 4. POPUP PERAYAAN BINTANG & LEVEL UP ================= */
+    #celebration-popup {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 100;
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(5px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      text-align: center;
       color: #ffffff;
+      text-align: center;
+      padding: 24px;
     }
 
-    .reward-box-card {
+    .celebration-box {
       background: #ffffff;
-      color: #2f3542;
+      color: #1e293b;
       border-radius: 36px;
+      border: 6px solid #f59e0b;
       padding: 28px 24px;
       width: 90%;
-      max-width: 340px;
+      max-width: 360px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 16px 36px rgba(0,0,0,0.3);
-      border: 6px solid #ffa502;
-      animation: popBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      animation: popAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    @keyframes popBounce {
-      0% { transform: scale(0.4); opacity: 0; }
-      80% { transform: scale(1.08); }
+    @keyframes popAnim {
+      0% { transform: scale(0.3); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
 
-    .reward-icon-big {
-      font-size: 76px;
-      animation: wiggleReward 1.5s infinite ease-in-out;
-    }
-    @keyframes wiggleReward {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-8deg); }
-      75% { transform: rotate(8deg); }
+    .star-hero-big { font-size: 80px; animation: heroBounce 1.5s infinite ease-in-out; }
+    @keyframes heroBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
     }
 
-    .btn-big-next {
+    .btn-super-next {
       margin-top: 18px;
-      background: linear-gradient(135deg, #2ed573, #10ac84);
+      background: linear-gradient(135deg, #ef4444, #dc2626);
       color: #ffffff;
       border: 4px solid #ffffff;
-      border-radius: 28px;
+      border-radius: 30px;
       font-size: 20px;
       font-weight: 800;
-      padding: 12px 32px;
+      padding: 14px 36px;
       cursor: pointer;
-      box-shadow: 0 8px 18px rgba(46, 213, 115, 0.4);
-      transition: transform 0.12s;
+      box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4);
+      font-family: inherit;
     }
-    .btn-big-next:active { transform: scale(0.95); }
+    .btn-super-next:active { transform: scale(0.95); }
 
-    /* ================= 6. LAYAR MENU UTAMA (WELCOME SCREEN) ================= */
-    #welcome-screen {
+    /* ================= 5. START MENU MODES ================= */
+    #start-modal-screen {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 120;
-      background: linear-gradient(180deg, #70a1ff 0%, #2ed573 100%);
+      background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -554,200 +362,225 @@
       color: #ffffff;
     }
 
-    .welcome-mascot {
-      font-size: 96px;
-      animation: floatLeo 2.2s infinite ease-in-out;
-      margin-bottom: 8px;
-    }
-    @keyframes floatLeo {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-14px); }
-    }
-
-    .welcome-title {
-      font-size: 32px;
-      font-weight: 800;
-      text-shadow: 0 4px 8px rgba(0,0,0,0.25);
-    }
-
-    .welcome-subtitle {
-      font-size: 16px;
-      font-weight: 600;
-      margin-top: 4px;
-      opacity: 0.95;
-    }
-
-    .welcome-characters-strip {
+    .menu-avatar-duo {
+      font-size: 72px;
       display: flex;
       gap: 16px;
-      font-size: 40px;
-      margin: 20px 0;
-      background: rgba(255, 255, 255, 0.25);
-      padding: 10px 24px;
-      border-radius: 30px;
+      margin-bottom: 8px;
+      animation: floatDuo 2s infinite ease-in-out;
+    }
+    @keyframes floatDuo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
-    .btn-play-huge {
-      background: #ffa502;
-      color: #ffffff;
-      border: 5px solid #ffffff;
-      border-radius: 40px;
-      padding: 16px 48px;
-      font-size: 24px;
+    .menu-main-title {
+      font-size: 28px;
       font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(255, 165, 2, 0.5), inset 0 -4px 0 #e67e22;
-      animation: pulsePlay 1.6s infinite ease-in-out;
-      margin-top: 10px;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
-    @keyframes pulsePlay {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.06); }
+    .menu-main-sub {
+      font-size: 15px;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-top: 4px;
+      margin-bottom: 24px;
     }
 
-    /* Utilitas */
+    .mode-cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .btn-card-mode {
+      border: 4px solid #ffffff;
+      border-radius: 26px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      font-family: inherit;
+      color: #ffffff;
+      text-align: left;
+      transition: transform 0.12s ease;
+    }
+    .btn-card-mode:active { transform: scale(0.95); }
+    .mode-spiderman { background: linear-gradient(135deg, #ef4444, #991b1b); }
+    .mode-roblox { background: linear-gradient(135deg, #38bdf8, #0284c7); }
+    .mode-hijaiyah-park { background: linear-gradient(135deg, #10b981, #047857); }
+
+    .card-mode-icon { font-size: 40px; }
+    .card-mode-info h4 { font-size: 18px; font-weight: 800; }
+    .card-mode-info p { font-size: 12px; opacity: 0.9; font-weight: 600; margin-top: 2px; }
+
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <div id="app-viewport">
+  <div id="game-viewport">
     
-    <!-- 1. Header HUD Atas -->
-    <header class="app-header">
-      <div class="header-actions">
-        <button id="btn-home-menu" class="bubble-btn btn-home" aria-label="Menu Utama" title="Menu Utama">🏠</button>
-        <button id="btn-replay-voice" class="bubble-btn btn-speaker" aria-label="Dengar Suara" title="Ulangi Instruksi">🔊</button>
+    <!-- Canvas 3D Three.js -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Top HUD (Score & Replay Voice) -->
+    <header class="top-hud">
+      <div class="hud-group">
+        <button id="btn-back-home" class="btn-circle btn-home" title="Pilih Mode">🏠</button>
+        <button id="btn-repeat-speech" class="btn-circle btn-speaker" title="Ulangi Suara">🔊</button>
       </div>
-      <div class="header-actions">
-        <div class="score-badge">
-          <span class="star-rot">⭐</span>
-          <span id="stars-display">0</span>
+
+      <!-- Mode Switch Pill Cepat -->
+      <div class="mode-switch-pill">
+        <button class="mode-pill-btn active" data-mode="spiderman">🕷️ Spider</button>
+        <button class="mode-pill-btn" data-mode="roblox">🧱 Obby</button>
+        <button class="mode-pill-btn" data-mode="hijaiyah">📖 Hijaiyah</button>
+      </div>
+
+      <div class="hud-group">
+        <div class="stat-pill">
+          <span>⭐</span>
+          <span id="star-counter">0</span>
         </div>
       </div>
     </header>
 
-    <!-- 2. Karakter Pemandu Lingokids Style (Leo si Singa Ceria) -->
-    <div id="mascot-bar" class="mascot-guide-bar">
-      <div class="mascot-avatar" id="mascot-face">🦁</div>
-      <div class="mascot-speech-text" id="mascot-text">
-        Halo adik manis! Ayo kita bermain sambil belajar!
+    <!-- Kontrol Sentuh HP (Joystick Kiri & Tombol Aksi Kanan) -->
+    <div class="mobile-controls-layer">
+      <!-- Virtual Joystick Touch Kiri -->
+      <div id="joystick-base" class="virtual-joystick-base">
+        <div id="joystick-thumb" class="virtual-joystick-thumb"></div>
       </div>
-      <div class="mascot-tap-hint">🔊</div>
+
+      <!-- Tombol Aksi Kanan (Lompat Obby & Tembak Jaring Spiderman) -->
+      <div class="action-buttons-group">
+        <button id="btn-shoot-web" class="action-btn-large btn-web-sling">
+          🕸️
+          <span>JARING</span>
+        </button>
+        <button id="btn-hero-jump" class="action-btn-large btn-jump">
+          ⬆️
+          <span>LOMPAT</span>
+        </button>
+      </div>
     </div>
 
-    <!-- 3. Dynamic Playground Area (Wadah Mini Game Berubah Sesuai Tab) -->
-    <main id="playground-area">
-      <!-- Diisi secara dinamis oleh JavaScript -->
-    </main>
+    <!-- Zona Tantangan Edukasi Interaktif (Muncul Saat Tiba di Target Gedung/Obby) -->
+    <div id="challenge-overlay-card">
+      <div class="challenge-speech-bar" id="speech-trigger-box">
+        <span class="speech-icon">🔊</span>
+        <span class="speech-text" id="challenge-prompt-text">
+          Ayo tembak jaring ke huruf A untuk memanjat gedung!
+        </span>
+      </div>
 
-    <!-- 4. Dock Navigasi Mode Lingokids (4 Mode Pembelajaran Interaktif) -->
-    <nav class="bottom-tabs-dock">
-      <!-- Tab 1: Memberi Makan Hewan (Feeding & Phonics) -->
-      <button class="tab-item-btn active" data-mode="feeding">
-        <div class="tab-icon-wrap">🍎</div>
-        <span>Beri Makan</span>
-      </button>
+      <div class="choices-bubble-row" id="choices-container">
+        <!-- Pilihan Huruf Kartu di-render dinamis -->
+      </div>
+    </div>
 
-      <!-- Tab 2: Meletuskan Balon Alfabet (Balloon Pop) -->
-      <button class="tab-item-btn" data-mode="balloon">
-        <div class="tab-icon-wrap">🎈</div>
-        <span>Pecah Balon</span>
-      </button>
-
-      <!-- Tab 3: Menjiplak Huruf dengan Jari (Finger Tracing) -->
-      <button class="tab-item-btn" data-mode="tracing">
-        <div class="tab-icon-wrap">✍️</div>
-        <span>Gores Huruf</span>
-      </button>
-
-      <!-- Tab 4: Huruf Hijaiyah Ceria (Hijaiyah 28 Huruf) -->
-      <button class="tab-item-btn" data-mode="hijaiyah">
-        <div class="tab-icon-wrap">📖</div>
-        <span>Hijaiyah</span>
-      </button>
-    </nav>
-
-    <!-- 5. Layar Perayaan Reward (Lingokids Confetti & Star Pop) -->
-    <div id="celebration-screen" class="hidden">
-      <div class="reward-box-card">
-        <div class="reward-icon-big">🌟</div>
-        <h2 style="font-size: 24px; font-weight: 800; color: #ff4757; margin-top: 8px;">LUAR BIASA!</h2>
-        <p id="celebration-subtext" style="font-size: 15px; color: #57606f; margin-top: 6px; font-weight: 600;">
-          Adik pintar sekali! Kamu dapat 1 bintang baru!
+    <!-- Popup Perayaan Kemenangan Bintang Hero -->
+    <div id="celebration-popup" class="hidden">
+      <div class="celebration-box">
+        <div class="star-hero-big">🦸‍♂️✨</div>
+        <h2 style="font-size: 24px; font-weight: 800; color: #ef4444; margin-top: 10px;">HEBAT BANGET!</h2>
+        <p id="celebration-detail" style="font-size: 15px; color: #64748b; font-weight: 600; margin-top: 6px;">
+          Spider-Hero berhasil memanjat puncak gedung!
         </p>
-        <button id="btn-next-challenge" class="btn-big-next">Lanjut! 🚀</button>
+        <button id="btn-next-mission" class="btn-super-next">Misi Berikutnya! 🚀</button>
       </div>
     </div>
 
-    <!-- 6. Layar Awal Playlearning (Welcome Screen) -->
-    <div id="welcome-screen">
-      <div class="welcome-mascot">🦁</div>
-      <h1 class="welcome-title">Petualangan Pintar</h1>
-      <p class="welcome-subtitle">Belajar Huruf & Hijaiyah Ceria (Gaya Lingokids)</p>
-      
-      <div class="welcome-characters-strip">
-        <span>🐰</span>
-        <span>🐵</span>
-        <span>🐘</span>
-        <span>⭐</span>
+    <!-- Menu Utama Pilihan Dunia -->
+    <div id="start-modal-screen">
+      <div class="menu-avatar-duo">
+        <span>🕷️</span>
+        <span>🧱</span>
       </div>
+      <h1 class="menu-main-title">Petualangan Hero Kids</h1>
+      <p class="menu-main-sub">Spiderman Memanjat Gedung & Obby Roblox Seru</p>
 
-      <button id="btn-start-playing" class="btn-play-huge">MULAI MAIN! ▶️</button>
+      <div class="mode-cards-container">
+        <!-- Mode 1: Spiderman Memanjat Gedung -->
+        <button class="btn-card-mode mode-spiderman" data-gamemode="spiderman">
+          <span class="card-mode-icon">🕷️</span>
+          <div class="card-mode-info">
+            <h4>Spider-Hero Panjat Gedung</h4>
+            <p>Tembak jaring laba-laba & panjat menara huruf</p>
+          </div>
+        </button>
+
+        <!-- Mode 2: Roblox Obby Parkour -->
+        <button class="btn-card-mode mode-roblox" data-gamemode="roblox">
+          <span class="card-mode-icon">🧱</span>
+          <div class="card-mode-info">
+            <h4>Roblox Obby Parkour</h4>
+            <p>Lompat platform warna-warni & cari balok huruf</p>
+          </div>
+        </button>
+
+        <!-- Mode 3: Petualangan Hijaiyah 3D -->
+        <button class="btn-card-mode mode-hijaiyah-park" data-gamemode="hijaiyah">
+          <span class="card-mode-icon">🕌</span>
+          <div class="card-mode-info">
+            <h4>Taman Hijaiyah Hero</h4>
+            <p>Mengenal huruf Alif sampai Ya di kota suci</p>
+          </div>
+        </button>
+      </div>
     </div>
 
   </div>
 
   <!-- ==========================================================================
-       SCRIPT ENGINE LINGOKIDS PLAYLEARNING: VOICE-FIRST & INTERACTIVE TOUCH
+       SCRIPT ENGINE 3D THREE.JS: SPIDERMAN WEB-SLINGING, ROBLOX OBBY & AUDIO
        ========================================================================== -->
   <script>
     (function() {
       'use strict';
 
-      // ------------------------------------------------------------------------
-      // 1. DATA MATERI: ALFABET, HIJAIYAH & SUARA
-      // ------------------------------------------------------------------------
-      const ALPHABET_DATA = [
-        { letter: 'A', name: 'A', food: 'Apel', emoji: '🍎', animal: 'Anjing', animalEmoji: '🐶' },
-        { letter: 'B', name: 'B', food: 'Pisang', emoji: '🍌', animal: 'Bebek', animalEmoji: '🦆' },
-        { letter: 'C', name: 'C', food: 'Ceri', emoji: '🍒', animal: 'Cicak', animalEmoji: '🦎' },
-        { letter: 'D', name: 'D', food: 'Donat', emoji: '🍩', animal: 'Domba', animalEmoji: '🐑' },
-        { letter: 'E', name: 'E', food: 'Es Krim', emoji: '🍦', animal: 'Elang', animalEmoji: '🦅' },
-        { letter: 'F', name: 'F', food: 'Fanta', emoji: '🥤', animal: 'Flamingo', animalEmoji: '🦩' },
-        { letter: 'G', name: 'G', food: 'Gula', emoji: '🍬', animal: 'Gajah', animalEmoji: '🐘' },
-        { letter: 'H', name: 'H', food: 'Hotdog', emoji: '🌭', animal: 'Harimau', animalEmoji: '🐯' },
-        { letter: 'I', name: 'I', food: 'Ikan', emoji: '🐟', animal: 'Iguana', animalEmoji: '🦎' },
-        { letter: 'J', name: 'J', food: 'Jeruk', emoji: '🍊', animal: 'Jerapah', animalEmoji: '🦒' },
-        { letter: 'K', name: 'K', food: 'Kue', emoji: '🍰', animal: 'Kucing', animalEmoji: '🐱' },
-        { letter: 'L', name: 'L', food: 'Lemon', emoji: '🍋', animal: 'Lumba-lumba', animalEmoji: '🐬' },
-        { letter: 'M', name: 'M', food: 'Mangga', emoji: '🥭', animal: 'Monyet', animalEmoji: '🐵' }
+      // ----------------------------------------------------------------------
+      // 1. DATA MISI EDUKASI SPIDERMAN, ROBLOX & HIJAIYAH
+      // ----------------------------------------------------------------------
+      const SPIDER_MISSIONS = [
+        { letter: 'A', name: 'A', word: 'Apel', desc: 'A untuk Apel Merah! Tembak jaring ke huruf A!' },
+        { letter: 'B', name: 'B', word: 'Bola', desc: 'B untuk Bola Bundar! Tembak jaring ke huruf B!' },
+        { letter: 'C', name: 'C', word: 'Ceri', desc: 'C untuk Ceri Manis! Tembak jaring ke huruf C!' },
+        { letter: 'D', name: 'D', word: 'Donat', desc: 'D untuk Donat Cokelat! Tembak jaring ke huruf D!' },
+        { letter: 'E', name: 'E', word: 'Elang', desc: 'E untuk Elang Terbang! Tembak jaring ke huruf E!' },
+        { letter: 'F', name: 'F', word: 'Flamingo', desc: 'F untuk Flamingo Cantik! Tembak jaring ke huruf F!' }
       ];
 
-      const HIJAIYAH_DATA = [
-        { id: 'alif', arabic: 'ا', name: 'Alif', hint: 'Tegak lurus seperti pensil' },
-        { id: 'ba', arabic: 'ب', name: 'Ba', hint: 'Ada satu titik di bawah mangkuk' },
-        { id: 'ta', arabic: 'ت', name: 'Ta', hint: 'Ada dua titik mata di atas mangkuk' },
-        { id: 'tsa', arabic: 'ث', name: 'Tsa', hint: 'Ada tiga titik bintang di atas mangkuk' },
-        { id: 'jim', arabic: 'ج', name: 'Jim', hint: 'Ada satu titik di dalam perutnya' },
-        { id: 'ha', arabic: 'ح', name: 'Ha', hint: 'Bersih tanpa titik' },
-        { id: 'kha', arabic: 'خ', name: 'Kha', hint: 'Ada satu titik mahkota di kepalanya' },
-        { id: 'dal', arabic: 'د', name: 'Dal', hint: 'Melengkung ramah tanpa titik' },
-        { id: 'dzal', arabic: 'ذ', name: 'Dzal', hint: 'Melengkung dengan satu titik di atas' },
-        { id: 'ra', arabic: 'ر', name: 'Ra', hint: 'Meluncur ke bawah tanpa titik' },
-        { id: 'zai', arabic: 'ز', name: 'Zai', hint: 'Meluncur dengan satu titik di atas' },
-        { id: 'sin', arabic: 'س', name: 'Sin', hint: 'Memiliki gigi-gigi kecil yang rapi' },
-        { id: 'syin', arabic: 'ش', name: 'Syin', hint: 'Punya tiga titik di atas giginya' },
-        { id: 'shad', arabic: 'ص', name: 'Shad', hint: 'Melengkung bulat dan bersahabat' }
+      const ROBLOX_OBBY_MISSIONS = [
+        { letter: 'G', name: 'G', word: 'Gajah', desc: 'Lompat ke platform balok huruf G!' },
+        { letter: 'H', name: 'H', word: 'Harimau', desc: 'Lompat ke platform balok huruf H!' },
+        { letter: 'I', name: 'I', word: 'Ikan', desc: 'Lompat ke platform balok huruf I!' },
+        { letter: 'J', name: 'J', word: 'Jerapah', desc: 'Lompat ke platform balok huruf J!' },
+        { letter: 'K', name: 'K', word: 'Kelinci', desc: 'Lompat ke platform balok huruf K!' },
+        { letter: 'L', name: 'L', word: 'Lumba-lumba', desc: 'Lompat ke platform balok huruf L!' }
       ];
 
-      // ------------------------------------------------------------------------
-      // 2. AUDIO SYNTHESIZER & SPEECH ENGINE (VOICE-FIRST RAMAH ANAK)
-      // ------------------------------------------------------------------------
-      class KidsVoiceAudio {
+      const HIJAIYAH_MISSIONS = [
+        { id: 'alif', arabic: 'ا', name: 'Alif', desc: 'Tegak lurus seperti tiang! Tembak jaring ke huruf Alif!' },
+        { id: 'ba', arabic: 'ب', name: 'Ba', desc: 'Ada satu titik di bawah perahu! Cari huruf Ba!' },
+        { id: 'ta', arabic: 'ت', name: 'Ta', desc: 'Ada dua titik mata di atas perahu! Cari huruf Ta!' },
+        { id: 'tsa', arabic: 'ث', name: 'Tsa', desc: 'Ada tiga titik bintang di atas! Cari huruf Tsa!' },
+        { id: 'jim', arabic: 'ج', name: 'Jim', desc: 'Ada satu titik di dalam perutnya! Cari huruf Jim!' },
+        { id: 'ha', arabic: 'ح', name: 'Ha', desc: 'Bersih tanpa titik! Cari huruf Ha!' }
+      ];
+
+      // ----------------------------------------------------------------------
+      // 2. SISTEM SUARA & EFEK SFX WEB-SLINGING & JUMP
+      // ----------------------------------------------------------------------
+      class SoundEngine {
         constructor() {
           this.synth = window.speechSynthesis || null;
           this.audioCtx = null;
-          this.lastUtterance = '';
+          this.lastSpeech = '';
           this.unlocked = false;
           this.initVoice();
         }
@@ -755,9 +588,9 @@
         unlock() {
           if (this.unlocked) return;
           try {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (AudioCtx) {
-              this.audioCtx = new AudioCtx();
+            const ACtx = window.AudioContext || window.webkitAudioContext;
+            if (ACtx) {
+              this.audioCtx = new ACtx();
               if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
             }
             if (this.synth) this.synth.speak(new SpeechSynthesisUtterance(''));
@@ -767,123 +600,116 @@
 
         initVoice() {
           if (!this.synth) return;
-          const setVoice = () => {
+          const setV = () => {
             const voices = this.synth.getVoices() || [];
             this.idVoice = voices.find(v => v.lang && (v.lang.includes('id') || v.lang.includes('ID'))) || null;
           };
-          setVoice();
+          setV();
           if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = setVoice;
+            window.speechSynthesis.onvoiceschanged = setV;
           }
         }
 
         speak(text, onEnd) {
           if (!text) { if (onEnd) onEnd(); return; }
-          this.lastUtterance = text;
+          this.lastSpeech = text;
+          if (!this.synth) { if (onEnd) setTimeout(onEnd, 1000); return; }
 
-          if (!this.synth) {
-            if (onEnd) setTimeout(onEnd, 1200);
-            return;
-          }
-
-          try { this.synth.cancel(); } catch (e) {}
-
+          try { this.synth.cancel(); } catch(e) {}
           try {
             const utter = new SpeechSynthesisUtterance(text);
             if (this.idVoice) utter.voice = this.idVoice;
             utter.lang = 'id-ID';
-            utter.rate = 0.88; // Santai dan artikulasi jelas
-            utter.pitch = 1.25; // Ceria seperti karakter kartun anak
+            utter.rate = 0.9;
+            utter.pitch = 1.25;
             utter.onend = () => { if (onEnd) onEnd(); };
             utter.onerror = () => { if (onEnd) onEnd(); };
             this.synth.speak(utter);
-          } catch (e) {
+          } catch(e) {
             if (onEnd) onEnd();
           }
         }
 
         repeat() {
-          if (this.lastUtterance) {
+          if (this.lastSpeech) {
             this.playTap();
-            this.speak(this.lastUtterance);
+            this.speak(this.lastSpeech);
           }
         }
 
-        _ctx() {
+        _getCtx() {
           if (!this.audioCtx) {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (AudioCtx) this.audioCtx = new AudioCtx();
+            const ACtx = window.AudioContext || window.webkitAudioContext;
+            if (ACtx) this.audioCtx = new ACtx();
           }
           if (this.audioCtx && this.audioCtx.state === 'suspended') this.audioCtx.resume();
           return this.audioCtx;
         }
 
-        // Efek Suara Gelembung Pop (Lingokids Bubble Pop)
-        playPop() {
-          const c = this._ctx();
+        // Efek Suara Tembak Jaring Spiderman (Thwip!)
+        playWebThwip() {
+          const c = this._getCtx();
+          if (!c) return;
+          try {
+            const t = c.currentTime;
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(800, t);
+            osc.frequency.exponentialRampToValueAtTime(2200, t + 0.12);
+            gain.gain.setValueAtTime(0.3, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(t);
+            osc.stop(t + 0.14);
+          } catch(e) {}
+        }
+
+        // Efek Suara Lompat Obby Roblox (Boing!)
+        playJumpBoing() {
+          const c = this._getCtx();
           if (!c) return;
           try {
             const t = c.currentTime;
             const osc = c.createOscillator();
             const gain = c.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(450, t);
-            osc.frequency.exponentialRampToValueAtTime(900, t + 0.08);
-            gain.gain.setValueAtTime(0.3, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+            osc.frequency.setValueAtTime(240, t);
+            osc.frequency.exponentialRampToValueAtTime(600, t + 0.15);
+            gain.gain.setValueAtTime(0.25, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
             osc.connect(gain);
             gain.connect(c.destination);
             osc.start(t);
-            osc.stop(t + 0.09);
-          } catch (e) {}
-        }
-
-        // Efek Suara Kunyah Makan (Yum Yum!)
-        playNomNom() {
-          const c = this._ctx();
-          if (!c) return;
-          try {
-            const t = c.currentTime;
-            [260, 320, 290].forEach((freq, i) => {
-              const osc = c.createOscillator();
-              const gain = c.createGain();
-              const st = t + (i * 0.07);
-              osc.type = 'triangle';
-              osc.frequency.setValueAtTime(freq, st);
-              gain.gain.setValueAtTime(0.2, st);
-              gain.gain.exponentialRampToValueAtTime(0.001, st + 0.06);
-              osc.connect(gain);
-              gain.connect(c.destination);
-              osc.start(st);
-              osc.stop(st + 0.06);
-            });
+            osc.stop(t + 0.16);
           } catch(e) {}
         }
 
-        // Suara Bintang Juara (Fanfare Ceria)
-        playWinFanfare() {
-          const c = this._ctx();
+        // Efek Kemenangan
+        playVictory() {
+          const c = this._getCtx();
           if (!c) return;
           try {
             const t = c.currentTime;
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
               const osc = c.createOscillator();
               const gain = c.createGain();
-              const st = t + idx * 0.09;
+              const st = t + idx * 0.08;
               osc.type = 'triangle';
               osc.frequency.setValueAtTime(freq, st);
-              gain.gain.setValueAtTime(0.28, st);
-              gain.gain.exponentialRampToValueAtTime(0.001, st + 0.3);
+              gain.gain.setValueAtTime(0.25, st);
+              gain.gain.exponentialRampToValueAtTime(0.001, st + 0.35);
               osc.connect(gain);
               gain.connect(c.destination);
               osc.start(st);
-              osc.stop(st + 0.3);
+              osc.stop(st + 0.35);
             });
           } catch (e) {}
         }
 
         playTap() {
-          const c = this._ctx();
+          const c = this._getCtx();
           if (!c) return;
           try {
             const t = c.currentTime;
@@ -901,16 +727,16 @@
         }
 
         playSoftTryAgain() {
-          const c = this._ctx();
+          const c = this._getCtx();
           if (!c) return;
           try {
             const t = c.currentTime;
             const osc = c.createOscillator();
             const gain = c.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(420, t);
-            osc.frequency.linearRampToValueAtTime(360, t + 0.2);
-            gain.gain.setValueAtTime(0.18, t);
+            osc.frequency.setValueAtTime(400, t);
+            osc.frequency.linearRampToValueAtTime(320, t + 0.2);
+            gain.gain.setValueAtTime(0.2, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
             osc.connect(gain);
             gain.connect(c.destination);
@@ -920,459 +746,545 @@
         }
       }
 
-      const audio = new KidsVoiceAudio();
+      const sounds = new SoundEngine();
 
-      // ------------------------------------------------------------------------
-      // 3. PENGATUR UTAMA APLIKASI (LINGOKIDS GAME CONTROLLER)
-      // ------------------------------------------------------------------------
-      class LingokidsApp {
+      // ----------------------------------------------------------------------
+      // 3. ENGINE 3D TAMPILAN SPIDERMAN & ROBLOX OBBY (THREE.JS)
+      // ----------------------------------------------------------------------
+      class ThreeDWorldManager {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.scene = null;
+          this.camera = null;
+          this.renderer = null;
+
+          // Karakter 3D
+          this.characterGroup = null;
+          this.characterType = 'spiderman'; // 'spiderman' atau 'roblox'
+          this.charPos = { x: 0, y: 0.8, z: 0 };
+          this.charVelocity = { x: 0, y: 0, z: 0 };
+          this.isClimbing = false;
+          this.isJumping = false;
+
+          // Jaring Laba-laba 3D (Cylinder / Line)
+          this.webLine = null;
+
+          // Gedung & Balok Obby
+          this.environmentGroup = new THREE.Group();
+
+          this.initThree();
+          this.animate = this.animate.bind(this);
+          requestAnimationFrame(this.animate);
+        }
+
+        initThree() {
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+
+          this.scene = new THREE.Scene();
+          this.scene.background = new THREE.Color('#38bdf8'); // Langit cerah
+
+          this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+          this.camera.position.set(0, 5, 11);
+          this.camera.lookAt(0, 2, 0);
+
+          this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
+          this.renderer.setSize(width, height);
+          this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+          // Pencahayaan Ceria
+          const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+          hemiLight.position.set(0, 20, 0);
+          this.scene.add(hemiLight);
+
+          const dirLight = new THREE.DirectionalLight(0xfffaed, 0.8);
+          dirLight.position.set(10, 20, 10);
+          this.scene.add(dirLight);
+
+          this.scene.add(this.environmentGroup);
+
+          this.buildCharacter('spiderman');
+          this.buildCityEnvironment();
+
+          window.addEventListener('resize', () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            this.camera.aspect = w / h;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(w, h);
+          });
+        }
+
+        // ================= DESAIN KARAKTER 3D ================= //
+        buildCharacter(type) {
+          if (this.characterGroup) this.scene.remove(this.characterGroup);
+          this.characterType = type;
+          this.characterGroup = new THREE.Group();
+
+          if (type === 'spiderman') {
+            // SPIDERMAN 3D (Setelan Merah & Biru Kartun)
+            // Badan
+            const bodyGeo = new THREE.BoxGeometry(0.8, 1.0, 0.5);
+            const redMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
+            const blueMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 });
+            const spideyBody = new THREE.Mesh(bodyGeo, redMat);
+            spideyBody.position.y = 0.5;
+            this.characterGroup.add(spideyBody);
+
+            // Kepala dengan Topeng Spiderman
+            const headGeo = new THREE.SphereGeometry(0.45, 16, 16);
+            const head = new THREE.Mesh(headGeo, redMat);
+            head.position.y = 1.35;
+            this.characterGroup.add(head);
+
+            // Mata Putih Spiderman
+            const eyeGeo = new THREE.BoxGeometry(0.18, 0.1, 0.05);
+            const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const leftEye = new THREE.Mesh(eyeGeo, whiteMat);
+            leftEye.position.set(-0.16, 1.35, 0.42);
+            leftEye.rotation.z = 0.2;
+            const rightEye = new THREE.Mesh(eyeGeo, whiteMat);
+            rightEye.position.set(0.16, 1.35, 0.42);
+            rightEye.rotation.z = -0.2;
+            this.characterGroup.add(leftEye, rightEye);
+
+            // Kaki Biru
+            const legGeo = new THREE.BoxGeometry(0.3, 0.8, 0.35);
+            const leftLeg = new THREE.Mesh(legGeo, blueMat);
+            leftLeg.position.set(-0.25, -0.4, 0);
+            const rightLeg = new THREE.Mesh(legGeo, blueMat);
+            rightLeg.position.set(0.25, -0.4, 0);
+            this.characterGroup.add(leftLeg, rightLeg);
+
+          } else {
+            // ROBLOX NOOB AVATAR (Kuning, Biru, Hijau Roblox Klasik)
+            const yellowMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
+            const blueMat = new THREE.MeshLambertMaterial({ color: 0x0284c7 });
+            const greenMat = new THREE.MeshLambertMaterial({ color: 0x22c55e });
+
+            // Kepala Kotak Kuning Roblox
+            const headGeo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
+            const head = new THREE.Mesh(headGeo, yellowMat);
+            head.position.y = 1.45;
+            this.characterGroup.add(head);
+
+            // Badan Kotak Biru Roblox
+            const bodyGeo = new THREE.BoxGeometry(1.0, 1.0, 0.5);
+            const robloxBody = new THREE.Mesh(bodyGeo, blueMat);
+            robloxBody.position.y = 0.5;
+            this.characterGroup.add(robloxBody);
+
+            // Kaki Hijau Roblox
+            const legGeo = new THREE.BoxGeometry(0.45, 0.9, 0.45);
+            const leftLeg = new THREE.Mesh(legGeo, greenMat);
+            leftLeg.position.set(-0.26, -0.45, 0);
+            const rightLeg = new THREE.Mesh(legGeo, greenMat);
+            rightLeg.position.set(0.26, -0.45, 0);
+            this.characterGroup.add(leftLeg, rightLeg);
+          }
+
+          this.characterGroup.position.set(this.charPos.x, this.charPos.y, this.charPos.z);
+          this.scene.add(this.characterGroup);
+        }
+
+        // ================= KOTA GEDUNG SPIDERMAN & OBBY ROBLOX ================= //
+        buildCityEnvironment() {
+          while (this.environmentGroup.children.length > 0) {
+            this.environmentGroup.remove(this.environmentGroup.children[0]);
+          }
+
+          // Lantai Jalan / Rumput Luas
+          const groundGeo = new THREE.PlaneGeometry(80, 80);
+          groundGeo.rotateX(-Math.PI / 2);
+          const groundMat = new THREE.MeshLambertMaterial({ color: 0x86efac });
+          const ground = new THREE.Mesh(groundGeo, groundMat);
+          ground.position.y = -0.5;
+          this.environmentGroup.add(ground);
+
+          if (this.characterType === 'spiderman') {
+            // GEDUNG MENARA BESAR UNTUK DIPANJAT
+            const towerGeo = new THREE.BoxGeometry(5, 16, 5);
+            const towerMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+            const tower = new THREE.Mesh(towerGeo, towerMat);
+            tower.position.set(0, 7.5, -4);
+            this.environmentGroup.add(tower);
+
+            // Jendela-jendela Gedung Bercahaya
+            for (let y = 1; y < 14; y += 2) {
+              for (let x = -1.6; x <= 1.6; x += 1.6) {
+                const winGeo = new THREE.PlaneGeometry(0.8, 1.0);
+                const winMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+                const win = new THREE.Mesh(winGeo, winMat);
+                win.position.set(x, y, -1.48);
+                this.environmentGroup.add(win);
+              }
+            }
+
+            // Target Bintang Emas di Puncak Gedung
+            const starGeo = new THREE.OctahedronGeometry(0.8);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+            this.goalStar = new THREE.Mesh(starGeo, starMat);
+            this.goalStar.position.set(0, 16.5, -4);
+            this.environmentGroup.add(this.goalStar);
+
+          } else {
+            // ROBLOX OBBY PARKOUR (PLATFORM BALOK WARNA-WARNI MELAYANG)
+            const colors = [0xef4444, 0xf59e0b, 0x10b981, 0x3b82f6, 0x8b5cf6];
+            for (let i = 0; i < 7; i++) {
+              const platGeo = new THREE.BoxGeometry(2.5, 0.4, 2.5);
+              const platMat = new THREE.MeshLambertMaterial({ color: colors[i % colors.length] });
+              const plat = new THREE.Mesh(platGeo, platMat);
+              plat.position.set((i % 2 === 0 ? 1 : -1) * 1.5, i * 1.6, -i * 2.5);
+              this.environmentGroup.add(plat);
+            }
+          }
+        }
+
+        // ================= TEMBAK JARING & PANJAT GEDUNG ================= //
+        shootWebAndClimb(onClimbed) {
+          sounds.playWebThwip();
+          this.isClimbing = true;
+
+          // Buat Tali Jaring Laba-Laba
+          if (this.webLine) this.scene.remove(this.webLine);
+          const points = [];
+          points.push(new THREE.Vector3(this.characterGroup.position.x, this.characterGroup.position.y + 1, this.characterGroup.position.z));
+          points.push(new THREE.Vector3(0, 15, -4)); // Menancap ke puncak gedung
+          const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+          const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 4 });
+          this.webLine = new THREE.Line(lineGeo, lineMat);
+          this.scene.add(this.webLine);
+
+          // Animasi Karakter Terangkat Melayang ke Atas
+          const climbInterval = setInterval(() => {
+            if (this.characterGroup.position.y < 15) {
+              this.characterGroup.position.y += 0.4;
+              this.characterGroup.position.z -= 0.08;
+              this.characterGroup.rotation.y += 0.2; // Gaya akrobatik spiderman berputar
+              this.camera.position.y = this.characterGroup.position.y + 4;
+            } else {
+              clearInterval(climbInterval);
+              this.isClimbing = false;
+              if (this.webLine) {
+                this.scene.remove(this.webLine);
+                this.webLine = null;
+              }
+              if (onClimbed) onClimbed();
+            }
+          }, 30);
+        }
+
+        jumpAction() {
+          if (this.isJumping || this.isClimbing) return;
+          sounds.playJumpBoing();
+          this.isJumping = true;
+          let jumpVelocity = 0.35;
+
+          const jumpLoop = setInterval(() => {
+            this.characterGroup.position.y += jumpVelocity;
+            jumpVelocity -= 0.03;
+            if (this.characterGroup.position.y <= 0.8) {
+              this.characterGroup.position.y = 0.8;
+              this.isJumping = false;
+              clearInterval(jumpLoop);
+            }
+          }, 30);
+        }
+
+        resetCharacterPosition() {
+          this.characterGroup.position.set(0, 0.8, 0);
+          this.characterGroup.rotation.set(0, 0, 0);
+          this.camera.position.set(0, 5, 11);
+          this.camera.lookAt(0, 2, 0);
+        }
+
+        animate() {
+          requestAnimationFrame(this.animate);
+
+          // Animasi Putar Bintang Emas Puncak
+          if (this.goalStar) {
+            this.goalStar.rotation.y += 0.03;
+            this.goalStar.rotation.x += 0.02;
+          }
+
+          this.renderer.render(this.scene, this.camera);
+        }
+      }
+
+      // ----------------------------------------------------------------------
+      // 4. LOGIKA PERMAINAN UTAMA (SPIDER-HERO & ROBLOX CONTROLLER)
+      // ----------------------------------------------------------------------
+      class SuperheroGameApp {
         constructor() {
-          this.currentMode = 'feeding'; // 'feeding', 'balloon', 'tracing', 'hijaiyah'
-          this.stars = 0;
-          this.currentIndex = 0;
+          this.world3D = null;
+          this.activeMode = 'spiderman'; // 'spiderman', 'roblox', 'hijaiyah'
+          this.currentMissionIndex = 0;
+          this.starScore = 0;
+          this.canAnswer = true;
 
           this.init();
         }
 
         init() {
-          this.loadStars();
-          this.bindGlobalEvents();
+          const canvas = document.getElementById('three-canvas');
+          this.world3D = new ThreeDWorldManager(canvas);
+
+          this.bindControls();
+          this.loadScore();
         }
 
-        loadStars() {
+        loadScore() {
           try {
-            const s = localStorage.getItem('lingokids_stars_count');
-            if (s) this.stars = parseInt(s, 10) || 0;
-            document.getElementById('stars-display').innerText = this.stars;
+            const s = localStorage.getItem('spider_kids_stars');
+            if (s) this.starScore = parseInt(s, 10) || 0;
+            document.getElementById('star-counter').innerText = this.starScore;
           } catch(e) {}
         }
 
-        addStar() {
-          this.stars++;
+        addScore() {
+          this.starScore++;
           try {
-            localStorage.setItem('lingokids_stars_count', this.stars);
+            localStorage.setItem('spider_kids_stars', this.starScore);
           } catch(e) {}
-          document.getElementById('stars-display').innerText = this.stars;
+          document.getElementById('star-counter').innerText = this.starScore;
         }
 
-        bindGlobalEvents() {
-          // Tombol Mulai di Welcome Screen
-          document.getElementById('btn-start-playing')?.addEventListener('click', () => {
-            audio.unlock();
-            audio.playPop();
-            document.getElementById('welcome-screen').classList.add('hidden');
-            this.switchMode('feeding');
-          });
-
-          // Tombol Rumah Menu
-          document.getElementById('btn-home-menu')?.addEventListener('click', () => {
-            audio.playTap();
-            document.getElementById('welcome-screen').classList.remove('hidden');
-          });
-
-          // Tombol Speaker Replay
-          document.getElementById('btn-replay-voice')?.addEventListener('click', () => {
-            audio.repeat();
-          });
-
-          // Klik Bar Maskot untuk Mengulang Suara
-          document.getElementById('mascot-bar')?.addEventListener('click', () => {
-            audio.repeat();
-          });
-
-          // Klik Tombol Lanjut di Celebration Popup
-          document.getElementById('btn-next-challenge')?.addEventListener('click', () => {
-            audio.playPop();
-            document.getElementById('celebration-screen').classList.add('hidden');
-            this.nextItem();
-          });
-
-          // Tab Bar Navigasi Lingokids
-          document.querySelectorAll('.tab-item-btn').forEach(btn => {
+        bindControls() {
+          // Tombol Pilih Mode di Start Menu
+          document.querySelectorAll('.btn-card-mode').forEach(btn => {
             btn.addEventListener('click', (e) => {
-              const targetBtn = e.currentTarget;
-              const mode = targetBtn.getAttribute('data-mode');
-              document.querySelectorAll('.tab-item-btn').forEach(b => b.classList.remove('active'));
-              targetBtn.classList.add('active');
-              audio.playTap();
-              this.switchMode(mode);
+              sounds.unlock();
+              sounds.playTap();
+              const mode = e.currentTarget.getAttribute('data-gamemode');
+              document.getElementById('start-modal-screen').classList.add('hidden');
+              this.setGameMode(mode);
             });
           });
-        }
 
-        setMascot(face, text, speakNow = true) {
-          const f = document.getElementById('mascot-face');
-          const t = document.getElementById('mascot-text');
-          if (f) f.innerText = face;
-          if (t) t.innerText = text;
-          if (speakNow) audio.speak(text);
-        }
-
-        switchMode(mode) {
-          this.currentMode = mode;
-          this.currentIndex = 0;
-          const container = document.getElementById('playground-area');
-          container.innerHTML = '';
-
-          if (mode === 'feeding') {
-            this.renderFeedingGame();
-          } else if (mode === 'balloon') {
-            this.renderBalloonGame();
-          } else if (mode === 'tracing') {
-            this.renderTracingGame();
-          } else if (mode === 'hijaiyah') {
-            this.renderHijaiyahGame();
-          }
-        }
-
-        nextItem() {
-          this.currentIndex++;
-          this.switchMode(this.currentMode);
-        }
-
-        showCelebration(customText = 'Hebat sekali! Bintang untukmu!') {
-          audio.playWinFanfare();
-          this.addStar();
-          const sub = document.getElementById('celebration-subtext');
-          if (sub) sub.innerText = customText;
-          document.getElementById('celebration-screen').classList.remove('hidden');
-          audio.speak("Horeee! " + customText);
-        }
-
-        // ======================================================================
-        // MODE 1: FEED THE ANIMAL (BERI MAKAN HEWAN)
-        // Balita menyeret atau menyentuh makanan yang tepat ke mulut hewan!
-        // ======================================================================
-        renderFeedingGame() {
-          const item = ALPHABET_DATA[this.currentIndex % ALPHABET_DATA.length];
-          const container = document.getElementById('playground-area');
-
-          // Pilih 3 pilihan makanan acak (1 benar, 2 salah)
-          let choices = [item];
-          let others = ALPHABET_DATA.filter(x => x.letter !== item.letter);
-          others.sort(() => Math.random() - 0.5);
-          choices.push(others[0], others[1]);
-          choices.sort(() => Math.random() - 0.5);
-
-          container.innerHTML = `
-            <div class="feed-game-container">
-              <div id="animal-drop-target" class="animal-target-box">
-                <span class="animal-target-face" id="target-animal-emoji">${item.animalEmoji}</span>
-                <span class="animal-target-badge">Minta ${item.letter}</span>
-              </div>
-
-              <div class="feed-items-dock" id="food-items-dock">
-                <!-- Pilihan Makanan Di-render Dinamis -->
-              </div>
-            </div>
-          `;
-
-          const prompt = `Adik pintar, ${item.animal} lapar! Ayo beri makan huruf ${item.letter} untuk ${item.food}!`;
-          this.setMascot(item.animalEmoji, prompt);
-
-          const dock = document.getElementById('food-items-dock');
-          const targetBox = document.getElementById('animal-drop-target');
-
-          choices.forEach(ch => {
-            const bubble = document.createElement('div');
-            bubble.className = 'food-bubble-item';
-            bubble.innerHTML = `
-              <span class="food-emoji">${ch.emoji}</span>
-              <span class="food-letter">${ch.letter}</span>
-            `;
-
-            // Dukungan Tap Langsung & Drag-and-Drop Touch
-            let isDragging = false;
-            let startX = 0, startY = 0;
-            let curX = 0, curY = 0;
-
-            const onTouchStart = (e) => {
-              isDragging = true;
-              audio.playTap();
-              const touch = e.touches ? e.touches[0] : e;
-              startX = touch.clientX;
-              startY = touch.clientY;
-              bubble.style.zIndex = '1000';
-              targetBox.classList.add('animal-mouth-open');
-            };
-
-            const onTouchMove = (e) => {
-              if (!isDragging) return;
-              e.preventDefault();
-              const touch = e.touches ? e.touches[0] : e;
-              curX = touch.clientX - startX;
-              curY = touch.clientY - startY;
-              bubble.style.transform = `translate(${curX}px, ${curY}px) scale(1.15)`;
-            };
-
-            const onTouchEnd = (e) => {
-              if (!isDragging) return;
-              isDragging = false;
-              targetBox.classList.remove('animal-mouth-open');
-
-              // Periksa apakah dilepas di atas hewan atau hanya di-tap
-              const touch = e.changedTouches ? e.changedTouches[0] : e;
-              const targetRect = targetBox.getBoundingClientRect();
-              const isOverTarget = (
-                touch.clientX >= targetRect.left &&
-                touch.clientX <= targetRect.right &&
-                touch.clientY >= targetRect.top &&
-                touch.clientY <= targetRect.bottom
-              );
-
-              // Jika di-tap biasa atau di-drop tepat ke target
-              if (isOverTarget || (Math.abs(curX) < 15 && Math.abs(curY) < 15)) {
-                if (ch.letter === item.letter) {
-                  // Benar! Hewan memakan makanannya
-                  audio.playNomNom();
-                  targetBox.innerHTML = `
-                    <span class="animal-target-face">😋</span>
-                    <span class="animal-target-badge">Nyam! Nyam!</span>
-                  `;
-                  bubble.style.transition = 'all 0.3s ease';
-                  bubble.style.transform = `scale(0)`;
-                  setTimeout(() => {
-                    this.showCelebration(`Nyam nyam! ${item.animal} kenyang makan ${item.food} huruf ${item.letter}!`);
-                  }, 500);
-                } else {
-                  // Salah: Hewan menggeleng ramah
-                  audio.playSoftTryAgain();
-                  bubble.style.transition = 'transform 0.2s';
-                  bubble.style.transform = 'translate(0, 0) scale(1)';
-                  audio.speak(`Bukan itu adik manis. Cari huruf ${item.letter} untuk ${item.food}!`);
-                }
-              } else {
-                // Kembali ke posisi semula jika tidak kena
-                bubble.style.transition = 'transform 0.2s';
-                bubble.style.transform = 'translate(0, 0) scale(1)';
-              }
-            };
-
-            bubble.addEventListener('touchstart', onTouchStart, { passive: false });
-            bubble.addEventListener('touchmove', onTouchMove, { passive: false });
-            bubble.addEventListener('touchend', onTouchEnd);
-
-            // Support Mouse PC / Laptop
-            bubble.addEventListener('mousedown', onTouchStart);
-            window.addEventListener('mousemove', onTouchMove);
-            window.addEventListener('mouseup', onTouchEnd);
-
-            dock.appendChild(bubble);
-          });
-        }
-
-        // ======================================================================
-        // MODE 2: BALLOON POP (PECAHKAN BALON ALFABET)
-        // Balita menyentuh balon terbang yang cocok dengan instruksi suara
-        // ======================================================================
-        renderBalloonGame() {
-          const item = ALPHABET_DATA[this.currentIndex % ALPHABET_DATA.length];
-          const container = document.getElementById('playground-area');
-
-          container.innerHTML = `
-            <div class="balloon-sky-container" id="balloon-sky">
-              <!-- Balon-balon terbang akan muncul di sini -->
-            </div>
-          `;
-
-          const prompt = `Ayo cari dan pecahkan balon huruf ${item.letter}! Sentuh balonnya!`;
-          this.setMascot('🎈', prompt);
-
-          const sky = document.getElementById('balloon-sky');
-          const balloonColors = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#9b59b6'];
-
-          // Buat 4 balon dengan huruf acak
-          let letters = [item.letter];
-          let others = ALPHABET_DATA.filter(x => x.letter !== item.letter);
-          others.sort(() => Math.random() - 0.5);
-          letters.push(others[0].letter, others[1].letter, others[2].letter);
-          letters.sort(() => Math.random() - 0.5);
-
-          letters.forEach((letChar, idx) => {
-            const b = document.createElement('div');
-            b.className = 'flying-balloon';
-            b.style.background = balloonColors[idx % balloonColors.length];
-            
-            // Atur posisi acak vertikal & horizontal
-            const leftPct = 10 + (idx * 22);
-            const topPct = 20 + ((idx % 2) * 35);
-            b.style.left = `${leftPct}%`;
-            b.style.top = `${topPct}%`;
-
-            // Animasi melayang
-            b.style.animation = `mascotBounce ${2 + (idx * 0.4)}s infinite ease-in-out`;
-
-            b.innerHTML = `
-              <span class="balloon-char">${letChar}</span>
-              <div class="balloon-tail"></div>
-            `;
-
-            b.addEventListener('click', () => {
-              if (letChar === item.letter) {
-                // Balon Meletus!
-                audio.playPop();
-                b.style.transform = 'scale(1.4)';
-                b.style.opacity = '0';
-                b.style.transition = 'all 0.2s ease-out';
-                setTimeout(() => {
-                  this.showCelebration(`Duaarr! Balon huruf ${item.letter} berhasil kamu pecahkan!`);
-                }, 350);
-              } else {
-                audio.playSoftTryAgain();
-                b.style.transform = 'scale(0.85)';
-                setTimeout(() => b.style.transform = 'scale(1)', 200);
-                audio.speak(`Itu huruf ${letChar}. Ayo cari balon huruf ${item.letter}!`);
-              }
+          // Switch Mode Cepat di Bar Atas
+          document.querySelectorAll('.mode-pill-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              sounds.playTap();
+              const mode = e.currentTarget.getAttribute('data-mode');
+              document.querySelectorAll('.mode-pill-btn').forEach(b => b.classList.remove('active'));
+              e.currentTarget.classList.add('active');
+              this.setGameMode(mode);
             });
-
-            sky.appendChild(b);
           });
+
+          // Tombol Home
+          document.getElementById('btn-back-home')?.addEventListener('click', () => {
+            sounds.playTap();
+            document.getElementById('start-modal-screen').classList.remove('hidden');
+          });
+
+          // Tombol Replay Suara
+          document.getElementById('btn-repeat-speech')?.addEventListener('click', () => {
+            sounds.repeat();
+          });
+
+          document.getElementById('speech-trigger-box')?.addEventListener('click', () => {
+            sounds.repeat();
+          });
+
+          // Tombol Aksi Tembak Jaring Spiderman
+          document.getElementById('btn-shoot-web')?.addEventListener('click', () => {
+            sounds.playTap();
+            if (this.activeMode === 'spiderman') {
+              sounds.speak("Jawab huruf yang tepat agar jaring bisa menancap ke puncak gedung!");
+            }
+          });
+
+          // Tombol Lompat Obby
+          document.getElementById('btn-hero-jump')?.addEventListener('click', () => {
+            this.world3D.jumpAction();
+          });
+
+          // Tombol Lanjut di Popup Menang
+          document.getElementById('btn-next-mission')?.addEventListener('click', () => {
+            sounds.playTap();
+            document.getElementById('celebration-popup').classList.add('hidden');
+            this.nextMission();
+          });
+
+          // Joystick Sentuh Virtual untuk HP
+          this.initJoystick();
         }
 
-        // ======================================================================
-        // MODE 3: FINGER TRACING (GORES HURUF DENGAN JARI)
-        // Balita menggores garis membentuk huruf besar di atas kanvas
-        // ======================================================================
-        renderTracingGame() {
-          const item = ALPHABET_DATA[this.currentIndex % ALPHABET_DATA.length];
-          const container = document.getElementById('playground-area');
+        initJoystick() {
+          const base = document.getElementById('joystick-base');
+          const thumb = document.getElementById('joystick-thumb');
+          let isTouching = false;
+          let startX = 0, startY = 0;
 
-          container.innerHTML = `
-            <div class="tracing-box-container">
-              <div class="tracing-canvas-card">
-                <div class="trace-guide-char" id="trace-guide-text">${item.letter}</div>
-                <canvas id="trace-canvas" width="280" height="280"></canvas>
-              </div>
-
-              <div class="trace-progress-bar">
-                <div class="trace-progress-fill" id="trace-fill"></div>
-              </div>
-            </div>
-          `;
-
-          const prompt = `Ayo ikuti bentuk huruf ${item.letter} dengan jarimu yang pintar!`;
-          this.setMascot('✍️', prompt);
-
-          const canvas = document.getElementById('trace-canvas');
-          const ctx = canvas.getContext('2d');
-          const progressFill = document.getElementById('trace-fill');
-
-          ctx.strokeStyle = '#2ed573';
-          ctx.lineWidth = 26;
-          ctx.lineCap = 'round';
-          ctx.lineJoin = 'round';
-
-          let isDrawing = false;
-          let strokedPixels = 0;
-          const targetStrokes = 45; // Jumlah sentuhan goresan minimal
-
-          const getPos = (e) => {
-            const rect = canvas.getBoundingClientRect();
+          const handleStart = (e) => {
+            isTouching = true;
             const touch = e.touches ? e.touches[0] : e;
-            return {
-              x: touch.clientX - rect.left,
-              y: touch.clientY - rect.top
-            };
+            const rect = base.getBoundingClientRect();
+            startX = rect.left + rect.width / 2;
+            startY = rect.top + rect.height / 2;
           };
 
-          const startStroke = (e) => {
-            isDrawing = true;
-            audio.playTap();
-            const pos = getPos(e);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-          };
+          const handleMove = (e) => {
+            if (!isTouching) return;
+            const touch = e.touches ? e.touches[0] : e;
+            let dx = touch.clientX - startX;
+            let dy = touch.clientY - startY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const maxRadius = 35;
 
-          const moveStroke = (e) => {
-            if (!isDrawing) return;
-            e.preventDefault();
-            const pos = getPos(e);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
+            if (dist > maxRadius) {
+              dx = (dx / dist) * maxRadius;
+              dy = (dy / dist) * maxRadius;
+            }
 
-            strokedPixels++;
-            const pct = Math.min(100, Math.round((strokedPixels / targetStrokes) * 100));
-            progressFill.style.width = `${pct}%`;
+            thumb.style.transform = `translate(${dx}px, ${dy}px)`;
 
-            if (pct >= 100 && isDrawing) {
-              isDrawing = false;
-              setTimeout(() => {
-                this.showCelebration(`Keren sekali! Kamu sudah bisa menulis huruf ${item.letter}!`);
-              }, 400);
+            // Gerakkan Karakter 3D Secara Halus
+            if (this.world3D.characterGroup) {
+              this.world3D.characterGroup.position.x += dx * 0.005;
+              this.world3D.characterGroup.rotation.y = -Math.atan2(dy, dx) - Math.PI / 2;
             }
           };
 
-          const endStroke = () => {
-            isDrawing = false;
+          const handleEnd = () => {
+            isTouching = false;
+            thumb.style.transform = 'translate(0px, 0px)';
           };
 
-          canvas.addEventListener('touchstart', startStroke, { passive: false });
-          canvas.addEventListener('touchmove', moveStroke, { passive: false });
-          canvas.addEventListener('touchend', endStroke);
+          base.addEventListener('touchstart', handleStart, { passive: true });
+          window.addEventListener('touchmove', handleMove, { passive: true });
+          window.addEventListener('touchend', handleEnd);
 
-          canvas.addEventListener('mousedown', startStroke);
-          canvas.addEventListener('mousemove', moveStroke);
-          window.addEventListener('mouseup', endStroke);
+          base.addEventListener('mousedown', handleStart);
+          window.addEventListener('mousemove', handleMove);
+          window.addEventListener('mouseup', handleEnd);
         }
 
-        // ======================================================================
-        // MODE 4: HIJAIYAH (HURUF ARAB BAKU & INTERAKTIF)
-        // Balita menyentuh huruf hijaiyah dengan visual besar dan suara tajwid ramah
-        // ======================================================================
-        renderHijaiyahGame() {
-          const item = HIJAIYAH_DATA[this.currentIndex % HIJAIYAH_DATA.length];
-          const container = document.getElementById('playground-area');
+        setGameMode(mode) {
+          this.activeMode = mode;
+          this.currentMissionIndex = 0;
+          this.world3D.buildCharacter(mode === 'roblox' ? 'roblox' : 'spiderman');
+          this.world3D.buildCityEnvironment();
+          this.world3D.resetCharacterPosition();
 
-          // Pilih 3 pilihan huruf hijaiyah
-          let choices = [item];
-          let others = HIJAIYAH_DATA.filter(x => x.id !== item.id);
+          this.loadMission();
+        }
+
+        getCurrentList() {
+          if (this.activeMode === 'roblox') return ROBLOX_OBBY_MISSIONS;
+          if (this.activeMode === 'hijaiyah') return HIJAIYAH_MISSIONS;
+          return SPIDER_MISSIONS;
+        }
+
+        loadMission() {
+          this.canAnswer = true;
+          const list = this.getCurrentList();
+          const mission = list[this.currentMissionIndex % list.length];
+          const isHijaiyah = (this.activeMode === 'hijaiyah');
+
+          // Buat 3 Pilihan (1 Benar, 2 Pengecoh)
+          let choices = [mission];
+          let others = list.filter(m => (isHijaiyah ? m.id !== mission.id : m.letter !== mission.letter));
           others.sort(() => Math.random() - 0.5);
           choices.push(others[0], others[1]);
           choices.sort(() => Math.random() - 0.5);
 
-          container.innerHTML = `
-            <div class="counting-grid-container" id="hijaiyah-dock" style="margin-top: 20px;">
-              <!-- Pilihan Huruf Hijaiyah Besar -->
-            </div>
-          `;
+          // Update Teks Instruksi
+          const promptEl = document.getElementById('challenge-prompt-text');
+          promptEl.innerText = mission.desc;
+          sounds.speak(mission.desc);
 
-          const prompt = `Mana huruf ${item.name}? ${item.hint}. Sentuh huruf ${item.name}!`;
-          this.setMascot('📖', prompt);
+          // Render Tombol Pilihan Huruf Kartun
+          const container = document.getElementById('choices-container');
+          container.innerHTML = '';
 
-          const dock = document.getElementById('hijaiyah-dock');
-
-          choices.forEach(h => {
+          choices.forEach(ch => {
             const btn = document.createElement('button');
-            btn.className = 'count-bubble-btn';
-            btn.style.borderColor = '#10ac84';
-            btn.innerHTML = `
-              <span class="count-num" style="font-family: 'Amiri', serif; font-size: 58px; color: #10ac84; line-height: 1;">${h.arabic}</span>
-              <span class="count-sub">${h.name}</span>
-            `;
+            btn.className = 'bubble-choice-btn';
+
+            if (isHijaiyah) {
+              btn.innerHTML = `
+                <span class="choice-main-char arabic">${ch.arabic}</span>
+                <span class="choice-sub-text">${ch.name}</span>
+              `;
+            } else {
+              btn.innerHTML = `
+                <span class="choice-main-char">${ch.letter}</span>
+                <span class="choice-sub-text">${ch.word}</span>
+              `;
+            }
 
             btn.addEventListener('click', () => {
-              audio.playTap();
-              if (h.id === item.id) {
-                btn.style.transform = 'scale(1.15)';
-                btn.style.background = '#dcfce7';
-                setTimeout(() => {
-                  this.showCelebration(`Pintar sekali! Ini huruf ${item.name}! ${item.hint}!`);
-                }, 400);
-              } else {
-                audio.playSoftTryAgain();
-                btn.style.animation = 'pulseBtn 0.3s';
-                audio.speak(`Ini huruf ${h.name}. Ayo cari huruf ${item.name}!`);
-              }
+              if (!this.canAnswer) return;
+              this.handleChoiceAnswer(ch, mission, btn);
             });
 
-            dock.appendChild(btn);
+            container.appendChild(btn);
           });
+        }
+
+        handleChoiceAnswer(selected, target, btnElem) {
+          sounds.playTap();
+          const isCorrect = (this.activeMode === 'hijaiyah') ? (selected.id === target.id) : (selected.letter === target.letter);
+
+          if (isCorrect) {
+            this.canAnswer = false;
+            this.addScore();
+            btnElem.style.borderColor = '#10b981';
+            btnElem.style.background = '#dcfce7';
+
+            if (this.activeMode === 'spiderman' || this.activeMode === 'hijaiyah') {
+              // Animasi Spiderman Tembak Jaring & Panjat Gedung ke Puncak!
+              this.world3D.shootWebAndClimb(() => {
+                this.showCelebrationPopup();
+              });
+            } else {
+              // Mode Roblox Obby: Karakter Melompat Parkour Melewati Balok!
+              this.world3D.jumpAction();
+              setTimeout(() => {
+                this.showCelebrationPopup();
+              }, 600);
+            }
+
+          } else {
+            // Salah Lembut
+            sounds.playSoftTryAgain();
+            btnElem.style.transform = 'scale(0.88)';
+            setTimeout(() => btnElem.style.transform = 'scale(1)', 200);
+            sounds.speak("Yuk coba lagi! Cari huruf yang sesuai instruksi ya adik hebat!");
+          }
+        }
+
+        showCelebrationPopup() {
+          sounds.playVictory();
+          const popup = document.getElementById('celebration-popup');
+          const detail = document.getElementById('celebration-detail');
+
+          if (this.activeMode === 'spiderman') {
+            detail.innerText = "Yeeay! Spider-Hero berhasil menembak jaring dan memanjat gedung sampai ke puncak!";
+            sounds.speak("Horeee! Spider Hero berhasil memanjat puncak menara! Kamu anak yang sangat hebat!");
+          } else if (this.activeMode === 'roblox') {
+            detail.innerText = "Keren sekali! Karakter Obby kamu berhasil parkour di platform balok huruf!";
+            sounds.speak("Luar biasa! Karakter Roblox kamu berhasil melewati rintangan Obby!");
+          } else {
+            detail.innerText = "Alhamdulillah! Huruf Hijaiyah berhasil kamu temukan!";
+            sounds.speak("Alhamdulillah! Kamu hebat sekali menemukan huruf Hijaiyah!");
+          }
+
+          popup.classList.remove('hidden');
+        }
+
+        nextMission() {
+          this.currentMissionIndex++;
+          this.world3D.resetCharacterPosition();
+          this.loadMission();
         }
       }
 
-      // Mulai Game saat DOM Siap
+      // Start saat Halaman Siap
       window.addEventListener('DOMContentLoaded', () => {
-        window.lingoApp = new LingokidsApp();
+        window.heroGame = new SuperheroGameApp();
       });
 
     })();
