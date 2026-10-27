@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Spider-Hero & Obby Roblox Kids — Eksplorasi Bebas</title>
+  <title>Alphabet Racing Adventure — Game Balap Edukasi Alfabet A-Z</title>
   
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕷️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏎️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
-  
-  <!-- Three.js (3D Engine untuk Roblox Obby & Spiderman) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
+    /* ==========================================================================
+       STYLE ALPHABET RACING ADVENTURE (MOBILE-FIRST, PORTRAIT, RETINA READY)
+       ========================================================================== */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -23,7 +23,7 @@
       -webkit-user-select: none;
     }
 
-    body, html {
+    html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -32,22 +32,25 @@
       touch-action: none;
     }
 
-    #game-viewport {
+    #app-container {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
+      background: #22c55e;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* 3D WebGL Canvas */
-    #three-canvas {
+    /* Canvas Balapan Utama */
+    #race-canvas {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       display: block;
-      z-index: 1;
+      z-index: 5;
     }
 
     /* ================= 1. TOP HUD (STATUS & AUDIO) ================= */
@@ -60,7 +63,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: env(safe-area-inset-top, 10px) 14px 6px;
+      padding: env(safe-area-inset-top, 12px) 16px 8px;
       pointer-events: none;
     }
 
@@ -71,316 +74,328 @@
       pointer-events: auto;
     }
 
-    .btn-circle {
-      width: 52px;
-      height: 52px;
+    .hud-circle-btn {
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       background: #ffffff;
-      border: 4px solid #ef4444;
+      border: 3.5px solid #3b82f6;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
+      font-size: 24px;
       cursor: pointer;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.3), inset 0 -4px 0 rgba(0,0,0,0.15);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25), inset 0 -3px 0 rgba(0,0,0,0.15);
       transition: transform 0.1s ease;
     }
-    .btn-circle:active { transform: scale(0.9); }
+    .hud-circle-btn:active { transform: scale(0.9); }
     .btn-home { border-color: #f59e0b; background: #fef08a; }
-    .btn-speaker { border-color: #10b981; background: #bbf7d0; animation: pulseBtn 1.8s infinite alternate; }
+    .btn-speaker { border-color: #10b981; background: #bbf7d0; animation: pulseSpeaker 1.8s infinite alternate ease-in-out; }
+    .btn-pause { border-color: #6366f1; background: #e0e7ff; }
 
-    @keyframes pulseBtn {
+    @keyframes pulseSpeaker {
       0% { transform: scale(1); }
       100% { transform: scale(1.08); }
     }
 
-    .stat-pill {
+    /* Progress Checkpoint & Score */
+    .checkpoint-badge {
       background: rgba(255, 255, 255, 0.95);
-      border: 3px solid #f59e0b;
+      border: 3.5px solid #f59e0b;
       padding: 6px 16px;
       border-radius: 30px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: #b45309;
       display: flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
-    }
-
-    /* Mode Selector Pill di Atas */
-    .mode-switch-pill {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(8px);
-      border: 3px solid #38bdf8;
-      border-radius: 30px;
-      padding: 4px;
-      display: flex;
-      gap: 4px;
+      gap: 6px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
       pointer-events: auto;
     }
 
-    .mode-pill-btn {
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .mode-pill-btn.active {
-      background: #38bdf8;
-      color: #0f172a;
-      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
-    }
-
-    /* ================= 2. SPIDERMAN WEB-SHOOTER & KONTROL HP ================= */
-    .mobile-controls-layer {
+    /* ================= 2. KONTROL SETIR HP BAWAH ================= */
+    .bottom-controls-layer {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      z-index: 30;
-      pointer-events: none;
-    }
-
-    /* Joystick Virtual Kiri */
-    .virtual-joystick-base {
-      position: absolute;
-      bottom: 24px;
-      left: 20px;
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.25);
-      border: 4px solid rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: auto;
-      touch-action: none;
-    }
-
-    .virtual-joystick-thumb {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #38bdf8;
-      border: 3px solid #ffffff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      position: absolute;
-      pointer-events: none;
-    }
-
-    /* Tombol Aksi Kanan (Lompat / Tembak Jaring / Panjat Gedung) */
-    .action-buttons-group {
-      position: absolute;
-      bottom: 24px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      pointer-events: auto;
-    }
-
-    .action-btn-large {
-      width: 76px;
-      height: 76px;
-      border-radius: 50%;
-      border: 5px solid #ffffff;
-      color: #ffffff;
-      font-size: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-      transition: transform 0.1s ease;
-      font-family: inherit;
-    }
-    .action-btn-large:active { transform: scale(0.9); }
-    .action-btn-large span { font-size: 10px; font-weight: 800; margin-top: -2px; }
-
-    .btn-jump { background: linear-gradient(135deg, #10b981, #059669); }
-    .btn-web-sling { background: linear-gradient(135deg, #ef4444, #b91c1c); }
-
-    /* Petunjuk Banner Ringan Saat Eksplorasi */
-    .explore-hint-banner {
-      position: absolute;
-      top: 72px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.82);
-      backdrop-filter: blur(6px);
-      color: #ffffff;
-      padding: 8px 18px;
-      border-radius: 30px;
-      border: 2px solid #38bdf8;
-      font-size: 14px;
-      font-weight: 700;
       z-index: 40;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-      transition: opacity 0.3s ease;
+      padding: 16px 20px env(safe-area-inset-bottom, 20px);
       pointer-events: none;
     }
 
-    /* ================= 3. POPUP TANTANGAN INTERAKTIF (HANYA MUNCUL DI GERBANG / PUNCAK) ================= */
-    #challenge-overlay-card {
+    .steering-btn {
+      pointer-events: auto;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      border: 5px solid #ffffff;
+      color: #ffffff;
+      font-size: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.45), inset 0 -5px 0 #0369a1;
+      transition: transform 0.08s ease, background 0.1s;
+    }
+    .steering-btn:active {
+      transform: scale(0.9);
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    }
+
+    /* ================= 3. OVERLAY KUIS DI CHECKPOINT GERBANG ================= */
+    #question-card-overlay {
       position: absolute;
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 440px;
-      z-index: 60;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(10px);
-      border: 5px solid #ef4444;
-      border-radius: 32px;
-      padding: 16px 18px;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 70;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      animation: popBounceCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      justify-content: center;
+      padding: 20px;
     }
 
-    @keyframes popBounceCard {
-      0% { transform: translate(-50%, 40px) scale(0.8); opacity: 0; }
-      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-    }
-
-    .challenge-speech-bar {
+    .question-modal-box {
       width: 100%;
-      background: #fef2f2;
-      border: 3px solid #f87171;
-      border-radius: 20px;
-      padding: 8px 14px;
+      max-width: 420px;
+      background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+      border: 6px solid #22c55e;
+      border-radius: 36px;
+      padding: 22px 18px 26px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      animation: popCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popCard {
+      0% { transform: scale(0.4); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Banner Pertanyaan Suara */
+    .question-banner-pill {
+      width: 100%;
+      background: #ffffff;
+      border: 3.5px solid #38bdf8;
+      border-radius: 24px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+    }
+    .question-banner-pill:active { transform: scale(0.98); }
+
+    .q-speaker-icon {
+      font-size: 32px;
+      line-height: 1;
+      animation: pulseSpeaker 1.6s infinite alternate;
     }
 
-    .speech-icon { font-size: 26px; }
-    .speech-text {
-      font-size: 15px;
+    .q-text-prompt {
+      flex: 1;
+      font-size: 17px;
       font-weight: 800;
-      color: #991b1b;
+      color: #0369a1;
       line-height: 1.25;
     }
 
-    .choices-bubble-row {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
+    /* Tiga Pilihan Huruf Kartu Besar */
+    .choices-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
       width: 100%;
     }
 
-    .bubble-choice-btn {
-      flex: 1;
+    .choice-card-btn {
       aspect-ratio: 1;
-      max-height: 84px;
       background: #ffffff;
-      border: 4px solid #38bdf8;
-      border-radius: 22px;
+      border: 4.5px solid #38bdf8;
+      border-radius: 26px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.15), inset 0 -4px 0 #bae6fd;
-      transition: transform 0.1s ease;
+      box-shadow: 0 8px 18px rgba(2, 132, 199, 0.22), inset 0 -4px 0 #bae6fd;
+      transition: transform 0.1s ease, border-color 0.15s ease;
     }
-    .bubble-choice-btn:active { transform: scale(0.92); }
-    .choice-main-char { font-size: 38px; font-weight: 800; color: #0284c7; line-height: 1; }
-    .choice-main-char.arabic { font-family: 'Amiri', serif; font-size: 46px; color: #059669; }
-    .choice-sub-text { font-size: 11px; font-weight: 700; color: #64748b; margin-top: 2px; }
+    .choice-card-btn:active {
+      transform: scale(0.92);
+    }
 
-    /* ================= 4. POPUP PERAYAAN BINTANG & LEVEL UP ================= */
-    #celebration-popup {
+    .choice-char {
+      font-size: 52px;
+      font-weight: 800;
+      color: #0284c7;
+      line-height: 1;
+    }
+
+    .choice-word-hint {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Animasi Salah Lembut & Benar */
+    .card-shake-soft {
+      animation: shakeCard 0.4s ease-in-out;
+      border-color: #f59e0b !important;
+    }
+    @keyframes shakeCard {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    .card-correct-pop {
+      animation: correctPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-color: #22c55e !important;
+      background: #dcfce7 !important;
+    }
+    @keyframes correctPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    /* Status Gerbang Info */
+    .gate-lock-info {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ================= 4. LAYAR AWAL / MENU UTAMA ================= */
+    #main-menu-screen {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 100;
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(5px);
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
-      text-align: center;
       padding: 24px;
+      text-align: center;
+      color: #ffffff;
     }
 
-    .celebration-box {
-      background: #ffffff;
-      color: #1e293b;
-      border-radius: 36px;
-      border: 6px solid #f59e0b;
-      padding: 28px 24px;
-      width: 90%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      animation: popAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    .menu-trophy-car {
+      font-size: 80px;
+      animation: floatCar 2s infinite ease-in-out;
+      margin-bottom: 8px;
     }
-
-    @keyframes popAnim {
-      0% { transform: scale(0.3); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .star-hero-big { font-size: 80px; animation: heroBounce 1.5s infinite ease-in-out; }
-    @keyframes heroBounce {
+    @keyframes floatCar {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-12px); }
     }
 
-    .btn-super-next {
-      margin-top: 18px;
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: #ffffff;
-      border: 4px solid #ffffff;
-      border-radius: 30px;
-      font-size: 20px;
+    .game-main-title {
+      font-size: 30px;
       font-weight: 800;
-      padding: 14px 36px;
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4);
-      font-family: inherit;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      line-height: 1.15;
     }
-    .btn-super-next:active { transform: scale(0.95); }
 
-    /* ================= 5. START MENU MODES ================= */
-    #start-modal-screen {
+    .game-main-subtitle {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 6px;
+      opacity: 0.95;
+      margin-bottom: 24px;
+    }
+
+    /* Pilihan Mobil */
+    .car-select-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+
+    .car-palette-dock {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .car-option-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 20px;
+      background: #ffffff;
+      border: 4px solid #bae6fd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+      transition: transform 0.1s ease, border-color 0.15s ease;
+    }
+    .car-option-btn:active { transform: scale(0.92); }
+    .car-option-btn.selected {
+      border-color: #f59e0b;
+      background: #fef08a;
+      transform: scale(1.1);
+    }
+
+    /* Tombol Mulai Balapan Besar */
+    .btn-start-race-huge {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: #ffffff;
+      border: 5px solid #ffffff;
+      border-radius: 40px;
+      padding: 16px 48px;
+      font-size: 24px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(22, 163, 74, 0.5), inset 0 -5px 0 #15803d;
+      animation: pulseStartBtn 1.8s infinite ease-in-out;
+    }
+    @keyframes pulseStartBtn {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .btn-start-race-huge:active { transform: scale(0.96); }
+
+    /* ================= 5. LAYAR KEMENANGAN AKHIR FINIS ================= */
+    #victory-screen {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 120;
-      background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.95) 100%);
+      backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -390,967 +405,1001 @@
       color: #ffffff;
     }
 
-    .menu-avatar-duo {
-      font-size: 72px;
-      display: flex;
-      gap: 16px;
-      margin-bottom: 8px;
-      animation: floatDuo 2s infinite ease-in-out;
+    .trophy-huge-icon {
+      font-size: 96px;
+      animation: trophyPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    @keyframes floatDuo {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+    @keyframes trophyPop {
+      0% { transform: scale(0); }
+      80% { transform: scale(1.2); }
+      100% { transform: scale(1); }
     }
 
-    .menu-main-title {
-      font-size: 28px;
-      font-weight: 800;
-      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-    .menu-main-sub {
-      font-size: 15px;
-      font-weight: 600;
-      opacity: 0.95;
-      margin-top: 4px;
-      margin-bottom: 24px;
-    }
-
-    .mode-cards-container {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      width: 100%;
-      max-width: 360px;
-    }
-
-    .btn-card-mode {
-      border: 4px solid #ffffff;
-      border-radius: 26px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      font-family: inherit;
+    .btn-restart-game {
+      margin-top: 24px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       color: #ffffff;
-      text-align: left;
-      transition: transform 0.12s ease;
+      border: 4px solid #ffffff;
+      border-radius: 36px;
+      padding: 14px 42px;
+      font-size: 22px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
     }
-    .btn-card-mode:active { transform: scale(0.95); }
-    .mode-spiderman { background: linear-gradient(135deg, #ef4444, #991b1b); }
-    .mode-roblox { background: linear-gradient(135deg, #38bdf8, #0284c7); }
-    .mode-hijaiyah-park { background: linear-gradient(135deg, #10b981, #047857); }
+    .btn-restart-game:active { transform: scale(0.95); }
 
-    .card-mode-icon { font-size: 40px; }
-    .card-mode-info h4 { font-size: 18px; font-weight: 800; }
-    .card-mode-info p { font-size: 12px; opacity: 0.9; font-weight: 600; margin-top: 2px; }
-
+    /* Utilitas */
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <div id="game-viewport">
+  <div id="app-container">
     
-    <!-- Canvas 3D Three.js -->
-    <canvas id="three-canvas"></canvas>
-
-    <!-- Top HUD (Score & Replay Voice) -->
+    <!-- 1. Top HUD Header -->
     <header class="top-hud">
       <div class="hud-group">
-        <button id="btn-back-home" class="btn-circle btn-home" title="Pilih Mode">🏠</button>
-        <button id="btn-repeat-speech" class="btn-circle btn-speaker" title="Ulangi Suara">🔊</button>
-      </div>
-
-      <!-- Mode Switch Pill Cepat -->
-      <div class="mode-switch-pill">
-        <button class="mode-pill-btn active" data-mode="spiderman">🕷️ Spider</button>
-        <button class="mode-pill-btn" data-mode="roblox">🧱 Obby</button>
-        <button class="mode-pill-btn" data-mode="hijaiyah">📖 Hijaiyah</button>
+        <button id="btn-home" class="hud-circle-btn btn-home" aria-label="Menu Utama" title="Menu Utama">🏠</button>
+        <button id="btn-repeat-voice" class="hud-circle-btn btn-speaker" aria-label="Ulangi Suara" title="Ulangi Pertanyaan">🔊</button>
       </div>
 
       <div class="hud-group">
-        <div class="stat-pill">
+        <div class="checkpoint-badge">
+          <span>🏁</span>
+          <span id="checkpoint-label">Gerbang A (1/26)</span>
           <span>⭐</span>
-          <span id="star-counter">0</span>
+          <span id="star-score-label">0</span>
         </div>
       </div>
     </header>
 
-    <!-- Banner Ringan Saat Anak Sedang Eksplorasi Bebas -->
-    <div id="explore-banner" class="explore-hint-banner">
-      <span id="explore-banner-icon">🎮</span>
-      <span id="explore-banner-text">Ayo jalan-jalan bebas! Panjat gedung atau lewati balok!</span>
+    <!-- 2. Canvas Animasi Balap Mobil & Lintasan 3 Jalur -->
+    <canvas id="race-canvas"></canvas>
+
+    <!-- 3. Tombol Kemudi Sentuh Layar HP (Kiri & Kanan) -->
+    <div class="bottom-controls-layer">
+      <button id="btn-steer-left" class="steering-btn" aria-label="Geser Kiri" title="Geser Kiri">⬅️</button>
+      <button id="btn-steer-right" class="steering-btn" aria-label="Geser Kanan" title="Geser Kanan">➡️</button>
     </div>
 
-    <!-- Kontrol Sentuh HP (Joystick Kiri & Tombol Aksi Kanan) -->
-    <div class="mobile-controls-layer">
-      <!-- Virtual Joystick Touch Kiri -->
-      <div id="joystick-base" class="virtual-joystick-base">
-        <div id="joystick-thumb" class="virtual-joystick-thumb"></div>
-      </div>
+    <!-- 4. Overlay Panel Pertanyaan Alfabet di Checkpoint -->
+    <div id="question-card-overlay" class="hidden">
+      <div class="question-modal-box">
+        <!-- Banner Suara Pertanyaan -->
+        <div id="btn-voice-prompt-box" class="question-banner-pill" title="Sentuh untuk mengulang suara">
+          <span class="q-speaker-icon">🔊</span>
+          <span id="question-prompt-text" class="q-text-prompt">Ayo cari huruf A!</span>
+        </div>
 
-      <!-- Tombol Aksi Kanan (Lompat Obby & Tembak Jaring Spiderman) -->
-      <div class="action-buttons-group">
-        <button id="btn-shoot-web" class="action-btn-large btn-web-sling">
-          🕸️
-          <span>JARING</span>
-        </button>
-        <button id="btn-hero-jump" class="action-btn-large btn-jump">
-          ⬆️
-          <span>LOMPAT</span>
-        </button>
-      </div>
-    </div>
+        <!-- Tiga Pilihan Huruf Kartun -->
+        <div id="choices-container" class="choices-row">
+          <!-- Render Tombol Pilihan Jawaban Dinamis -->
+        </div>
 
-    <!-- Zona Tantangan Edukasi Interaktif (HANYA MUNCUL KETIKA TIBA DI TARGET/PUNCAK) -->
-    <div id="challenge-overlay-card" class="hidden">
-      <div class="challenge-speech-bar" id="speech-trigger-box">
-        <span class="speech-icon">🔊</span>
-        <span class="speech-text" id="challenge-prompt-text">
-          Ayo sentuh huruf yang benar untuk membuka peti rahasia!
-        </span>
-      </div>
-
-      <div class="choices-bubble-row" id="choices-container">
-        <!-- Pilihan Huruf Kartu di-render dinamis -->
+        <!-- Info Gerbang Terkunci -->
+        <div class="gate-lock-info">
+          <span>🔒</span>
+          <span>Pilih huruf yang benar untuk membuka gerbang balap!</span>
+        </div>
       </div>
     </div>
 
-    <!-- Popup Perayaan Kemenangan Bintang Hero -->
-    <div id="celebration-popup" class="hidden">
-      <div class="celebration-box">
-        <div class="star-hero-big">🦸‍♂️✨</div>
-        <h2 style="font-size: 24px; font-weight: 800; color: #ef4444; margin-top: 10px;">HEBAT BANGET!</h2>
-        <p id="celebration-detail" style="font-size: 15px; color: #64748b; font-weight: 600; margin-top: 6px;">
-          Spider-Hero berhasil memanjat puncak gedung!
-        </p>
-        <button id="btn-next-mission" class="btn-super-next">Main Lagi! 🚀</button>
+    <!-- 5. Layar Pilihan Menu Utama & Mobil -->
+    <div id="main-menu-screen">
+      <div class="menu-trophy-car">🏎️</div>
+      <h1 class="game-main-title">Alphabet Racing<br>Adventure</h1>
+      <p class="game-main-subtitle">Belajar Huruf A sampai Z Sambil Balapan Ceria</p>
+
+      <p class="car-select-title">Pilih Mobil Favoritmu:</p>
+      <div class="car-palette-dock">
+        <button class="car-option-btn selected" data-car="red" title="Mobil Merah">🏎️</button>
+        <button class="car-option-btn" data-car="blue" title="Mobil Biru">🚙</button>
+        <button class="car-option-btn" data-car="yellow" title="Taksi Kuning">🚖</button>
+        <button class="car-option-btn" data-car="green" title="Mobil Hijau">🚗</button>
       </div>
+
+      <button id="btn-start-race" class="btn-start-race-huge">MULAI BALAPAN! ▶️</button>
     </div>
 
-    <!-- Menu Utama Pilihan Dunia -->
-    <div id="start-modal-screen">
-      <div class="menu-avatar-duo">
-        <span>🕷️</span>
-        <span>🧱</span>
-      </div>
-      <h1 class="menu-main-title">Petualangan Hero Kids</h1>
-      <p class="menu-main-sub">Spiderman Memanjat Gedung & Obby Roblox Seru</p>
-
-      <div class="mode-cards-container">
-        <!-- Mode 1: Spiderman Memanjat Gedung -->
-        <button class="btn-card-mode mode-spiderman" data-gamemode="spiderman">
-          <span class="card-mode-icon">🕷️</span>
-          <div class="card-mode-info">
-            <h4>Spider-Hero Panjat Gedung</h4>
-            <p>Main bebas, jalan-jalan, tembak jaring & panjat menara</p>
-          </div>
-        </button>
-
-        <!-- Mode 2: Roblox Obby Parkour -->
-        <button class="btn-card-mode mode-roblox" data-gamemode="roblox">
-          <span class="card-mode-icon">🧱</span>
-          <div class="card-mode-info">
-            <h4>Roblox Obby Parkour</h4>
-            <p>Main bebas lompat platform balok warna-warni</p>
-          </div>
-        </button>
-
-        <!-- Mode 3: Petualangan Hijaiyah 3D -->
-        <button class="btn-card-mode mode-hijaiyah-park" data-gamemode="hijaiyah">
-          <span class="card-mode-icon">🕌</span>
-          <div class="card-mode-info">
-            <h4>Taman Hijaiyah Hero</h4>
-            <p>Jalan-jalan di kota suci menemukan bintang huruf</p>
-          </div>
-        </button>
-      </div>
+    <!-- 6. Layar Kemenangan Finis 26 Huruf Selesai -->
+    <div id="victory-screen" class="hidden">
+      <div class="trophy-huge-icon">🏆✨</div>
+      <h2 style="font-size: 32px; font-weight: 800; color: #facc15; margin-top: 14px;">SELAMAT JUARA!</h2>
+      <p id="victory-sub-text" style="font-size: 17px; font-weight: 600; opacity: 0.95; margin-top: 8px;">
+        Kamu berhasil menyelesaikan 26 gerbang alfabet A sampai Z!
+      </p>
+      <button id="btn-restart-race" class="btn-restart-game">MAIN LAGI! 🔄</button>
     </div>
 
   </div>
 
   <!-- ==========================================================================
-       SCRIPT ENGINE 3D THREE.JS: EKSPLORASI BEBAS DULU, TANTANGAN MUNCUL DI TARGET
+       LOGIKA GAME ENGINE VANILLA JS LENGKAP: STATE MACHINE & VOICE-FIRST
        ========================================================================== -->
   <script>
     (function() {
       'use strict';
 
       // ----------------------------------------------------------------------
-      // 1. DATA MISI EDUKASI
+      // 1. DATA MASTER 26 HURUF ALFABET A–Z LENGKAP
       // ----------------------------------------------------------------------
-      const SPIDER_MISSIONS = [
-        { letter: 'A', name: 'A', word: 'Apel', desc: 'Kamu sampai di atas gedung! Mana huruf A untuk Apel?' },
-        { letter: 'B', name: 'B', word: 'Bola', desc: 'Kamu sampai di atas gedung! Mana huruf B untuk Bola?' },
-        { letter: 'C', name: 'C', word: 'Ceri', desc: 'Kamu sampai di atas gedung! Mana huruf C untuk Ceri?' },
-        { letter: 'D', name: 'D', word: 'Donat', desc: 'Kamu sampai di atas gedung! Mana huruf D untuk Donat?' },
-        { letter: 'E', name: 'E', word: 'Elang', desc: 'Kamu sampai di atas gedung! Mana huruf E untuk Elang?' },
-        { letter: 'F', name: 'F', word: 'Flamingo', desc: 'Kamu sampai di atas gedung! Mana huruf F untuk Flamingo?' }
+      const ALPHABET_CHECKPOINTS = [
+        { letter: 'A', word: 'Apel', emoji: '🍎', prompt: 'Ayo cari huruf A! A seperti Apel merah!' },
+        { letter: 'B', word: 'Bola', emoji: '⚽', prompt: 'Ayo cari huruf B! B seperti Bola bundar!' },
+        { letter: 'C', word: 'Ceri', emoji: '🍒', prompt: 'Ayo cari huruf C! C seperti Ceri manis!' },
+        { letter: 'D', word: 'Donat', emoji: '🍩', prompt: 'Ayo cari huruf D! D seperti Donat lezat!' },
+        { letter: 'E', word: 'Elang', emoji: '🦅', prompt: 'Ayo cari huruf E! E seperti Elang gagah!' },
+        { letter: 'F', word: 'Flamingo', emoji: '🦩', prompt: 'Ayo cari huruf F! F seperti Flamingo anggun!' },
+        { letter: 'G', word: 'Gajah', emoji: '🐘', prompt: 'Ayo cari huruf G! G seperti Gajah besar!' },
+        { letter: 'H', word: 'Harimau', emoji: '🐯', prompt: 'Ayo cari huruf H! H seperti Harimau ceria!' },
+        { letter: 'I', word: 'Ikan', emoji: '🐟', prompt: 'Ayo cari huruf I! I seperti Ikan berenang!' },
+        { letter: 'J', word: 'Jerapah', emoji: '🦒', prompt: 'Ayo cari huruf J! J seperti Jerapah tinggi!' },
+        { letter: 'K', word: 'Kelinci', emoji: '🐰', prompt: 'Ayo cari huruf K! K seperti Kelinci melompat!' },
+        { letter: 'L', word: 'Lemon', emoji: '🍋', prompt: 'Ayo cari huruf L! L seperti Lemon segar!' },
+        { letter: 'M', word: 'Monyet', emoji: '🐵', prompt: 'Ayo cari huruf M! M seperti Monyet lucu!' },
+        { letter: 'N', word: 'Nanas', emoji: '🍍', prompt: 'Ayo cari huruf N! N seperti Nanas manis!' },
+        { letter: 'O', word: 'Orangutan', emoji: '🦧', prompt: 'Ayo cari huruf O! O seperti Orangutan!' },
+        { letter: 'P', word: 'Pisang', emoji: '🍌', prompt: 'Ayo cari huruf P! P seperti Pisang kuning!' },
+        { letter: 'Q', word: 'Quran', emoji: '📖', prompt: 'Ayo cari huruf Q! Huruf Q yang rapi!' },
+        { letter: 'R', word: 'Rusa', emoji: '🦌', prompt: 'Ayo cari huruf R! R seperti Rusa lincah!' },
+        { letter: 'S', word: 'Singa', emoji: '🦁', prompt: 'Ayo cari huruf S! S seperti Singa pemberani!' },
+        { letter: 'T', word: 'Topi', emoji: '🧢', prompt: 'Ayo cari huruf T! T seperti Topi keren!' },
+        { letter: 'U', word: 'Udang', emoji: '🦐', prompt: 'Ayo cari huruf U! U seperti Udang laut!' },
+        { letter: 'V', word: 'Vas', emoji: '🏺', prompt: 'Ayo cari huruf V! V seperti Vas bunga cantik!' },
+        { letter: 'W', word: 'Wortel', emoji: '🥕', prompt: 'Ayo cari huruf W! W seperti Wortel oranye!' },
+        { letter: 'X', word: 'Xilofon', emoji: '🎵', prompt: 'Ayo cari huruf X! X seperti Xilofon merdu!' },
+        { letter: 'Y', word: 'Yoyo', emoji: '🪀', prompt: 'Ayo cari huruf Y! Y seperti Yoyo berputar!' },
+        { letter: 'Z', word: 'Zebra', emoji: '🦓', prompt: 'Ayo cari huruf Z! Z seperti Zebra belang!' }
       ];
 
-      const ROBLOX_OBBY_MISSIONS = [
-        { letter: 'G', name: 'G', word: 'Gajah', desc: 'Hore sampai di garis akhir! Mana balok huruf G?' },
-        { letter: 'H', name: 'H', word: 'Harimau', desc: 'Hore sampai di garis akhir! Mana balok huruf H?' },
-        { letter: 'I', name: 'I', word: 'Ikan', desc: 'Hore sampai di garis akhir! Mana balok huruf I?' },
-        { letter: 'J', name: 'J', word: 'Jerapah', desc: 'Hore sampai di garis akhir! Mana balok huruf J?' },
-        { letter: 'K', name: 'K', word: 'Kelinci', desc: 'Hore sampai di garis akhir! Mana balok huruf K?' },
-        { letter: 'L', name: 'L', word: 'Lumba-lumba', desc: 'Hore sampai di garis akhir! Mana balok huruf L?' }
-      ];
-
-      const HIJAIYAH_MISSIONS = [
-        { id: 'alif', arabic: 'ا', name: 'Alif', desc: 'Selamat datang di puncak menara! Mana huruf Alif?' },
-        { id: 'ba', arabic: 'ب', name: 'Ba', desc: 'Selamat datang di puncak menara! Mana huruf Ba dengan titik di bawah?' },
-        { id: 'ta', arabic: 'ت', name: 'Ta', desc: 'Selamat datang di puncak menara! Mana huruf Ta dengan dua titik di atas?' },
-        { id: 'tsa', arabic: 'ث', name: 'Tsa', desc: 'Selamat datang di puncak menara! Mana huruf Tsa dengan tiga titik?' },
-        { id: 'jim', arabic: 'ج', name: 'Jim', desc: 'Selamat datang di puncak menara! Mana huruf Jim dengan titik di perut?' },
-        { id: 'ha', arabic: 'ح', name: 'Ha', desc: 'Selamat datang di puncak menara! Mana huruf Ha tanpa titik?' }
-      ];
-
       // ----------------------------------------------------------------------
-      // 2. SISTEM SUARA & EFEK SFX
+      // 2. SISTEM SUARA (VOICE-FIRST ENGINE & WEB AUDIO SFX)
       // ----------------------------------------------------------------------
-      class SoundEngine {
+      class RacingAudioSystem {
         constructor() {
           this.synth = window.speechSynthesis || null;
           this.audioCtx = null;
-          this.lastSpeech = '';
+          this.currentSpeech = '';
+          this.idVoice = null;
           this.unlocked = false;
-          this.initVoice();
+
+          this.initSpeech();
         }
 
         unlock() {
           if (this.unlocked) return;
           try {
-            const ACtx = window.AudioContext || window.webkitAudioContext;
-            if (ACtx) {
-              this.audioCtx = new ACtx();
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+              this.audioCtx = new AudioCtx();
               if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
             }
             if (this.synth) this.synth.speak(new SpeechSynthesisUtterance(''));
             this.unlocked = true;
-          } catch(e) {}
+          } catch (e) {}
         }
 
-        initVoice() {
+        initSpeech() {
           if (!this.synth) return;
-          const setV = () => {
-            const voices = this.synth.getVoices() || [];
-            this.idVoice = voices.find(v => v.lang && (v.lang.includes('id') || v.lang.includes('ID'))) || null;
+          const selectIndoVoice = () => {
+            try {
+              const voices = this.synth.getVoices() || [];
+              this.idVoice = voices.find(v => v.lang && (v.lang.includes('id') || v.lang.includes('ID'))) || null;
+            } catch (e) {}
           };
-          setV();
+          selectIndoVoice();
           if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = setV;
+            window.speechSynthesis.onvoiceschanged = selectIndoVoice;
           }
         }
 
-        speak(text, onEnd) {
+        speakQuestion(text, onEnd) {
           if (!text) { if (onEnd) onEnd(); return; }
-          this.lastSpeech = text;
-          if (!this.synth) { if (onEnd) setTimeout(onEnd, 1000); return; }
+          this.currentSpeech = text;
 
-          try { this.synth.cancel(); } catch(e) {}
+          if (!this.synth) {
+            if (onEnd) setTimeout(onEnd, 1200);
+            return;
+          }
+
+          try { this.synth.cancel(); } catch (e) {}
+
           try {
             const utter = new SpeechSynthesisUtterance(text);
             if (this.idVoice) utter.voice = this.idVoice;
             utter.lang = 'id-ID';
-            utter.rate = 0.9;
-            utter.pitch = 1.25;
+            utter.rate = 0.88; // Tempo ramah untuk anak 3-5 tahun
+            utter.pitch = 1.25; // Ceria & ekspresif
             utter.onend = () => { if (onEnd) onEnd(); };
             utter.onerror = () => { if (onEnd) onEnd(); };
             this.synth.speak(utter);
-          } catch(e) {
+          } catch (e) {
             if (onEnd) onEnd();
           }
         }
 
-        repeat() {
-          if (this.lastSpeech) {
-            this.playTap();
-            this.speak(this.lastSpeech);
+        speakCorrect(onEnd) {
+          const praises = [
+            "Benar! Hebat sekali!",
+            "Pintar sekali! Gerbang terbuka!",
+            "Luar biasa! Ayo tancap gas lagi!"
+          ];
+          const text = praises[Math.floor(Math.random() * praises.length)];
+          this.speakQuestion(text, onEnd);
+        }
+
+        speakTryAgain() {
+          this.speakQuestion("Yuk, coba lagi ya! Dengarkan baik-baik.");
+        }
+
+        repeatQuestion() {
+          if (this.currentSpeech) {
+            this.playTapSound();
+            this.speakQuestion(this.currentSpeech);
           }
         }
 
         _getCtx() {
           if (!this.audioCtx) {
-            const ACtx = window.AudioContext || window.webkitAudioContext;
-            if (ACtx) this.audioCtx = new ACtx();
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.audioCtx = new AudioCtx();
           }
           if (this.audioCtx && this.audioCtx.state === 'suspended') this.audioCtx.resume();
           return this.audioCtx;
         }
 
-        playWebThwip() {
-          const c = this._getCtx();
-          if (!c) return;
+        // Suara Mesin Mobil Balap Ceria
+        playEngineRev() {
+          const ctx = this._getCtx();
+          if (!ctx) return;
           try {
-            const t = c.currentTime;
-            const osc = c.createOscillator();
-            const gain = c.createGain();
+            const t = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(700, t);
-            osc.frequency.exponentialRampToValueAtTime(2400, t + 0.12);
-            gain.gain.setValueAtTime(0.3, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+            osc.frequency.setValueAtTime(140, t);
+            osc.frequency.exponentialRampToValueAtTime(320, t + 0.35);
+            gain.gain.setValueAtTime(0.2, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
             osc.connect(gain);
-            gain.connect(c.destination);
+            gain.connect(ctx.destination);
             osc.start(t);
-            osc.stop(t + 0.14);
-          } catch(e) {}
+            osc.stop(t + 0.4);
+          } catch (e) {}
         }
 
-        playJumpBoing() {
-          const c = this._getCtx();
-          if (!c) return;
+        // Suara Geser Jalur Setir (Whoosh)
+        playSteerWhoosh() {
+          const ctx = this._getCtx();
+          if (!ctx) return;
           try {
-            const t = c.currentTime;
-            const osc = c.createOscillator();
-            const gain = c.createGain();
+            const t = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(240, t);
-            osc.frequency.exponentialRampToValueAtTime(620, t + 0.15);
-            gain.gain.setValueAtTime(0.25, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+            osc.frequency.setValueAtTime(300, t);
+            osc.frequency.linearRampToValueAtTime(500, t + 0.08);
+            gain.gain.setValueAtTime(0.18, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
             osc.connect(gain);
-            gain.connect(c.destination);
+            gain.connect(ctx.destination);
             osc.start(t);
-            osc.stop(t + 0.16);
-          } catch(e) {}
+            osc.stop(t + 0.09);
+          } catch (e) {}
         }
 
-        playVictory() {
-          const c = this._getCtx();
-          if (!c) return;
+        // Suara Gerbang Terbuka (Ting Ting Fanfare)
+        playGateOpenSound() {
+          const ctx = this._getCtx();
+          if (!ctx) return;
           try {
-            const t = c.currentTime;
+            const t = ctx.currentTime;
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-              const osc = c.createOscillator();
-              const gain = c.createGain();
-              const st = t + idx * 0.08;
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              const st = t + (idx * 0.08);
               osc.type = 'triangle';
               osc.frequency.setValueAtTime(freq, st);
               gain.gain.setValueAtTime(0.25, st);
-              gain.gain.exponentialRampToValueAtTime(0.001, st + 0.35);
+              gain.gain.exponentialRampToValueAtTime(0.001, st + 0.3);
               osc.connect(gain);
-              gain.connect(c.destination);
+              gain.connect(ctx.destination);
               osc.start(st);
-              osc.stop(st + 0.35);
+              osc.stop(st + 0.3);
             });
           } catch (e) {}
         }
 
-        playTap() {
-          const c = this._getCtx();
-          if (!c) return;
+        playTapSound() {
+          const ctx = this._getCtx();
+          if (!ctx) return;
           try {
-            const t = c.currentTime;
-            const osc = c.createOscillator();
-            const gain = c.createGain();
+            const t = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(380, t);
+            osc.frequency.setValueAtTime(420, t);
             gain.gain.setValueAtTime(0.15, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
             osc.connect(gain);
-            gain.connect(c.destination);
+            gain.connect(ctx.destination);
             osc.start(t);
             osc.stop(t + 0.05);
-          } catch(e) {}
+          } catch (e) {}
         }
 
         playSoftTryAgain() {
-          const c = this._getCtx();
-          if (!c) return;
+          const ctx = this._getCtx();
+          if (!ctx) return;
           try {
-            const t = c.currentTime;
-            const osc = c.createOscillator();
-            const gain = c.createGain();
+            const t = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(400, t);
-            osc.frequency.linearRampToValueAtTime(320, t + 0.2);
+            osc.frequency.setValueAtTime(380, t);
+            osc.frequency.linearRampToValueAtTime(300, t + 0.25);
             gain.gain.setValueAtTime(0.2, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
             osc.connect(gain);
-            gain.connect(c.destination);
+            gain.connect(ctx.destination);
             osc.start(t);
-            osc.stop(t + 0.25);
+            osc.stop(t + 0.3);
           } catch (e) {}
         }
       }
 
-      const sounds = new SoundEngine();
+      const audio = new RacingAudioSystem();
 
       // ----------------------------------------------------------------------
-      // 3. ENGINE 3D TAMPILAN THREE.JS
+      // 3. CANVAS 2D BALAPAN: 3 JALUR, MOBIL KARTUN, GERBANG CHECKPOINT
       // ----------------------------------------------------------------------
-      class ThreeDWorldManager {
-        constructor(canvas, onTargetReached) {
+      class RaceTrackRenderer {
+        constructor(canvas) {
           this.canvas = canvas;
-          this.onTargetReached = onTargetReached;
-          this.scene = null;
-          this.camera = null;
-          this.renderer = null;
+          this.ctx = canvas.getContext('2d');
 
-          // Karakter 3D
-          this.characterGroup = null;
-          this.characterType = 'spiderman';
-          this.isClimbing = false;
-          this.isJumping = false;
-          this.webLine = null;
+          // Jalur Balap: 0 (Kiri), 1 (Tengah), 2 (Kanan)
+          this.currentLane = 1;
+          this.targetLaneX = 0;
+          this.currentCarX = 0;
+          this.carY = 0;
 
-          // Target Puncak / Akhir Obby
-          this.targetMesh = null;
-          this.hasTriggeredTarget = false;
+          // Animasi Lintasan & Latar Bergerak
+          this.roadOffset = 0;
+          this.roadSpeed = 5;
 
-          // Grup Dunia
-          this.environmentGroup = new THREE.Group();
+          // State Checkpoint Gerbang 2D
+          this.gateY = -200; // Posisi vertikal gerbang
+          this.isGateVisible = false;
+          this.isGateOpen = false;
+          this.gateOpenAngle = 0;
+          this.gateLetter = 'A';
 
-          this.initThree();
-          this.animate = this.animate.bind(this);
-          requestAnimationFrame(this.animate);
+          this.selectedCarColor = 'red'; // 'red', 'blue', 'yellow', 'green'
+
+          this.resize();
+          window.addEventListener('resize', () => this.resize());
         }
 
-        initThree() {
-          const width = window.innerWidth;
-          const height = window.innerHeight;
+        resize() {
+          this.width = window.innerWidth;
+          this.height = window.innerHeight;
+          this.canvas.width = this.width;
+          this.canvas.height = this.height;
 
-          this.scene = new THREE.Scene();
-          this.scene.background = new THREE.Color('#38bdf8');
+          // Hitung Koordinat 3 Jalur (Kiri, Tengah, Kanan)
+          const roadWidth = Math.min(this.width * 0.88, 460);
+          this.roadLeft = (this.width - roadWidth) / 2;
+          this.roadRight = this.roadLeft + roadWidth;
+          this.laneWidth = roadWidth / 3;
 
-          this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-          this.camera.position.set(0, 5, 11);
-          this.camera.lookAt(0, 2, 0);
-
-          this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
-          this.renderer.setSize(width, height);
-          this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-          const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
-          hemiLight.position.set(0, 20, 0);
-          this.scene.add(hemiLight);
-
-          const dirLight = new THREE.DirectionalLight(0xfffaed, 0.8);
-          dirLight.position.set(10, 20, 10);
-          this.scene.add(dirLight);
-
-          this.scene.add(this.environmentGroup);
-
-          this.buildCharacter('spiderman');
-          this.buildCityEnvironment();
-
-          window.addEventListener('resize', () => {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            this.camera.aspect = w / h;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(w, h);
-          });
-        }
-
-        buildCharacter(type) {
-          if (this.characterGroup) this.scene.remove(this.characterGroup);
-          this.characterType = type;
-          this.characterGroup = new THREE.Group();
-
-          if (type === 'spiderman') {
-            const redMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
-            const blueMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 });
-
-            const bodyGeo = new THREE.BoxGeometry(0.8, 1.0, 0.5);
-            const spideyBody = new THREE.Mesh(bodyGeo, redMat);
-            spideyBody.position.y = 0.5;
-            this.characterGroup.add(spideyBody);
-
-            const headGeo = new THREE.SphereGeometry(0.45, 16, 16);
-            const head = new THREE.Mesh(headGeo, redMat);
-            head.position.y = 1.35;
-            this.characterGroup.add(head);
-
-            const eyeGeo = new THREE.BoxGeometry(0.18, 0.1, 0.05);
-            const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const leftEye = new THREE.Mesh(eyeGeo, whiteMat);
-            leftEye.position.set(-0.16, 1.35, 0.42);
-            leftEye.rotation.z = 0.2;
-            const rightEye = new THREE.Mesh(eyeGeo, whiteMat);
-            rightEye.position.set(0.16, 1.35, 0.42);
-            rightEye.rotation.z = -0.2;
-            this.characterGroup.add(leftEye, rightEye);
-
-            const legGeo = new THREE.BoxGeometry(0.3, 0.8, 0.35);
-            const leftLeg = new THREE.Mesh(legGeo, blueMat);
-            leftLeg.position.set(-0.25, -0.4, 0);
-            const rightLeg = new THREE.Mesh(legGeo, blueMat);
-            rightLeg.position.set(0.25, -0.4, 0);
-            this.characterGroup.add(leftLeg, rightLeg);
-
-          } else {
-            const yellowMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
-            const blueMat = new THREE.MeshLambertMaterial({ color: 0x0284c7 });
-            const greenMat = new THREE.MeshLambertMaterial({ color: 0x22c55e });
-
-            const headGeo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
-            const head = new THREE.Mesh(headGeo, yellowMat);
-            head.position.y = 1.45;
-            this.characterGroup.add(head);
-
-            const bodyGeo = new THREE.BoxGeometry(1.0, 1.0, 0.5);
-            const robloxBody = new THREE.Mesh(bodyGeo, blueMat);
-            robloxBody.position.y = 0.5;
-            this.characterGroup.add(robloxBody);
-
-            const legGeo = new THREE.BoxGeometry(0.45, 0.9, 0.45);
-            const leftLeg = new THREE.Mesh(legGeo, greenMat);
-            leftLeg.position.set(-0.26, -0.45, 0);
-            const rightLeg = new THREE.Mesh(legGeo, greenMat);
-            rightLeg.position.set(0.26, -0.45, 0);
-            this.characterGroup.add(leftLeg, rightLeg);
-          }
-
-          this.characterGroup.position.set(0, 0.8, 0);
-          this.scene.add(this.characterGroup);
-        }
-
-        buildCityEnvironment() {
-          this.hasTriggeredTarget = false;
-          while (this.environmentGroup.children.length > 0) {
-            this.environmentGroup.remove(this.environmentGroup.children[0]);
-          }
-
-          // Lantai Jalan Luas (Anak Bebas Berlari)
-          const groundGeo = new THREE.PlaneGeometry(100, 100);
-          groundGeo.rotateX(-Math.PI / 2);
-          const groundMat = new THREE.MeshLambertMaterial({ color: 0x86efac });
-          const ground = new THREE.Mesh(groundGeo, groundMat);
-          ground.position.y = -0.5;
-          this.environmentGroup.add(ground);
-
-          if (this.characterType === 'spiderman') {
-            // GEDUNG BESAR DI DEPAN UNTUK DIPANJAT KAPAN SAJA
-            const towerGeo = new THREE.BoxGeometry(5.5, 16, 5.5);
-            const towerMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
-            const tower = new THREE.Mesh(towerGeo, towerMat);
-            tower.position.set(0, 7.5, -4);
-            this.environmentGroup.add(tower);
-
-            // Jendela-jendela
-            for (let y = 1; y < 14; y += 2) {
-              for (let x = -1.6; x <= 1.6; x += 1.6) {
-                const winGeo = new THREE.PlaneGeometry(0.8, 1.0);
-                const winMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
-                const win = new THREE.Mesh(winGeo, winMat);
-                win.position.set(x, y, -1.22);
-                this.environmentGroup.add(win);
-              }
-            }
-
-            // Bintang Emas Puncak Gedung
-            const starGeo = new THREE.OctahedronGeometry(0.9);
-            const starMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
-            this.targetMesh = new THREE.Mesh(starGeo, starMat);
-            this.targetMesh.position.set(0, 16.2, -4);
-            this.environmentGroup.add(this.targetMesh);
-
-          } else {
-            // ROBLOX OBBY PLATFORM BALOK WARNA-WARNI
-            const colors = [0xef4444, 0xf59e0b, 0x10b981, 0x3b82f6, 0x8b5cf6];
-            for (let i = 0; i < 6; i++) {
-              const platGeo = new THREE.BoxGeometry(3, 0.5, 3);
-              const platMat = new THREE.MeshLambertMaterial({ color: colors[i % colors.length] });
-              const plat = new THREE.Mesh(platGeo, platMat);
-              plat.position.set((i % 2 === 0 ? 1 : -1) * 1.6, i * 1.5, -i * 2.8);
-              this.environmentGroup.add(plat);
-            }
-
-            // Bintang Finish Obby di Platform Terakhir
-            const starGeo = new THREE.OctahedronGeometry(0.9);
-            const starMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
-            this.targetMesh = new THREE.Mesh(starGeo, starMat);
-            this.targetMesh.position.set(-1.6, 5 * 1.5 + 1.2, -5 * 2.8);
-            this.environmentGroup.add(this.targetMesh);
-          }
-        }
-
-        // Tembak Jaring Bebas & Panjat
-        shootWebAndClimb() {
-          if (this.isClimbing) return;
-          sounds.playWebThwip();
-          this.isClimbing = true;
-
-          // Buat Tali Jaring Laba-laba 3D
-          if (this.webLine) this.scene.remove(this.webLine);
-          const points = [
-            new THREE.Vector3(this.characterGroup.position.x, this.characterGroup.position.y + 1, this.characterGroup.position.z),
-            new THREE.Vector3(0, 15.5, -4)
+          this.lanePositions = [
+            this.roadLeft + this.laneWidth * 0.5, // Jalur 0: Kiri
+            this.roadLeft + this.laneWidth * 1.5, // Jalur 1: Tengah
+            this.roadLeft + this.laneWidth * 2.5  // Jalur 2: Kanan
           ];
-          const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-          const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 4 });
-          this.webLine = new THREE.Line(lineGeo, lineMat);
-          this.scene.add(this.webLine);
 
-          // Panjat ke Atas Gedung
-          const climbInterval = setInterval(() => {
-            if (this.characterGroup.position.y < 15.5) {
-              this.characterGroup.position.y += 0.35;
-              this.characterGroup.position.z -= 0.08;
-              this.characterGroup.rotation.y += 0.18;
-              this.camera.position.y = this.characterGroup.position.y + 4;
-            } else {
-              clearInterval(climbInterval);
-              this.isClimbing = false;
-              if (this.webLine) {
-                this.scene.remove(this.webLine);
-                this.webLine = null;
+          this.carY = this.height * 0.74;
+          this.targetLaneX = this.lanePositions[this.currentLane];
+          if (!this.currentCarX) this.currentCarX = this.targetLaneX;
+        }
+
+        setLane(laneIndex) {
+          if (laneIndex < 0 || laneIndex > 2) return;
+          this.currentLane = laneIndex;
+          this.targetLaneX = this.lanePositions[this.currentLane];
+          audio.playSteerWhoosh();
+        }
+
+        steerLeft() {
+          if (this.currentLane > 0) this.setLane(this.currentLane - 1);
+        }
+
+        steerRight() {
+          if (this.currentLane < 2) this.setLane(this.currentLane + 1);
+        }
+
+        setCarColor(color) {
+          this.selectedCarColor = color;
+        }
+
+        spawnGate(letter) {
+          this.gateLetter = letter;
+          this.gateY = -120; // Mulai dari atas layar
+          this.isGateVisible = true;
+          this.isGateOpen = false;
+          this.gateOpenAngle = 0;
+        }
+
+        openGate() {
+          this.isGateOpen = true;
+          audio.playGateOpenSound();
+        }
+
+        updateDriving(isDriving) {
+          // Gerakan Halus Perpindahan Jalur Mobil
+          this.currentCarX += (this.targetLaneX - this.currentCarX) * 0.22;
+
+          if (isDriving) {
+            this.roadOffset = (this.roadOffset + this.roadSpeed) % 60;
+
+            // Jika ada gerbang aktif, gerbang meluncur turun mendekati mobil
+            if (this.isGateVisible && !this.isGateOpen) {
+              const stopTargetY = this.carY - 140; // Berhenti tepat di depan moncong mobil
+              if (this.gateY < stopTargetY) {
+                this.gateY += this.roadSpeed;
+              } else {
+                this.gateY = stopTargetY;
+                // Mobil tiba tepat di Checkpoint!
+                return true; // Beri sinyal ke state machine
               }
-              // Karakter tiba di puncak gedung! Munculkan kuis huruf
-              if (!this.hasTriggeredTarget) {
-                this.hasTriggeredTarget = true;
-                if (this.onTargetReached) this.onTargetReached();
+            } else if (this.isGateOpen) {
+              // Gerbang terbuka: Gerbang terus berjalan ke bawah meninggalkan mobil
+              this.gateY += this.roadSpeed * 1.4;
+              if (this.gateOpenAngle < Math.PI / 2) {
+                this.gateOpenAngle += 0.08;
+              }
+              if (this.gateY > this.height + 100) {
+                this.isGateVisible = false;
               }
             }
-          }, 30);
+          }
+          return false;
         }
 
-        // Lompat Bebas (Bisa Ditekan Kapan Saja)
-        jumpAction() {
-          if (this.isJumping || this.isClimbing) return;
-          sounds.playJumpBoing();
-          this.isJumping = true;
-          let velY = 0.35;
-          const origY = this.characterGroup.position.y;
+        draw() {
+          const ctx = this.ctx;
+          const w = this.width;
+          const h = this.height;
 
-          const jumpLoop = setInterval(() => {
-            this.characterGroup.position.y += velY;
-            this.characterGroup.position.z -= 0.05; // Sedikit maju saat lompat
-            velY -= 0.03;
+          ctx.clearRect(0, 0, w, h);
 
-            // Periksa jika mendekati finish obby
-            if (this.characterType === 'roblox' && this.characterGroup.position.z <= -12 && !this.hasTriggeredTarget) {
-              this.hasTriggeredTarget = true;
-              if (this.onTargetReached) this.onTargetReached();
-            }
+          // 1. Gambar Rumput & Pemandangan Kartun Samping
+          this.drawScenery(ctx, w, h);
 
-            if (this.characterGroup.position.y <= origY) {
-              this.characterGroup.position.y = origY;
-              this.isJumping = false;
-              clearInterval(jumpLoop);
-            }
-          }, 30);
-        }
+          // 2. Gambar Lintasan Jalan Raya 3 Jalur
+          this.drawRoad(ctx, w, h);
 
-        resetCharacterPosition() {
-          this.hasTriggeredTarget = false;
-          this.characterGroup.position.set(0, 0.8, 0);
-          this.characterGroup.rotation.set(0, 0, 0);
-          this.camera.position.set(0, 5, 11);
-          this.camera.lookAt(0, 2, 0);
-        }
-
-        animate() {
-          requestAnimationFrame(this.animate);
-
-          // Animasi Bintang Target Berputar Menarik Perhatian Anak
-          if (this.targetMesh) {
-            this.targetMesh.rotation.y += 0.03;
-            this.targetMesh.rotation.x += 0.02;
+          // 3. Gambar Gerbang Checkpoint (Jika Sedang Aktif)
+          if (this.isGateVisible) {
+            this.drawGate(ctx, w);
           }
 
-          this.renderer.render(this.scene, this.camera);
+          // 4. Gambar Mobil Balap Kartun
+          this.drawCar(ctx, this.currentCarX, this.carY);
+        }
+
+        drawScenery(ctx, w, h) {
+          // Rumput Hijau Terang Ceria
+          ctx.fillStyle = '#22c55e';
+          ctx.fillRect(0, 0, w, h);
+
+          // Bukit-bukit Halus di Sisi Kiri & Kanan
+          ctx.fillStyle = '#16a34a';
+          ctx.beginPath();
+          ctx.arc(this.roadLeft - 60, h * 0.3, 110, 0, Math.PI * 2);
+          ctx.arc(this.roadLeft - 50, h * 0.7, 90, 0, Math.PI * 2);
+          ctx.arc(this.roadRight + 60, h * 0.4, 120, 0, Math.PI * 2);
+          ctx.arc(this.roadRight + 50, h * 0.8, 80, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Pepohonan Kartun Lucu
+          const drawTree = (x, y) => {
+            ctx.fillStyle = '#854d0e';
+            ctx.fillRect(x - 6, y, 12, 22);
+            ctx.fillStyle = '#4ade80';
+            ctx.beginPath();
+            ctx.arc(x, y - 6, 20, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.arc(x, y - 10, 15, 0, Math.PI * 2);
+            ctx.fill();
+          };
+
+          drawTree(this.roadLeft - 45, (h * 0.2 + this.roadOffset * 2) % h);
+          drawTree(this.roadLeft - 50, (h * 0.6 + this.roadOffset * 2) % h);
+          drawTree(this.roadRight + 45, (h * 0.35 + this.roadOffset * 2) % h);
+          drawTree(this.roadRight + 55, (h * 0.8 + this.roadOffset * 2) % h);
+        }
+
+        drawRoad(ctx, w, h) {
+          const rl = this.roadLeft;
+          const rr = this.roadRight;
+          const rw = rr - rl;
+
+          // Aspal Jalan Abu-Abu Tua Kartun
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(rl, 0, rw, h);
+
+          // Garis Tepi Bahu Jalan Merah-Putih Balap (Kerb)
+          const kerbHeight = 30;
+          for (let y = -kerbHeight; y < h + kerbHeight; y += kerbHeight) {
+            const isRed = Math.floor((y + this.roadOffset) / kerbHeight) % 2 === 0;
+            ctx.fillStyle = isRed ? '#ef4444' : '#ffffff';
+            ctx.fillRect(rl - 12, y + (this.roadOffset % kerbHeight), 12, kerbHeight);
+            ctx.fillRect(rr, y + (this.roadOffset % kerbHeight), 12, kerbHeight);
+          }
+
+          // Garis Putus-Putus Pembatas 3 Jalur
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 5;
+          ctx.setLineDash([26, 24]);
+          ctx.lineDashOffset = -this.roadOffset * 1.5;
+
+          // Garis Antara Jalur 1 & 2
+          ctx.beginPath();
+          ctx.moveTo(rl + this.laneWidth, 0);
+          ctx.lineTo(rl + this.laneWidth, h);
+          ctx.stroke();
+
+          // Garis Antara Jalur 2 & 3
+          ctx.beginPath();
+          ctx.moveTo(rl + this.laneWidth * 2, 0);
+          ctx.lineTo(rl + this.laneWidth * 2, h);
+          ctx.stroke();
+
+          ctx.setLineDash([]); // Reset dash
+        }
+
+        drawGate(ctx, w) {
+          const gy = this.gateY;
+          const rl = this.roadLeft - 18;
+          const rr = this.roadRight + 18;
+          const gateW = rr - rl;
+
+          ctx.save();
+
+          // Tiang Gerbang Kiri & Kanan (Pilar Pelangi Balap)
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillRect(rl, gy - 70, 24, 90);
+          ctx.fillRect(rr - 24, gy - 70, 24, 90);
+
+          // Balok Atas Gerbang
+          ctx.fillStyle = '#3b82f6';
+          ctx.fillRect(rl - 6, gy - 85, gateW + 12, 28);
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(rl - 6, gy - 85, gateW + 12, 28);
+
+          // Lencana Huruf Alfabet Besar di Puncak Gerbang
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.arc(w * 0.5, gy - 85, 34, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 4;
+          ctx.stroke();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '800 36px Fredoka, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(this.gateLetter, w * 0.5, gy - 85);
+
+          // Daun Pintu Penghalang Jalan
+          if (!this.isGateOpen) {
+            // Palang Gerbang Tertutup (Garis Belang Kuning-Hitam)
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(rl + 24, gy - 20, gateW - 48, 20);
+            ctx.fillStyle = '#1e293b';
+            for (let x = rl + 30; x < rr - 40; x += 32) {
+              ctx.beginPath();
+              ctx.moveTo(x, gy - 20);
+              ctx.lineTo(x + 16, gy - 20);
+              ctx.lineTo(x + 6, gy);
+              ctx.lineTo(x - 10, gy);
+              ctx.fill();
+            }
+
+            // Gembok Emas Bintang
+            ctx.fillStyle = '#eab308';
+            ctx.beginPath();
+            ctx.arc(w * 0.5, gy - 10, 16, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = '#1e293b';
+            ctx.font = '14px sans-serif';
+            ctx.fillText('🔒', w * 0.5, gy - 9);
+
+          } else {
+            // Palang Gerbang Terangkat Naik (Terbuka!)
+            ctx.strokeStyle = '#22c55e';
+            ctx.lineWidth = 14;
+            ctx.beginPath();
+            ctx.moveTo(rl + 24, gy - 20);
+            ctx.lineTo(rl + 24 + Math.cos(-this.gateOpenAngle) * (gateW * 0.45), gy - 20 + Math.sin(-this.gateOpenAngle) * (gateW * 0.45));
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(rr - 24, gy - 20);
+            ctx.lineTo(rr - 24 - Math.cos(-this.gateOpenAngle) * (gateW * 0.45), gy - 20 + Math.sin(-this.gateOpenAngle) * (gateW * 0.45));
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        }
+
+        drawCar(ctx, cx, cy) {
+          ctx.save();
+          ctx.translate(cx, cy);
+
+          // Warna Mobil Kartun
+          let bodyColor = '#ef4444';
+          let roofColor = '#b91c1c';
+          if (this.selectedCarColor === 'blue') { bodyColor = '#3b82f6'; roofColor = '#1d4ed8'; }
+          if (this.selectedCarColor === 'yellow') { bodyColor = '#eab308'; roofColor = '#ca8a04'; }
+          if (this.selectedCarColor === 'green') { bodyColor = '#10b981'; roofColor = '#047857'; }
+
+          // Bayangan Mobil di Aspal
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+          ctx.beginPath();
+          ctx.ellipse(0, 32, 34, 12, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 4 Roda Ban Balap Hitam Tebal
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(-34, -32, 12, 22); // Kiri Depan
+          ctx.fillRect(22, -32, 12, 22);  // Kanan Depan
+          ctx.fillRect(-34, 14, 12, 22);  // Kiri Belakang
+          ctx.fillRect(22, 14, 12, 22);   // Kanan Belakang
+
+          // Pelek Roda Kuning Ceria
+          ctx.fillStyle = '#facc15';
+          ctx.fillRect(-32, -26, 8, 10);
+          ctx.fillRect(24, -26, 8, 10);
+          ctx.fillRect(-32, 20, 8, 10);
+          ctx.fillRect(24, 20, 8, 10);
+
+          // Bodi Utama Mobil Balap Bulat Lucu
+          ctx.fillStyle = bodyColor;
+          ctx.beginPath();
+          ctx.roundRect(-26, -38, 52, 74, 16);
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 3.5;
+          ctx.stroke();
+
+          // Kaca Depan & Belakang Biru Cerah
+          ctx.fillStyle = '#bae6fd';
+          ctx.beginPath();
+          ctx.roundRect(-18, -26, 36, 18, 8);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.roundRect(-18, 12, 36, 12, 6);
+          ctx.fill();
+
+          // Atap Mobil
+          ctx.fillStyle = roofColor;
+          ctx.beginPath();
+          ctx.roundRect(-16, -6, 32, 16, 6);
+          ctx.fill();
+
+          // Lampu Depan Menyala Ceria
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.arc(-16, -37, 6, 0, Math.PI * 2);
+          ctx.arc(16, -37, 6, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Spoiler Belakang Mobil Balap
+          ctx.fillStyle = bodyColor;
+          ctx.fillRect(-28, 30, 56, 8);
+
+          ctx.restore();
         }
       }
 
       // ----------------------------------------------------------------------
-      // 4. CONTROLLER GAME PLAY-FIRST (MAIN DULU, BARU TANYA)
+      // 4. GAME CONTROLLER & STATE MACHINE
+      // State Logika Mutlak:
+      // DRIVING -> CHECKPOINT -> QUESTION_ACTIVE -> CORRECT_ANSWER -> GATE_OPEN -> DRIVING
+      // Jika Salah: QUESTION_ACTIVE -> WRONG_ANSWER -> QUESTION_ACTIVE (Soal Sama!)
       // ----------------------------------------------------------------------
-      class SuperheroGameApp {
+      class AlphabetRacingGame {
         constructor() {
-          this.world3D = null;
-          this.activeMode = 'spiderman';
-          this.currentMissionIndex = 0;
+          this.track = null;
+
+          // State Machine Game
+          this.gameState = 'MENU'; // 'MENU', 'DRIVING', 'CHECKPOINT', 'QUESTION_ACTIVE', 'CORRECT_ANSWER', 'GATE_OPEN', 'FINISH'
+          this.currentCheckpointIndex = 0; // 0..25 (A..Z)
+          this.currentQuestionData = null; // Data soal checkpoint aktif
           this.starScore = 0;
+          this.isPaused = false;
           this.canAnswer = false;
-          this.isQuestionActive = false;
 
           this.init();
         }
 
         init() {
-          const canvas = document.getElementById('three-canvas');
-          // Callback saat anak berhasil memanjat puncak gedung atau menyelesaikan obby!
-          this.world3D = new ThreeDWorldManager(canvas, () => {
-            this.triggerQuestionAtTarget();
+          const canvas = document.getElementById('race-canvas');
+          this.track = new RaceTrackRenderer(canvas);
+
+          this.loadProgress();
+          this.bindEvents();
+
+          // Jalankan Loop Animasi Game Balap
+          this.gameLoop = this.gameLoop.bind(this);
+          requestAnimationFrame(this.gameLoop);
+        }
+
+        bindEvents() {
+          // Tombol Mulai Balapan di Menu
+          document.getElementById('btn-start-race')?.addEventListener('click', () => {
+            audio.unlock();
+            audio.playEngineRev();
+            this.startGame();
           });
 
-          this.bindControls();
-          this.loadScore();
-        }
-
-        loadScore() {
-          try {
-            const s = localStorage.getItem('spider_kids_stars');
-            if (s) this.starScore = parseInt(s, 10) || 0;
-            document.getElementById('star-counter').innerText = this.starScore;
-          } catch(e) {}
-        }
-
-        addScore() {
-          this.starScore++;
-          try {
-            localStorage.setItem('spider_kids_stars', this.starScore);
-          } catch(e) {}
-          document.getElementById('star-counter').innerText = this.starScore;
-        }
-
-        bindControls() {
-          // Tombol Pilih Mode di Start Menu
-          document.querySelectorAll('.btn-card-mode').forEach(btn => {
+          // Pilihan Warna Mobil
+          document.querySelectorAll('.car-option-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-              sounds.unlock();
-              sounds.playTap();
-              const mode = e.currentTarget.getAttribute('data-gamemode');
-              document.getElementById('start-modal-screen').classList.add('hidden');
-              this.setGameMode(mode);
+              audio.playTapSound();
+              document.querySelectorAll('.car-option-btn').forEach(b => b.classList.remove('selected'));
+              e.currentTarget.classList.add('selected');
+              const color = e.currentTarget.getAttribute('data-car');
+              this.track.setCarColor(color);
             });
           });
 
-          // Switch Mode Cepat di Bar Atas
-          document.querySelectorAll('.mode-pill-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-              sounds.playTap();
-              const mode = e.currentTarget.getAttribute('data-mode');
-              document.querySelectorAll('.mode-pill-btn').forEach(b => b.classList.remove('active'));
-              e.currentTarget.classList.add('active');
-              this.setGameMode(mode);
-            });
+          // Tombol Setir HP Kiri & Kanan
+          document.getElementById('btn-steer-left')?.addEventListener('click', () => {
+            if (this.gameState === 'DRIVING') this.track.steerLeft();
+          });
+          document.getElementById('btn-steer-right')?.addEventListener('click', () => {
+            if (this.gameState === 'DRIVING') this.track.steerRight();
           });
 
-          // Tombol Home
-          document.getElementById('btn-back-home')?.addEventListener('click', () => {
-            sounds.playTap();
-            document.getElementById('start-modal-screen').classList.remove('hidden');
-            this.hideQuestionCard();
-          });
-
-          // Tombol Replay Suara
-          document.getElementById('btn-repeat-speech')?.addEventListener('click', () => {
-            sounds.repeat();
-          });
-
-          document.getElementById('speech-trigger-box')?.addEventListener('click', () => {
-            sounds.repeat();
-          });
-
-          // AKSI BEBAS: Tembak Jaring Spiderman (Anak Bebas Memanjat Kapan Saja!)
-          document.getElementById('btn-shoot-web')?.addEventListener('click', () => {
-            this.world3D.shootWebAndClimb();
-          });
-
-          // AKSI BEBAS: Lompat Karakter (Anak Bebas Melompat Kapan Saja!)
-          document.getElementById('btn-hero-jump')?.addEventListener('click', () => {
-            this.world3D.jumpAction();
-          });
-
-          // Tombol Main Lagi di Popup
-          document.getElementById('btn-next-mission')?.addEventListener('click', () => {
-            sounds.playTap();
-            document.getElementById('celebration-popup').classList.add('hidden');
-            this.nextPlayRound();
-          });
-
-          // Joystick Sentuh Virtual untuk HP
-          this.initJoystick();
-        }
-
-        initJoystick() {
-          const base = document.getElementById('joystick-base');
-          const thumb = document.getElementById('joystick-thumb');
-          let isTouching = false;
-          let startX = 0, startY = 0;
-
-          const handleStart = (e) => {
-            isTouching = true;
-            const touch = e.touches ? e.touches[0] : e;
-            const rect = base.getBoundingClientRect();
-            startX = rect.left + rect.width / 2;
-            startY = rect.top + rect.height / 2;
-          };
-
-          const handleMove = (e) => {
-            if (!isTouching) return;
-            const touch = e.touches ? e.touches[0] : e;
-            let dx = touch.clientX - startX;
-            let dy = touch.clientY - startY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const maxRadius = 35;
-
-            if (dist > maxRadius) {
-              dx = (dx / dist) * maxRadius;
-              dy = (dy / dist) * maxRadius;
+          // Kontrol Keyboard untuk Pengujian Laptop/Komputer (ArrowLeft, ArrowRight)
+          window.addEventListener('keydown', (e) => {
+            if (this.gameState === 'DRIVING') {
+              if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') this.track.steerLeft();
+              if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') this.track.steerRight();
             }
+          });
 
-            thumb.style.transform = `translate(${dx}px, ${dy}px)`;
+          // Tombol Home Menu
+          document.getElementById('btn-home')?.addEventListener('click', () => {
+            audio.playTapSound();
+            this.showMainMenu();
+          });
 
-            // Gerakan Bebas Karakter 3D
-            if (this.world3D.characterGroup && !this.world3D.isClimbing) {
-              this.world3D.characterGroup.position.x += dx * 0.006;
-              this.world3D.characterGroup.position.z += dy * 0.006;
-              this.world3D.characterGroup.rotation.y = -Math.atan2(dy, dx) - Math.PI / 2;
+          // Tombol Ulangi Suara Pertanyaan
+          document.getElementById('btn-repeat-voice')?.addEventListener('click', () => {
+            audio.repeatQuestion();
+          });
 
-              // Jika anak berjalan mendekati gedung/target secara manual
-              if (this.world3D.characterGroup.position.z <= -3 && !this.world3D.hasTriggeredTarget && this.activeMode === 'spiderman') {
-                // Anak menyentuh gedung, bantu otomatis memanjat
-                this.world3D.shootWebAndClimb();
-              }
+          document.getElementById('btn-voice-prompt-box')?.addEventListener('click', () => {
+            audio.repeatQuestion();
+          });
+
+          // Tombol Main Lagi di Layar Finis
+          document.getElementById('btn-restart-race')?.addEventListener('click', () => {
+            audio.unlock();
+            audio.playEngineRev();
+            this.restartGame();
+          });
+        }
+
+        loadProgress() {
+          try {
+            const saved = localStorage.getItem('alphabet_racing_progress');
+            if (saved) {
+              const data = JSON.parse(saved);
+              this.starScore = data.starScore || 0;
+              document.getElementById('star-score-label').innerText = this.starScore;
             }
-          };
-
-          const handleEnd = () => {
-            isTouching = false;
-            thumb.style.transform = 'translate(0px, 0px)';
-          };
-
-          base.addEventListener('touchstart', handleStart, { passive: true });
-          window.addEventListener('touchmove', handleMove, { passive: true });
-          window.addEventListener('touchend', handleEnd);
-
-          base.addEventListener('mousedown', handleStart);
-          window.addEventListener('mousemove', handleMove);
-          window.addEventListener('mouseup', handleEnd);
+          } catch (e) {}
         }
 
-        setGameMode(mode) {
-          this.activeMode = mode;
-          this.currentMissionIndex = 0;
-          this.hideQuestionCard();
-          this.world3D.buildCharacter(mode === 'roblox' ? 'roblox' : 'spiderman');
-          this.world3D.buildCityEnvironment();
-          this.world3D.resetCharacterPosition();
-
-          // Sapaan Ceria Singkat di Awal Permainan
-          const bannerText = document.getElementById('explore-banner-text');
-          if (mode === 'spiderman') {
-            bannerText.innerText = "Ayo main bebas! Tekan JARING untuk panjat gedung!";
-            sounds.speak("Ayo main bebas! Tekan tombol jaring untuk memanjat gedung!");
-          } else if (mode === 'roblox') {
-            bannerText.innerText = "Ayo main bebas! Tekan LOMPAT untuk lewati balok!";
-            sounds.speak("Ayo main bebas! Tekan tombol lompat untuk melewati rintangan!");
-          } else {
-            bannerText.innerText = "Ayo temukan bintang rahasia di menara suci!";
-            sounds.speak("Ayo jalan-jalan dan temukan bintang rahasia!");
-          }
+        saveProgress() {
+          try {
+            const data = {
+              starScore: this.starScore,
+              checkpointIndex: this.currentCheckpointIndex,
+              timestamp: Date.now()
+            };
+            localStorage.setItem('alphabet_racing_progress', JSON.stringify(data));
+          } catch (e) {}
         }
 
-        hideQuestionCard() {
-          this.isQuestionActive = false;
-          this.canAnswer = false;
-          document.getElementById('challenge-overlay-card')?.classList.add('hidden');
-          document.getElementById('explore-banner')?.classList.remove('hidden');
+        showMainMenu() {
+          this.gameState = 'MENU';
+          document.getElementById('main-menu-screen')?.classList.remove('hidden');
+          document.getElementById('question-card-overlay')?.classList.add('hidden');
+          document.getElementById('victory-screen')?.classList.add('hidden');
         }
 
-        // ================= KUIS HANYA MUNCUL KETIKA TIBA DI TARGET/PUNCAK ================= //
-        triggerQuestionAtTarget() {
-          this.isQuestionActive = true;
+        startGame() {
+          document.getElementById('main-menu-screen')?.classList.add('hidden');
+          document.getElementById('victory-screen')?.classList.add('hidden');
+
+          this.currentCheckpointIndex = 0;
+          this.resumeRace();
+        }
+
+        restartGame() {
+          this.currentCheckpointIndex = 0;
+          this.starScore = 0;
+          document.getElementById('star-score-label').innerText = this.starScore;
+          document.getElementById('victory-screen')?.classList.add('hidden');
+          this.resumeRace();
+        }
+
+        // ================= RESUME RACE (DRIVING MODE) ================= //
+        resumeRace() {
+          this.gameState = 'DRIVING';
+          document.getElementById('question-card-overlay')?.classList.add('hidden');
+
+          const cpData = ALPHABET_CHECKPOINTS[this.currentCheckpointIndex];
+          document.getElementById('checkpoint-label').innerText = `Gerbang ${cpData.letter} (${this.currentCheckpointIndex + 1}/26)`;
+
+          // Munculkan Gerbang Alfabet Checkpoint di Depan Lintasan
+          this.track.spawnGate(cpData.letter);
+        }
+
+        // ================= KETIKA MOBIL TIBA DI CHECKPOINT ================= //
+        handleCarArrivedAtCheckpoint() {
+          // Cegah eksekusi ganda jika sudah dalam kuis
+          if (this.gameState !== 'DRIVING') return;
+
+          this.gameState = 'CHECKPOINT';
+          this.showQuestionForCurrentCheckpoint();
+        }
+
+        // ================= ATURAN PALING PENTING: SATU SOAL PER CHECKPOINT ================= //
+        showQuestionForCurrentCheckpoint() {
+          this.gameState = 'QUESTION_ACTIVE';
           this.canAnswer = true;
 
-          document.getElementById('explore-banner')?.classList.add('hidden');
-          const card = document.getElementById('challenge-overlay-card');
-          card.classList.remove('hidden');
+          const cpData = ALPHABET_CHECKPOINTS[this.currentCheckpointIndex];
+          this.currentQuestionData = cpData;
 
-          const list = this.getCurrentList();
-          const mission = list[this.currentMissionIndex % list.length];
-          const isHijaiyah = (this.activeMode === 'hijaiyah');
+          // Buat 3 Pilihan Huruf (1 Benar, 2 Pengecoh)
+          let choices = [cpData.letter];
+          let otherLetters = ALPHABET_CHECKPOINTS.map(x => x.letter).filter(l => l !== cpData.letter);
+          otherLetters.sort(() => Math.random() - 0.5);
+          choices.push(otherLetters[0], otherLetters[1]);
+          choices.sort(() => Math.random() - 0.5); // Acak posisi tombol
 
-          let choices = [mission];
-          let others = list.filter(m => (isHijaiyah ? m.id !== mission.id : m.letter !== mission.letter));
-          others.sort(() => Math.random() - 0.5);
-          choices.push(others[0], others[1]);
-          choices.sort(() => Math.random() - 0.5);
+          // Update Teks Tampilan Pertanyaan
+          const promptText = cpData.prompt;
+          document.getElementById('question-prompt-text').innerText = promptText;
 
-          const promptEl = document.getElementById('challenge-prompt-text');
-          promptEl.innerText = mission.desc;
-          sounds.speak(mission.desc);
-
+          // Render 3 Tombol Huruf Besar
           const container = document.getElementById('choices-container');
           container.innerHTML = '';
 
-          choices.forEach(ch => {
+          choices.forEach(letter => {
             const btn = document.createElement('button');
-            btn.className = 'bubble-choice-btn';
+            btn.className = 'choice-card-btn';
+            btn.setAttribute('data-letter', letter);
 
-            if (isHijaiyah) {
-              btn.innerHTML = `
-                <span class="choice-main-char arabic">${ch.arabic}</span>
-                <span class="choice-sub-text">${ch.name}</span>
-              `;
-            } else {
-              btn.innerHTML = `
-                <span class="choice-main-char">${ch.letter}</span>
-                <span class="choice-sub-text">${ch.word}</span>
-              `;
-            }
+            // Cari kata pendukung untuk huruf tersebut
+            const matchedInfo = ALPHABET_CHECKPOINTS.find(x => x.letter === letter);
+
+            btn.innerHTML = `
+              <span class="choice-char">${letter}</span>
+              <span class="choice-word-hint">${matchedInfo ? matchedInfo.word : ''}</span>
+            `;
 
             btn.addEventListener('click', () => {
               if (!this.canAnswer) return;
-              this.handleChoiceAnswer(ch, mission, btn);
+              this.checkAnswer(letter, cpData.letter, btn);
             });
 
             container.appendChild(btn);
           });
+
+          // Tampilkan Overlay Kuis
+          document.getElementById('question-card-overlay')?.classList.remove('hidden');
+
+          // Putar Suara Pertanyaan Secara Otomatis
+          audio.speakQuestion(promptText);
         }
 
-        getCurrentList() {
-          if (this.activeMode === 'roblox') return ROBLOX_OBBY_MISSIONS;
-          if (this.activeMode === 'hijaiyah') return HIJAIYAH_MISSIONS;
-          return SPIDER_MISSIONS;
-        }
+        // ================= VALIDASI JAWABAN KETAT ================= //
+        checkAnswer(selectedLetter, correctLetter, btnElement) {
+          audio.playTapSound();
 
-        handleChoiceAnswer(selected, target, btnElem) {
-          sounds.playTap();
-          const isCorrect = (this.activeMode === 'hijaiyah') ? (selected.id === target.id) : (selected.letter === target.letter);
+          if (selectedLetter === correctLetter) {
+            // JAWABAN BENAR!
+            this.canAnswer = false; // Kunci input agar tidak klik ganda
+            this.gameState = 'CORRECT_ANSWER';
 
-          if (isCorrect) {
-            this.canAnswer = false;
-            this.addScore();
-            btnElem.style.borderColor = '#10b981';
-            btnElem.style.background = '#dcfce7';
+            this.starScore += 1;
+            this.saveProgress();
+            document.getElementById('star-score-label').innerText = this.starScore;
 
-            this.hideQuestionCard();
-            this.showCelebrationPopup();
+            btnElement.classList.add('card-correct-pop');
+
+            // Buka Gerbang Balap
+            this.gameState = 'GATE_OPEN';
+            this.track.openGate();
+
+            // Ucapkan Pujian Ceria & Lanjutkan Mobil Otomatis
+            audio.speakCorrect(() => {
+              setTimeout(() => {
+                this.handleCheckpointResolved();
+              }, 400);
+            });
 
           } else {
-            sounds.playSoftTryAgain();
-            btnElem.style.transform = 'scale(0.88)';
-            setTimeout(() => btnElem.style.transform = 'scale(1)', 200);
-            sounds.speak("Yuk coba lagi! Cari huruf yang sesuai instruksi ya adik hebat!");
+            // JAWABAN SALAH:
+            // ATURAN MUTLAK:
+            // - Jangan ganti soal!
+            // - Jangan membuka gerbang!
+            // - Mobil tetap berhenti!
+            audio.playSoftTryAgain();
+            btnElement.classList.add('card-shake-soft');
+            setTimeout(() => btnElement.classList.remove('card-shake-soft'), 500);
+
+            audio.speakTryAgain();
           }
         }
 
-        showCelebrationPopup() {
-          sounds.playVictory();
-          const popup = document.getElementById('celebration-popup');
-          const detail = document.getElementById('celebration-detail');
-
-          if (this.activeMode === 'spiderman') {
-            detail.innerText = "Yeeay! Spider-Hero berhasil memanjat puncak dan mendapatkan bintang emas!";
-            sounds.speak("Horeee! Jawabanmu benar dan kamu mendapatkan bintang emas! Hebat sekali!");
-          } else if (this.activeMode === 'roblox') {
-            detail.innerText = "Keren sekali! Karakter Obby kamu berhasil parkour di platform balok huruf!";
-            sounds.speak("Luar biasa! Kamu berhasil melewati rintangan Obby dan mendapatkan bintang!");
+        // ================= CHECKPOINT SELESAI, LANJUTKAN BALAPAN ================= //
+        handleCheckpointResolved() {
+          // Tandai checkpoint saat ini selesai
+          if (this.currentCheckpointIndex + 1 < ALPHABET_CHECKPOINTS.length) {
+            this.currentCheckpointIndex++;
+            this.resumeRace(); // Mobil kembali melaju otomatis ke huruf berikutnya!
           } else {
-            detail.innerText = "Alhamdulillah! Bintang huruf Hijaiyah berhasil kamu temukan!";
-            sounds.speak("Alhamdulillah! Jawabanmu benar dan kamu dapat bintang baru!");
+            // Berhasil Menyelesaikan Seluruh 26 Huruf A-Z!
+            this.finishGame();
           }
-
-          popup.classList.remove('hidden');
         }
 
-        nextPlayRound() {
-          this.currentMissionIndex++;
-          this.hideQuestionCard();
-          this.world3D.resetCharacterPosition();
+        finishGame() {
+          this.gameState = 'FINISH';
+          document.getElementById('question-card-overlay')?.classList.add('hidden');
+          const victoryScreen = document.getElementById('victory-screen');
+          victoryScreen.classList.remove('hidden');
+
+          audio.playGateOpenSound();
+          audio.speakQuestion("Horeee! Selamat! Kamu berhasil menyelesaikan semua gerbang alfabet A sampai Z! Kamu adalah juara balap sejati!");
+        }
+
+        // ================= LOOP GAME ANIMASI ================= //
+        gameLoop() {
+          const isDriving = (this.gameState === 'DRIVING' || this.gameState === 'GATE_OPEN');
+          const hitCheckpoint = this.track.updateDriving(isDriving);
+
+          if (hitCheckpoint && this.gameState === 'DRIVING') {
+            this.handleCarArrivedAtCheckpoint();
+          }
+
+          this.track.draw();
+          requestAnimationFrame(this.gameLoop);
         }
       }
 
+      // Jalankan Game saat DOM Siap
       window.addEventListener('DOMContentLoaded', () => {
-        window.heroGame = new SuperheroGameApp();
+        window.racingGame = new AlphabetRacingGame();
       });
 
     })();
