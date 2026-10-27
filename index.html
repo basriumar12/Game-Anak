@@ -20,7 +20,7 @@
 
   <style>
     /* ==========================================================================
-       PETUALANGAN SI KECIL (HIGH-FPS 60-120Hz SMOOTH + PWA READY)
+       PETUALANGAN SI KECIL (HIGH-FPS 60-120Hz SMOOTH + PWA + AUDIO BAHASA INDONESIA)
        ========================================================================== */
     * {
       box-sizing: border-box;
@@ -421,7 +421,6 @@
         <button id="btn-back-home" class="hud-circle-btn btn-home" aria-label="Menu Utama" title="Menu Utama">🏠</button>
         <button id="btn-repeat-voice" class="hud-circle-btn btn-speaker" aria-label="Ulangi Suara" title="Ulangi Suara">🔊</button>
         <button id="btn-toggle-fullscreen" class="hud-circle-btn btn-fullscreen" aria-label="Layar Penuh" title="Layar Penuh HP">⛶</button>
-        <!-- Tombol Pasang PWA (Install App di Layar Utama HP) -->
         <button id="btn-install-pwa" class="hud-circle-btn btn-pwa-install hidden" aria-label="Install Aplikasi" title="Pasang di HP">
           <span>📲</span>
           <span>Pasang</span>
@@ -496,7 +495,7 @@
   </div>
 
   <!-- ==========================================================================
-       ENGINE LOGIKA: DELTA TIME FISIKA HALUS (60-120Hz) + PWA SERVICE WORKER
+       ENGINE LOGIKA: DELTA TIME FISIKA HALUS (60-120Hz) + PWA + AUDIO BAHASA INDONESIA
        ========================================================================== -->
   <script>
     (function() {
@@ -560,7 +559,7 @@
       };
 
       // ----------------------------------------------------------------------
-      // 3. AUDIO SYNTHESIZER
+      // 3. AUDIO SYNTHESIZER — DIPAKSA SELALU BAHASA INDONESIA (id-ID)
       // ----------------------------------------------------------------------
       class SoundEngine {
         constructor() {
@@ -573,13 +572,26 @@
 
         initVoice() {
           if (!this.synth) return;
-          const setV = () => {
-            const voices = this.synth.getVoices() || [];
-            this.idVoice = voices.find(v => v.lang && (v.lang.includes('id') || v.lang.includes('ID'))) || null;
+          const selectVoice = () => {
+            try {
+              const voices = this.synth.getVoices() || [];
+              // Prioritas 1: Voice dengan kode persis id-ID atau id_ID
+              let matched = voices.find(v => v.lang === 'id-ID' || v.lang === 'id_ID');
+              // Prioritas 2: Voice yang mengandung kata 'id' atau 'indonesia'
+              if (!matched) {
+                matched = voices.find(v => (v.lang && v.lang.toLowerCase().startsWith('id')) || (v.name && v.name.toLowerCase().includes('indonesia')));
+              }
+              // Prioritas 3: Voice Melayu/Regional yang aksennya mirip jika ponsel tidak punya voice ID
+              if (!matched) {
+                matched = voices.find(v => v.lang && (v.lang.toLowerCase().startsWith('ms') || v.lang.toLowerCase().includes('malay')));
+              }
+              this.idVoice = matched || null;
+            } catch (e) {}
           };
-          setV();
+
+          selectVoice();
           if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = setV;
+            window.speechSynthesis.onvoiceschanged = selectVoice;
           }
         }
 
@@ -591,8 +603,11 @@
           try { this.synth.cancel(); } catch(e) {}
           try {
             const u = new SpeechSynthesisUtterance(text);
-            if (this.idVoice) u.voice = this.idVoice;
+            // KUNCI MUTLAK: Selalu set lang ke 'id-ID'
             u.lang = 'id-ID';
+            if (this.idVoice) {
+              u.voice = this.idVoice;
+            }
             u.rate = 0.88;
             u.pitch = 1.25;
             u.onend = () => { if (onEnd) onEnd(); };
@@ -669,8 +684,8 @@
               gain.gain.exponentialRampToValueAtTime(0.001, st + 0.35);
               osc.connect(gain);
               gain.connect(c.destination);
-              osc.start(st);
-              osc.stop(st + 0.35);
+              osc.start(t);
+              osc.stop(t + 0.35);
             });
           } catch(e) {}
         }
@@ -718,7 +733,7 @@
             height: 56,
             vx: 0,
             vy: 0,
-            baseSpeed: 320, // Pixel per detik (frame-rate independent)
+            baseSpeed: 320,
             jumpSpeed: 580,
             gravity: 1200,
             isGrounded: false,
@@ -787,13 +802,11 @@
           };
         }
 
-        // Pembaruan Fisika Menggunakan Delta Time (Mulus di 60fps & 120fps HP)
         updatePhysics(dt, isPaused) {
           if (isPaused) return;
 
           const h = this.hero;
 
-          // 1. Gerakan Horizontal Mulus
           let targetVx = 0;
           if (this.keys.left) {
             targetVx = -h.baseSpeed;
@@ -805,11 +818,9 @@
             h.walkCycle += dt * 10;
           }
 
-          // Interpolasi kecepatan halus (lerp)
           h.vx += (targetVx - h.vx) * Math.min(1, dt * 14);
           h.x += h.vx * dt;
 
-          // 2. Gravitasi & Lompat
           h.vy += h.gravity * dt;
           h.y += h.vy * dt;
 
@@ -819,7 +830,6 @@
             audio.playJump();
           }
 
-          // 3. Tabrakan Platform
           h.isGrounded = false;
           for (let p of this.platforms) {
             if (
@@ -835,14 +845,12 @@
             }
           }
 
-          // Jika Jatuh ke Jurang -> Kembalikan ke tempat aman
           if (h.y > this.height + 40) {
             h.x = Math.max(80, h.x - 260);
             h.y = this.height * 0.5;
             h.vy = 0;
           }
 
-          // Tabrakan Gerbang Terkunci
           for (let gate of this.gates) {
             if (!gate.isOpen) {
               if (h.x + h.width >= gate.x && h.x <= gate.x + gate.w && h.y + h.height > gate.y) {
@@ -853,7 +861,6 @@
             }
           }
 
-          // Koin
           for (let c of this.coins) {
             if (!c.collected && Math.hypot((h.x + 22) - c.x, (h.y + 28) - c.y) < 38) {
               c.collected = true;
@@ -862,7 +869,6 @@
             }
           }
 
-          // Kristal
           if (this.crystalTarget && !this.crystalTarget.collected) {
             const ct = this.crystalTarget;
             if (Math.hypot((h.x + 22) - (ct.x + 20), (h.y + 28) - (ct.y + 20)) < 45) {
@@ -872,7 +878,6 @@
             }
           }
 
-          // 4. Kamera Mengikuti Karakter Secara Sangat Halus (Smooth Dampening)
           const targetCamX = h.x - this.width * 0.32;
           this.cameraX += (targetCamX - this.cameraX) * Math.min(1, dt * 6);
           this.cameraX = Math.max(0, Math.min(this.worldWidth - this.width, this.cameraX));
@@ -885,11 +890,9 @@
 
           ctx.clearRect(0, 0, w, h);
 
-          // Langit Biru Kartun Ceria
           ctx.fillStyle = '#38bdf8';
           ctx.fillRect(0, 0, w, h);
 
-          // Matahari Ceria
           ctx.fillStyle = '#fef08a';
           ctx.beginPath();
           ctx.arc(w * 0.85, h * 0.22, 42, 0, Math.PI * 2);
@@ -898,7 +901,6 @@
           ctx.save();
           ctx.translate(-Math.round(this.cameraX), 0);
 
-          // Platform Tanah Hijau Ramah Balita
           for (let p of this.platforms) {
             ctx.fillStyle = '#22c55e';
             ctx.beginPath();
@@ -909,7 +911,6 @@
             ctx.fillRect(p.x, p.y + 20, p.w, p.h - 20);
           }
 
-          // Koin Emas
           for (let c of this.coins) {
             if (!c.collected) {
               ctx.fillStyle = '#facc15';
@@ -922,7 +923,6 @@
             }
           }
 
-          // Gerbang Ajaib
           for (let gate of this.gates) {
             ctx.fillStyle = gate.isOpen ? '#22c55e' : '#f59e0b';
             ctx.fillRect(gate.x, gate.y, gate.w, gate.h);
@@ -936,7 +936,6 @@
             ctx.fillText(gate.isOpen ? '🔓' : '🔒', gate.x + 22, gate.y + 70);
           }
 
-          // Kristal Berlian
           if (this.crystalTarget && !this.crystalTarget.collected) {
             const ct = this.crystalTarget;
             ctx.save();
@@ -956,7 +955,6 @@
             ctx.restore();
           }
 
-          // Karakter Anak Lucu
           this.drawHero(ctx);
 
           ctx.restore();
@@ -970,32 +968,27 @@
 
           const bobbing = Math.abs(h.vx) > 10 ? Math.sin(h.walkCycle) * 3 : 0;
 
-          // Bayangan Kaki
           ctx.fillStyle = 'rgba(0,0,0,0.25)';
           ctx.beginPath();
           ctx.ellipse(0, 26, 18, 6, 0, 0, Math.PI * 2);
           ctx.fill();
 
-          // Baju Biru
           ctx.fillStyle = '#0284c7';
           ctx.beginPath();
           ctx.roundRect(-16, -12 + bobbing, 32, 30, 8);
           ctx.fill();
 
-          // Kepala
           ctx.fillStyle = '#fed7aa';
           ctx.beginPath();
           ctx.arc(0, -22 + bobbing, 14, 0, Math.PI * 2);
           ctx.fill();
 
-          // Topi Merah Petualang
           ctx.fillStyle = '#ef4444';
           ctx.beginPath();
           ctx.arc(0, -28 + bobbing, 14, Math.PI, 0);
           ctx.fill();
           ctx.fillRect(-18, -28 + bobbing, 36, 4);
 
-          // Mata
           ctx.fillStyle = '#0f172a';
           ctx.beginPath();
           ctx.arc(5, -23 + bobbing, 2.8, 0, Math.PI * 2);
@@ -1045,14 +1038,12 @@
         }
 
         bindControls() {
-          // Tombol Mulai
           document.getElementById('btn-start-quest')?.addEventListener('click', () => {
             document.getElementById('menu-screen').classList.add('hidden');
             this.worldEngine.loadWorld();
             audio.speak("Halo adik pintar! Ayo jalan dan kumpulkan koin emas!");
           });
 
-          // Pilihan Kategori Ramah Balita
           document.querySelectorAll('.chip-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
               document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
@@ -1061,12 +1052,10 @@
             });
           });
 
-          // Tombol Home
           document.getElementById('btn-back-home')?.addEventListener('click', () => {
             document.getElementById('menu-screen').classList.remove('hidden');
           });
 
-          // Tombol Ulangi Suara
           document.getElementById('btn-repeat-voice')?.addEventListener('click', () => {
             audio.repeat();
           });
@@ -1075,7 +1064,6 @@
             audio.repeat();
           });
 
-          // FITUR FULLSCREEN HP
           document.getElementById('btn-toggle-fullscreen')?.addEventListener('click', () => {
             if (!document.fullscreenElement) {
               document.documentElement.requestFullscreen().catch(() => {});
@@ -1084,7 +1072,6 @@
             }
           });
 
-          // KONTROL LAYAR SENTUH HP
           const setKey = (k, v) => { this.worldEngine.keys[k] = v; };
 
           const bindTouch = (id, keyName) => {
@@ -1100,7 +1087,6 @@
           bindTouch('btn-move-right', 'right');
           bindTouch('btn-jump', 'jump');
 
-          // Dukung Keyboard Laptop/PC
           window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a') setKey('left', true);
             if (e.key === 'ArrowRight' || e.key === 'd') setKey('right', true);
@@ -1112,7 +1098,6 @@
             if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') setKey('jump', false);
           });
 
-          // Tombol Main Lagi di Layar Menang
           document.getElementById('btn-next-world')?.addEventListener('click', () => {
             document.getElementById('victory-modal').classList.add('hidden');
             this.worldEngine.loadWorld();
@@ -1178,9 +1163,8 @@
           audio.speak("Horeee! Selamat adik pintar! Kamu berhasil menemukan Kristal Ajaib!");
         }
 
-        // Loop Game Halus dengan Perhitungan Delta Time (High FPS Safe)
         gameLoop(currentTime) {
-          const dt = Math.min((currentTime - this.lastTime) / 1000, 0.05); // Cap max dt 50ms untuk menghindari frame drop
+          const dt = Math.min((currentTime - this.lastTime) / 1000, 0.05);
           this.lastTime = currentTime;
 
           this.worldEngine.updatePhysics(dt, this.isPaused);
